@@ -1,0 +1,2328 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Village Defense RPG</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ======================= ЭКРАН ЗАГРУЗКИ ======================= -->
+<div id="loading-screen" class="loading-screen">
+    <div class="loader"></div>
+    <div class="loading-text">Загрузка игры...</div>
+    <div class="checking-files" id="file-check-status">Проверка файлов</div>
+    <div id="texture-loading-status" style="margin-top: 10px; color: #aaa; font-size: 14px;"></div>
+</div>
+
+<!-- ======================= ИНДИКАТОР ПАУЗЫ ======================= -->
+<div id="pause-indicator" class="pause-indicator">
+    ⏸️ ПАУЗА
+</div>
+
+<!-- ======================= ИНФОРМАЦИЯ О ПОГОДЕ ======================= -->
+<div id="weather-info" class="weather-info" style="display: none;">
+    <span class="weather-icon" id="weather-icon">🌤️</span>
+    <span id="weather-text">Ясно, 20°C</span>
+</div>
+
+<!-- ======================= ГЛАВНОЕ МЕНЮ ======================= -->
+<div id="main-menu">
+    <div class="menu-bg-overlay"></div>
+
+    <div class="menu-card">
+        <!-- ЛОГОТИП -->
+        <div class="menu-logo">
+            <div class="menu-logo-icon">🏰</div>
+            <div>
+                <div class="menu-title">Village Defense RPG</div>
+                <div class="menu-subtitle">Защитите деревню от волн врагов</div>
+            </div>
+        </div>
+
+        <!-- ВЫБОР УРОВНЯ -->
+        <div class="menu-section-label">Выбор уровня</div>
+        <div class="menu-level-picker">
+            <div class="levels-dropdown active" id="levels-dropdown" style="position:static; border:none; background:transparent; box-shadow:none; margin:0; padding:0; max-height: 220px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- КНОПКИ -->
+        <div class="menu-actions">
+            <button class="btn menu-btn-primary" onclick="startSelectedLevel()">▶ Начать игру</button>
+            <button class="btn menu-btn-secondary" onclick="showSettings()">⚙ Настройки</button>
+        </div>
+
+        <!-- ПОДСКАЗКА ПО УПРАВЛЕНИЮ -->
+        <div class="menu-hints">
+            <span><kbd>WASD</kbd> движение</span>
+            <span><kbd>Space</kbd> пауза</span>
+            <span><kbd>U</kbd> улучшить</span>
+            <span><kbd>H</kbd> лечение</span>
+            <span><kbd>K</kbd> навыки</span>
+            <span><kbd>Tab</kbd> трек</span>
+            <span><kbd>Esc</kbd> настройки</span>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= МЕНЮ НАСТРОЕК ======================= -->
+<div id="settings-menu">
+    <div class="settings-layout">
+
+        <!-- ── БОКОВАЯ ПАНЕЛЬ ── -->
+        <aside class="settings-sidebar">
+            <div class="settings-logo">
+                <span class="settings-logo-icon">⚙</span>
+                <span>Настройки</span>
+            </div>
+
+            <nav class="settings-tabs">
+                <button class="stab active" data-panel="panel-graphics" onclick="switchSettingsTab(this)">
+                    <span class="stab-icon">🎮</span><span>Графика</span>
+                </button>
+                <button class="stab" data-panel="panel-music" onclick="switchSettingsTab(this)">
+                    <span class="stab-icon">🎵</span><span>Музыка</span>
+                </button>
+                <button class="stab" data-panel="panel-extra" onclick="switchSettingsTab(this)">
+                    <span class="stab-icon">🔧</span><span>Прочее</span>
+                </button>
+                <button class="stab" data-panel="panel-controls" onclick="switchSettingsTab(this)">
+                    <span class="stab-icon">⌨</span><span>Управление</span>
+                </button>
+                <button class="stab" data-panel="panel-about" onclick="switchSettingsTab(this)">
+                    <span class="stab-icon">ℹ</span><span>О игре</span>
+                </button>
+            </nav>
+
+            <div class="settings-sidebar-actions">
+                <button class="btn s-btn-apply"  onclick="applyGraphicsSettings()">✔ Применить</button>
+                <button class="btn s-btn-save"   onclick="saveSettings()">💾 Сохранить</button>
+                <button class="btn s-btn-close"  onclick="hideSettings()">✕ Закрыть</button>
+            </div>
+        </aside>
+
+        <!-- ── КОНТЕНТ ── -->
+        <main class="settings-content">
+
+            <!-- ГРАФИКА -->
+            <div class="settings-panel active" id="panel-graphics">
+                <div class="spanel-title">Качество графики</div>
+                <div class="graphics-options">
+                    <div class="graphics-preset active" onclick="setGraphicsPreset('verylow')">
+                        <div class="graphics-label">
+                            <div class="graphics-icon">🔵</div>
+                            <div>
+                                <div>Очень низкая</div>
+                                <div class="graphics-desc">Без эффектов, максимальная производительность</div>
+                            </div>
+                        </div>
+                        <div class="gfx-fps good">60+ FPS</div>
+                    </div>
+                    <div class="graphics-preset" onclick="setGraphicsPreset('low')">
+                        <div class="graphics-label">
+                            <div class="graphics-icon">🟢</div>
+                            <div>
+                                <div>Низкая</div>
+                                <div class="graphics-desc">Базовые эффекты, средняя детализация</div>
+                            </div>
+                        </div>
+                        <div class="gfx-fps good">45+ FPS</div>
+                    </div>
+                    <div class="graphics-preset" onclick="setGraphicsPreset('medium')">
+                        <div class="graphics-label">
+                            <div class="graphics-icon">🟡</div>
+                            <div>
+                                <div>Средняя</div>
+                                <div class="graphics-desc">Улучшенные эффекты, хорошая детализация</div>
+                            </div>
+                        </div>
+                        <div class="gfx-fps warn">30+ FPS</div>
+                    </div>
+                    <div class="graphics-preset" onclick="setGraphicsPreset('high')">
+                        <div class="graphics-label">
+                            <div class="graphics-icon">🟠</div>
+                            <div>
+                                <div>Высокая</div>
+                                <div class="graphics-desc">Расширенные эффекты, высокая детализация</div>
+                            </div>
+                        </div>
+                        <div class="gfx-fps warn">20+ FPS</div>
+                    </div>
+                    <div class="graphics-preset" onclick="setGraphicsPreset('ultra')">
+                        <div class="graphics-label">
+                            <div class="graphics-icon">🔴</div>
+                            <div>
+                                <div>Ультра</div>
+                                <div class="graphics-desc">Максимальные эффекты, кинематографическое качество</div>
+                            </div>
+                        </div>
+                        <div class="gfx-fps bad">Мощный ПК</div>
+                    </div>
+                </div>
+
+                <div class="spanel-title" style="margin-top:28px;">Разрешение рендера</div>
+                <div class="res-buttons">
+                    <button class="btn resolution-btn" onclick="setResolution(640,360)">640×360</button>
+                    <button class="btn resolution-btn active" onclick="setResolution(900,500)">900×500</button>
+                    <button class="btn resolution-btn" onclick="setResolution(1280,720)">1280×720</button>
+                    <button class="btn resolution-btn" onclick="setResolution(1920,1080)">1920×1080</button>
+                </div>
+                <div class="res-hint">Текущее: <span id="current-resolution-label">900×500</span> · Применяется вместе с графикой</div>
+
+                <div class="spanel-title" style="margin-top:28px;">Атмосферные эффекты</div>
+                <div class="weather-controls">
+                    <div class="weather-option active" onclick="toggleWeatherEffect('fog')"><span>🌫 Туман</span></div>
+                    <div class="weather-option" onclick="toggleWeatherEffect('rain')"><span>🌧 Дождь</span></div>
+                    <div class="weather-option" onclick="toggleWeatherEffect('snow')"><span>❄ Снег</span></div>
+                    <div class="weather-option" onclick="toggleWeatherEffect('wind')"><span>💨 Ветер</span></div>
+                </div>
+
+                <div class="spanel-title" style="margin-top:28px;">Освещение и время</div>
+                <div class="toggle-rows">
+                    <div class="toggle-row">
+                        <span>🌙 Цикл дня и ночи</span>
+                        <label class="switch"><input type="checkbox" id="day-night-cycle" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span>💡 Динамическое освещение</span>
+                        <label class="switch"><input type="checkbox" id="dynamic-lighting" checked><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <div class="spanel-title" style="margin-top:28px;">Интенсивность погоды</div>
+                <div class="slider-row">
+                    <span>0%</span>
+                    <input type="range" id="weather-intensity" min="0" max="100" value="50">
+                    <span class="weather-intensity">50%</span>
+                </div>
+
+                <div class="spanel-title" style="margin-top:28px;">Выбор карты</div>
+                <div class="map-options">
+                    <div class="map-option active" onclick="changeMap('forest')"><div class="map-icon">🌲</div><div class="map-name">Лес</div><div class="map-desc">Классический лес</div></div>
+                    <div class="map-option" onclick="changeMap('desert')"><div class="map-icon">🏜</div><div class="map-name">Пустыня</div><div class="map-desc">Жаркие пески</div></div>
+                    <div class="map-option" onclick="changeMap('mountains')"><div class="map-icon">⛰</div><div class="map-name">Горы</div><div class="map-desc">Скалистые вершины</div></div>
+                    <div class="map-option" onclick="changeMap('meadows')"><div class="map-icon">🌿</div><div class="map-name">Луга</div><div class="map-desc">Цветущие поля</div></div>
+                    <div class="map-option" onclick="changeMap('jungle')"><div class="map-icon">🌴</div><div class="map-name">Джунгли</div><div class="map-desc">Густые заросли</div></div>
+                    <div class="map-option" onclick="changeMap('winter')"><div class="map-icon">❄</div><div class="map-name">Зима</div><div class="map-desc">Снежные просторы</div></div>
+                    <div class="map-option" onclick="changeMap('volcano')"><div class="map-icon">🌋</div><div class="map-name">Вулкан</div><div class="map-desc">Огненные земли</div></div>
+                    <div class="map-option" onclick="changeMap('swamp')"><div class="map-icon">🐊</div><div class="map-name">Болото</div><div class="map-desc">Топи и туманы</div></div>
+                    <div class="map-option" onclick="changeMap('autumn')"><div class="map-icon">🍁</div><div class="map-name">Осень</div><div class="map-desc">Золотой лес</div></div>
+                    <div class="map-option" onclick="changeMap('steppe')"><div class="map-icon">🌾</div><div class="map-name">Степь</div><div class="map-desc">Бескрайние травы</div></div>
+                    <div class="map-option" onclick="changeMap('coastal')"><div class="map-icon">🏖</div><div class="map-name">Побережье</div><div class="map-desc">Песчаный берег</div></div>
+                    <div class="map-option" onclick="changeMap('ruins')"><div class="map-icon">🏛</div><div class="map-name">Руины</div><div class="map-desc">Древние развалины</div></div>
+                    <div class="map-option" onclick="changeMap('canyon')"><div class="map-icon">🗻</div><div class="map-name">Каньон</div><div class="map-desc">Глубокие ущелья</div></div>
+                    <div class="map-option" onclick="changeMap('lava')"><div class="map-icon">🌋</div><div class="map-name">Лава</div><div class="map-desc">Раскалённая магма</div></div>
+                    <div class="map-option" onclick="changeMap('cloud')"><div class="map-icon">☁</div><div class="map-name">Облака</div><div class="map-desc">Небесные просторы</div></div>
+                    <div class="map-option" onclick="changeMap('cherry')"><div class="map-icon">🌸</div><div class="map-name">Сакура</div><div class="map-desc">Цветущая сакура</div></div>
+                    <div class="map-option" onclick="changeMap('dark')"><div class="map-icon">🌑</div><div class="map-name">Тьма</div><div class="map-desc">Тёмное царство</div></div>
+                    <div class="map-option" onclick="changeMap('heaven')"><div class="map-icon">😇</div><div class="map-name">Рай</div><div class="map-desc">Небесные сады</div></div>
+                </div>
+            </div>
+
+            <!-- МУЗЫКА -->
+            <div class="settings-panel music-section" id="panel-music">
+                <div class="now-playing-bar">
+                    <span class="now-playing-label">▶ Сейчас:</span>
+                    <span id="now-playing" class="now-playing-track">—</span>
+                </div>
+                <div class="music-controls-top">
+                    <input type="text" id="music-search" class="music-search" placeholder="🔍 Поиск...">
+                    <div class="music-playback-btns">
+                        <button class="btn music-ctrl-btn" id="music-prev" title="Предыдущий (Shift+Tab)">⏮</button>
+                        <button class="btn music-ctrl-btn" id="music-toggle" title="Пауза / Играть (Ctrl+M)">▶ Включить</button>
+                        <button class="btn music-ctrl-btn" id="music-next" title="Следующий (Tab)">⏭</button>
+                        <button class="btn music-ctrl-btn" id="shuffle-btn" title="Перемешивание">🔀</button>
+                    </div>
+                </div>
+                <div class="music-categories" id="music-categories">
+                    <button class="music-category-btn active" data-category="all"      onclick="filterMusicByCategory('all')">Все</button>
+                    <button class="music-category-btn"        data-category="epic"     onclick="filterMusicByCategory('epic')">🔥 Эпическая</button>
+                    <button class="music-category-btn"        data-category="battle"   onclick="filterMusicByCategory('battle')">⚔ Боевая</button>
+                    <button class="music-category-btn"        data-category="ambient"  onclick="filterMusicByCategory('ambient')">🌳 Атмосферная</button>
+                    <button class="music-category-btn"        data-category="fantasy"  onclick="filterMusicByCategory('fantasy')">🧝 Фэнтези</button>
+                    <button class="music-category-btn"        data-category="medieval" onclick="filterMusicByCategory('medieval')">🏰 Средневековая</button>
+                    <button class="music-category-btn"        data-category="calm"     onclick="filterMusicByCategory('calm')">🏡 Спокойная</button>
+                </div>
+                <div class="music-tracks-container">
+                    <div class="music-tracks-grid" id="music-tracks-grid"></div>
+                </div>
+                <div class="music-controls-bottom">
+                    <div class="volume-control">
+                        <span>🔈</span>
+                        <input type="range" id="music-volume" min="0" max="100" value="50">
+                        <span>🔊</span>
+                        <span class="vol-label">(<span id="volume-value">50%</span>)</span>
+                    </div>
+                    <div class="music-hint-line">Tab / Shift+Tab — трек · Ctrl+M — вкл/выкл · Ctrl+↑↓ — громкость</div>
+                </div>
+                <div id="music-status" class="music-status-line">🔍 Проверка треков...</div>
+            </div>
+
+            <!-- ПРОЧЕЕ -->
+            <div class="settings-panel" id="panel-extra">
+                <div class="spanel-title">Скорость игры</div>
+                <div class="speed-row">
+                    <button class="btn speed-btn active" onclick="setSpeed(1)">×1</button>
+                    <button class="btn speed-btn" onclick="setSpeed(2)">×2</button>
+                    <button class="btn speed-btn" onclick="setSpeed(3)">×3</button>
+                    <button class="btn speed-btn" onclick="setSpeed(4)">×4</button>
+                    <button class="btn speed-btn" onclick="setSpeed(5)">×5</button>
+                </div>
+
+                <div class="spanel-title" style="margin-top:28px;">Интерфейс</div>
+                <div class="toggle-rows">
+                    <div class="toggle-row">
+                        <span>📊 Показывать FPS</span>
+                        <label class="switch"><input type="checkbox" id="show-fps" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span>🌤 Показывать погоду</span>
+                        <label class="switch"><input type="checkbox" id="show-weather-info" checked><span class="slider"></span></label>
+                    </div>
+                    <div class="toggle-row">
+                        <span>✨ Эффекты частиц</span>
+                        <label class="switch"><input type="checkbox" id="particles-enabled" checked><span class="slider"></span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- УПРАВЛЕНИЕ -->
+            <div class="settings-panel" id="panel-controls">
+                <div class="spanel-title">Клавиши управления</div>
+                <div class="controls-grid">
+                    <div class="controls-group">
+                        <div class="controls-group-title">Движение</div>
+                        <div class="control-row"><kbd>W A S D</kbd><span>Движение персонажа</span></div>
+                        <div class="control-row"><kbd>↑ ↓ ← →</kbd><span>Движение персонажа</span></div>
+                    </div>
+                    <div class="controls-group">
+                        <div class="controls-group-title">Игровые действия</div>
+                        <div class="control-row"><kbd>Space</kbd> / <kbd>P</kbd><span>Пауза / Продолжить</span></div>
+                        <div class="control-row"><kbd>Esc</kbd><span>Настройки / Закрыть</span></div>
+                        <div class="control-row"><kbd>K</kbd><span>Дерево навыков</span></div>
+                        <div class="control-row"><kbd>U</kbd><span>Улучшить ближайшее</span></div>
+                        <div class="control-row"><kbd>H</kbd><span>Лечиться</span></div>
+                        <div class="control-row"><kbd>Q</kbd><span>Продать ближайшее</span></div>
+                        <div class="control-row"><kbd>1</kbd> – <kbd>5</kbd><span>Скорость ×1 – ×5</span></div>
+                    </div>
+                    <div class="controls-group">
+                        <div class="controls-group-title">Музыка</div>
+                        <div class="control-row"><kbd>Tab</kbd><span>Следующий трек</span></div>
+                        <div class="control-row"><kbd>Shift+Tab</kbd><span>Предыдущий трек</span></div>
+                        <div class="control-row"><kbd>Ctrl+M</kbd><span>Вкл / Выкл</span></div>
+                        <div class="control-row"><kbd>Ctrl+↑↓</kbd><span>Громкость</span></div>
+                    </div>
+                    <div class="controls-group">
+                        <div class="controls-group-title">Карта</div>
+                        <div class="control-row"><kbd>F1</kbd><span>Предыдущая карта</span></div>
+                        <div class="control-row"><kbd>F2</kbd><span>Следующая карта</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- О ИГРЕ -->
+            <div class="settings-panel" id="panel-about">
+                <div class="about-hero">
+                    <div class="about-logo-icon">🏰</div>
+                    <div class="about-game-title">Outpost</div>
+                    <div class="about-version-badge">Beta · v0.3.8.4</div>
+                    <div class="about-tagline">Стратегическая защита в реальном времени</div>
+                </div>
+
+                <div class="about-desc">
+                    Это бета-версия игры. Мы активно работаем над новым контентом,
+                    балансом и исправлением ошибок. Ваши отзывы и игра помогают
+                    нам делать проект лучше с каждым обновлением.
+                </div>
+
+                <div class="about-team-card">
+                    <div class="about-team-label">Команда разработки</div>
+                    <div class="about-team-name">ASPECT</div>
+                    <div class="about-team-member">
+                        <span class="about-member-role">Разработчик</span>
+                        <span class="about-member-name">Романуша Д.С.</span>
+                    </div>
+                </div>
+
+                <div class="about-thanks">
+                    <div class="about-thanks-icon">💙</div>
+                    <div class="about-thanks-text">
+                        Спасибо, что играете в Outpost!<br>
+                        Каждый игрок делает этот проект живым.
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- ======================= МЕНЮ НАВЫКОВ ======================= -->
+<div id="skills-menu" class="skills-menu">
+    <div class="skills-container">
+        <div class="skills-title">
+            <span>🌳 Древо навыков</span>
+        </div>
+        
+        <div class="skills-header">
+            <div class="skill-points-display">
+                <span>Очки навыков:</span>
+                <span class="skill-points-value" id="skill-points-value">0</span>
+                <span class="skill-points-cost">(Использовано: 0)</span>
+            </div>
+            <div>
+                <span style="color: #4fc3f7;">Уровень: 1</span>
+                <div style="font-size: 14px; color: #aaa; margin-top: 5px;">
+                    XP: 0/100
+                </div>
+            </div>
+        </div>
+        
+        <div class="skill-tree-tabs" id="skill-tree-tabs" style="display: none;">
+            <button class="skill-tree-tab active" data-tree="economy">💰 Экономика</button>
+            <button class="skill-tree-tab" data-tree="military">⚔️ Военное дело</button>
+        </div>
+        
+        <div class="skills-trees">
+            <div class="skill-tree active" id="economy-tree">
+                <div class="skill-tree-title">
+                    <span>💰 Экономика</span>
+                    <span class="skill-tree-badge">Ур. 0/18</span>
+                </div>
+                <div class="skill-tree-description">
+                    Улучшайте экономические показатели: увеличивайте доходы, снижайте затраты и оптимизируйте производство
+                </div>
+                <div class="skill-nodes" id="economy-skill-nodes">
+                    <!-- Навыки будут добавлены через JavaScript -->
+                </div>
+            </div>
+            
+            <div class="skill-tree" id="military-tree">
+                <div class="skill-tree-title">
+                    <span>⚔️ Военное дело</span>
+                    <span class="skill-tree-badge">Ур. 0/21</span>
+                </div>
+                <div class="skill-tree-description">
+                    Улучшайте боевые характеристики: увеличивайте урон, здоровье и эффективность в бою
+                </div>
+                <div class="skill-nodes" id="military-skill-nodes">
+                    <!-- Навыки будут добавлены через JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="bonus-stats" id="bonus-stats">
+            <!-- Статистика бонусов будет добавлена через JavaScript -->
+        </div>
+        
+        <div class="skill-buttons">
+            <button class="btn btn-danger" onclick="skillSystem.resetSkills()">
+                🔄 Сбросить навыки (500💰)
+            </button>
+            <button class="btn" onclick="hideSkillsMenu()">
+                ❌ Закрыть
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= ИГРОВОЙ КОНТЕЙНЕР ======================= -->
+<div id="game-container">
+    <canvas id="game"></canvas>
+    
+    <div class="fps-counter" id="fps-counter" style="display: none;">FPS: 60</div>
+    
+    <!-- ЭКРАН ПОБЕДЫ/ПОРАЖЕНИЯ -->
+    <div id="end-screen-buttons" class="end-screen-overlay" style="display: none;">
+        <div class="end-card" id="end-card">
+            <div class="end-card-glow" id="end-card-glow"></div>
+            <div class="end-icon" id="end-icon"></div>
+            <div class="end-title" id="end-title"></div>
+            <div class="end-subtitle" id="end-subtitle"></div>
+            <div class="end-stats" id="end-stats"></div>
+            <div class="end-actions">
+                <button class="end-btn end-btn-restart" onclick="restartGame()">🔄 Рестарт</button>
+                <button class="end-btn end-btn-menu" onclick="returnToMenu()">🏠 В меню</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="ui-overlay">
+        <div id="game-state"></div>
+
+        <!-- ── ВЕР ХНЯ Я ПАНЕЛЬ ── -->
+        <div class="hud-top">
+            <div class="hud-title">🏰 Village Defense RPG — <span id="level-title">Уровень 1</span></div>
+            <div class="hud-resources">
+                <div class="hud-res">💰 <span id="coins">100</span></div>
+                <div class="hud-res">🌲 <span id="wood">0</span></div>
+                <div class="hud-res">⛏ <span id="stone">0</span></div>
+                <div class="hud-res">🔥 <span id="iron">0</span></div>
+                <div class="hud-res hud-res-hp">❤️ <span id="hp">100</span>/100</div>
+            </div>
+            <div class="hud-badges">
+                <div class="hud-badge">👑 <span id="bosses">0/3</span></div>
+                <div class="hud-badge">🌊 <span id="wave-count">1</span></div>
+                <div class="hud-badge">⚔️ <span id="current-level">1</span></div>
+                <div class="hud-badge hud-badge-xp">🌳 <span id="player-level">1</span></div>
+                <span id="graphics-level" style="display:none">Средняя</span>
+            </div>
+        </div>
+
+        <!-- ── ЛЕВАЯ ПАНЕЛЬ ── -->
+        <div class="hud-left">
+            <div class="wave-card">
+                <div class="wave-card-header">
+                    <span class="wave-card-icon">🌊</span>
+                    <span class="wave-card-title">Волна <span id="wave-number">1</span></span>
+                </div>
+                <div class="wave-card-diff">Сложность: <span id="wave-difficulty">+0%</span></div>
+                <div class="wave-progress"><div class="wave-progress-bar" id="wave-progress-bar"></div></div>
+                <div class="wave-card-timer">⏱ <span id="next-boss">30 сек</span></div>
+            </div>
+            <button class="hud-left-btn" onclick="toggleFullscreen()">⛶ Полный экран</button>
+        </div>
+
+        <!-- ── ПРАВАЯ ПАНЕЛЬ ── -->
+        <div class="hud-right">
+            <button class="hud-right-btn hud-right-skills" onclick="showSkillsMenu()" title="Навыки (K)">
+                <span class="hrb-icon">🌳</span><span class="hrb-label">Навыки</span>
+            </button>
+            <button class="hud-right-btn" onclick="showSettings()" title="Настройки">
+                <span class="hrb-icon">⚙️</span><span class="hrb-label">Настройки</span>
+            </button>
+            <button class="hud-right-btn hud-right-danger" onclick="returnToMenu()" title="В меню">
+                <span class="hrb-icon">🏠</span><span class="hrb-label">Меню</span>
+            </button>
+        </div>
+
+        <!-- ── НИЖНЯЯ ПАНЕЛЬ ── -->
+        <div class="hud-bottom">
+            <!-- Ряд зданий -->
+            <div class="hud-build-row">
+                <div class="hud-category">
+                    <span class="hud-cat-label">💰</span>
+                    <button class="hbtn" onclick="build('sawmill')"><span class="hbtn-icon">🌲</span><span class="hbtn-name">Лесопилка</span></button>
+                    <button class="hbtn" onclick="build('quarry')"><span class="hbtn-icon">⛏</span><span class="hbtn-name">Каменоломня</span></button>
+                    <button class="hbtn" onclick="build('bank')"><span class="hbtn-icon">🏦</span><span class="hbtn-name">Банк</span></button>
+                    <button class="hbtn" onclick="build('smeltery')"><span class="hbtn-icon">🔥</span><span class="hbtn-name">Плавильня</span></button>
+                    <button class="hbtn" onclick="build('deep_quarry')" title="Требует каменоломню 3 ур."><span class="hbtn-icon">🏭</span><span class="hbtn-name">Карьер</span></button>
+                </div>
+                <div class="hud-divider"></div>
+                <div class="hud-category">
+                    <span class="hud-cat-label">🛡</span>
+                    <button class="hbtn" onclick="build('tower')"><span class="hbtn-icon">🏹</span><span class="hbtn-name">Башня</span></button>
+                    <button class="hbtn" onclick="build('cannon')"><span class="hbtn-icon">🗡</span><span class="hbtn-name">Пушка</span></button>
+                    <button class="hbtn" onclick="build('blacksmith')" title="Увеличивает урон зданий"><span class="hbtn-icon">🔨</span><span class="hbtn-name">Кузница</span></button>
+                    <button class="hbtn" onclick="build('torture_chamber')" title="Замедляет врагов"><span class="hbtn-icon">⛓</span><span class="hbtn-name">Камера</span></button>
+                </div>
+                <div class="hud-divider"></div>
+                <div class="hud-category">
+                    <span class="hud-cat-label">🔧</span>
+                    <button class="hbtn" onclick="build('workshop')"><span class="hbtn-icon">🔧</span><span class="hbtn-name">Мастерская</span></button>
+                </div>
+            </div>
+            <!-- Ряд действий -->
+            <div class="hud-action-row">
+                <button class="hact-btn" onclick="upgradeNearest()" title="U — Улучшить ближайшее">⬆ Улучшить</button>
+                <button class="hact-btn" onclick="sellNearest()" title="Q — Продать ближайшее">💸 Продать</button>
+                <button class="hact-btn hact-heal" onclick="healPlayer()" title="H — Лечиться">❤️ Лечиться</button>
+                <div class="hud-divider"></div>
+                <div class="hud-speed-group">
+                    <button class="speed-btn active" onclick="setSpeed(1)">×1</button>
+                    <button class="speed-btn" onclick="setSpeed(2)">×2</button>
+                    <button class="speed-btn" onclick="setSpeed(3)">×3</button>
+                    <button class="speed-btn" onclick="setSpeed(4)">×4</button>
+                    <button class="speed-btn" onclick="setSpeed(5)">×5</button>
+                </div>
+                <button class="pause-btn" onclick="togglePause()" id="pause-btn">⏸ Пауза</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= ВНЕШНИЕ СКРИПТЫ ======================= -->
+<script src="js/graphics-system.js"></script>
+<script src="js/music-system.js"></script>
+<script src="js/skills-system.js"></script>
+<script src="js/hotkeys-system.js"></script>
+<script src="js/levels-system.js"></script>
+
+<!-- ======================= ОСНОВНОЙ СКРИПТ ИГРЫ ======================= -->
+<script>
+// ======================= ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =======================
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d', { alpha: false });
+
+// Фиксированный размер игры (может меняться через setResolution)
+const GAME_WIDTH = 900;
+const GAME_HEIGHT = 500;
+
+let currentResolution = { w: GAME_WIDTH, h: GAME_HEIGHT };
+
+canvas.width = GAME_WIDTH;
+canvas.height = GAME_HEIGHT;
+
+let graphicsSystem;
+let gamePaused = false;
+let animationFrameId = null;
+let gameLoopLastTime = 0;
+
+// Игровые переменные
+let time = 0, keys = {}, enemies = [], buildings = [], arrows = [], cannonBalls = [];
+let coins = 100, wood = 0, stone = 0, iron = 0;
+let bossCount = 0, bossKilled = 0;
+let waveEnd = 0, speed = 1, gameOver = false, victory = false;
+let waveNumber = 1;
+let waveDifficulty = 0;
+let nextBossTime = 0;
+let gameTime = 0;
+let fullscreen = false;
+let showFPS = true;
+let fps = 60;
+let lastFrameTime = 0;
+let frameCount = 0;
+
+let waveInProgress = false;
+let waveJustStarted = false;
+let waveStartTime = 0;
+
+const player = { 
+    x: GAME_WIDTH/2, 
+    y: GAME_HEIGHT/2, 
+    hp: 100, 
+    maxHp: 100, 
+    dir: { x: 1, y: 0 },
+    size: 12,
+    direction: 'front'
+};
+
+// ======================= БАЛАНС И УРОВНИ =======================
+const balance = {
+    waveDifficultyIncrease: {
+        enemyHp: 10,
+        enemySpeed: 4,
+        enemyDamage: 6,
+        spawnRate: 5,
+        bossHp: 20,
+        waveIntervalReduction: 0.9
+    },
+    
+    baseEnemies: {
+        wolf: { hp: 15, speed: 1.2, damage: 0.12, reward: 10, spawnWeight: 40 },
+        robber: { hp: 35, speed: 0.9, damage: 0.25, reward: 18, spawnWeight: 30 },
+        marauder: { hp: 90, speed: 0.6, damage: 0.5, reward: 35, spawnWeight: 20 },
+        boss: { baseHp: 500, speed: 0.3, damage: 0.4, reward: 200 }
+    },
+    
+    buildings: {
+        sawmill: {
+            name: "Лесопилка",
+            baseCost: 30,
+            costIncrease: 1.15,
+            production: { wood: 2.0 },
+            upgradeCost: { coins: 50, wood: 25, stone: 10 },
+            upgradeMultiplier: 2.0,
+            color: "#8B4513"
+        },
+        quarry: {
+            name: "Каменоломня",
+            baseCost: 30,
+            costIncrease: 1.15,
+            production: { stone: 2.0 },
+            upgradeCost: { coins: 50, wood: 10, stone: 25 },
+            upgradeMultiplier: 2.0,
+            color: "#696969"
+        },
+        bank: {
+            name: "Банк",
+            baseCost: 60,
+            costIncrease: 1.2,
+            production: { coins: 1.2 },
+            upgradeCost: { coins: 100, wood: 40, stone: 40 },
+            upgradeMultiplier: 2.2,
+            color: "#FFD700"
+        },
+        smeltery: {
+            name: "Плавильня",
+            baseCost: 120,
+            costIncrease: 1.25,
+            production: { iron: 1.0 },
+            upgradeCost: { coins: 150, wood: 40, stone: 40 },
+            upgradeMultiplier: 2.0,
+            color: "#B22222",
+            woodCost: 20,
+            stoneCost: 20,
+            unique: false
+        },
+        deep_quarry: {
+            name: "Карьер",
+            baseCost: 500,
+            costIncrease: 1.0, // Только один можно построить
+            production: { stone: 10.0 },
+            upgradeCost: { coins: 1000, wood: 200, stone: 400, iron: 100 },
+            upgradeMultiplier: 2.5,
+            color: "#2F4F4F",
+            woodCost: 100,
+            stoneCost: 200,
+            ironCost: 50,
+            unique: true,
+            requires: { quarry: 3 } // Требует каменоломню 3 уровня
+        },
+        tower: {
+            name: "Башня",
+            baseCost: 60,
+            costIncrease: 1.18,
+            production: { damage: [5, 15, 25] },
+            attackRange: 200,
+            attackSpeed: 40,
+            upgradeCost: { coins: 80, wood: 30, stone: 30 },
+            upgradeMultiplier: 1.8,
+            color: "#808080"
+        },
+        cannon: {
+            name: "Пушка",
+            baseCost: 90,
+            costIncrease: 1.25,
+            production: { damage: [25, 50, 100] },
+            attackRange: 250,
+            attackSpeed: 80,
+            splashRadius: 60,
+            splashDamage: 0.4,
+            stoneCostPerShot: [1, 3, 5],
+            stoneCost: 10,
+            upgradeCost: { coins: 120, wood: 50, stone: 50 },
+            upgradeMultiplier: 2.0,
+            color: "#8B0000"
+        },
+        workshop: {
+            name: "Мастерская",
+            baseCost: 120,
+            costIncrease: 1.3,
+            production: { upgradeDiscount: [0.01, 0.04, 0.10] },
+            upgradeCost: { coins: 200, wood: 80, stone: 80 },
+            upgradeMultiplier: 1.0,
+            color: "#4A90E2",
+            unique: true
+        },
+        torture_chamber: {
+            name: "Камера пыток",
+            baseCost: 150,
+            costIncrease: 1.35,
+            production: { slowEffect: [0.01, 0.04, 0.10] },
+            upgradeCost: { coins: 250, wood: 100, stone: 100 },
+            upgradeMultiplier: 1.0,
+            color: "#800080",
+            unique: true,
+            radius: 300
+        },
+        blacksmith: {
+            name: "Кузница",
+            baseCost: 300,
+            costIncrease: 1.0, // Только одну можно построить
+            production: { damageBonus: [0.01, 0.04, 0.10] }, // 1%, 4%, 10% бонус урона
+            upgradeCost: { coins: 500, wood: 100, stone: 100, iron: 50 },
+            upgradeMultiplier: 1.0,
+            color: "#D2691E", // Коричневый/медный цвет
+            woodCost: 50,
+            stoneCost: 50,
+            ironCost: 30,
+            unique: true,
+            radius: 400 // Радиус действия бонуса
+        }
+    },
+    
+    player: {
+        healCost: 30,
+        healAmount: 50,
+        sellRefund: 0.75,
+        baseSpeed: 2.5
+    }
+};
+
+// ======================= МЕНЕДЖЕР УРОВНЕЙ =======================
+function toggleLevelsMenu() { /* список уровней всегда открыт в карточке меню */ }
+function closeLevelsMenuOutside() {}
+
+function startSelectedLevel() {
+    const dropdown = document.getElementById('levels-dropdown');
+    const activeLevel = dropdown.querySelector('.level-option.active');
+    
+    if (activeLevel) {
+        const levelText = activeLevel.querySelector('.level-number').textContent;
+        const levelMatch = levelText.match(/\d+/);
+        
+        if (levelMatch) {
+            const level = parseInt(levelMatch[0]);
+            startLevel(level);
+        } else {
+            startLevel(levelSystem.getCurrentLevel());
+        }
+    } else {
+        startLevel(levelSystem.getCurrentLevel());
+    }
+}
+
+// ======================= БУРГЕР-МЕНЮ НА ПРАВОЙ ПАНЕЛИ =======================
+function toggleBurgerMenu(menuId) {
+    const menu = document.getElementById(menuId);
+    const button = event.target.closest('.burger-menu-btn');
+    
+    document.querySelectorAll('.burger-menu-content').forEach(content => {
+        if (content.id !== menuId) {
+            content.classList.remove('active');
+        }
+    });
+    
+    document.querySelectorAll('.burger-menu-btn').forEach(btn => {
+        if (btn !== button) {
+            btn.classList.remove('active');
+        }
+    });
+    
+    menu.classList.toggle('active');
+    button.classList.toggle('active');
+    
+    if (menu.classList.contains('active')) {
+        setTimeout(() => {
+            document.addEventListener('click', closeBurgerMenuOutside);
+        }, 10);
+    } else {
+        document.removeEventListener('click', closeBurgerMenuOutside);
+    }
+}
+
+function closeBurgerMenuOutside(event) {
+    const menus = document.querySelectorAll('.burger-menu-content.active');
+    const buttons = document.querySelectorAll('.burger-menu-btn.active');
+    
+    let clickedInsideMenu = false;
+    
+    menus.forEach(menu => {
+        if (menu.contains(event.target)) {
+            clickedInsideMenu = true;
+        }
+    });
+    
+    buttons.forEach(button => {
+        if (button.contains(event.target)) {
+            clickedInsideMenu = true;
+        }
+    });
+    
+    if (!clickedInsideMenu) {
+        menus.forEach(menu => {
+            menu.classList.remove('active');
+        });
+        
+        buttons.forEach(button => {
+            button.classList.remove('active');
+        });
+        
+        document.removeEventListener('click', closeBurgerMenuOutside);
+    }
+}
+
+// ======================= СИСТЕМА ГРАФИКИ =======================
+function setGraphicsPreset(preset) {
+    if (graphicsSystem.setPreset(preset)) {
+        document.querySelectorAll('.graphics-preset').forEach(el => el.classList.remove('active'));
+        event.target.closest('.graphics-preset').classList.add('active');
+        
+        document.getElementById('graphics-level').textContent = graphicsSystem.settings.name;
+        
+        loadMapTexture(graphicsSystem.gameState.currentMap);
+        
+    }
+}
+
+function setResolution(w, h) {
+    currentResolution = { w, h };
+    document.querySelectorAll('.resolution-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('current-resolution-label').textContent = `${w}×${h}`;
+}
+
+function applyResolution() {
+    const { w, h } = currentResolution;
+    canvas.width = w;
+    canvas.height = h;
+    if (graphicsSystem) {
+        graphicsSystem.GAME_WIDTH = w;
+        graphicsSystem.GAME_HEIGHT = h;
+        graphicsSystem.initPostProcessing();
+    }
+}
+
+function applyGraphicsSettings() {
+    applyResolution();
+    graphicsSystem.applySettings();
+
+    updateWeatherSettings();
+
+    showNotification(`Графика применена: ${graphicsSystem.settings.name} · ${currentResolution.w}×${currentResolution.h}`, "success");
+    hideSettings();
+}
+
+function toggleWeatherEffect(effect) {
+    const button = event.target.closest('.weather-option');
+    const isActive = button.classList.contains('active');
+    
+    if (isActive) {
+        button.classList.remove('active');
+        graphicsSystem.updateSetting(effect + 'Effect', false);
+    } else {
+        button.classList.add('active');
+        graphicsSystem.updateSetting(effect + 'Effect', true);
+    }
+    
+    graphicsSystem.initWeatherSystem();
+}
+
+function updateWeatherSettings() {
+    const dayNightCheckbox = document.getElementById('day-night-cycle');
+    const lightingCheckbox = document.getElementById('dynamic-lighting');
+    const weatherIntensity = document.getElementById('weather-intensity');
+    
+    if (dayNightCheckbox) {
+        dayNightCheckbox.checked = graphicsSystem.settings.dayNightCycle;
+    }
+    
+    if (lightingCheckbox) {
+        lightingCheckbox.checked = graphicsSystem.settings.lighting;
+    }
+    
+    if (weatherIntensity) {
+        weatherIntensity.value = graphicsSystem.weather.intensity * 100;
+        weatherIntensity.nextElementSibling.textContent = Math.round(graphicsSystem.weather.intensity * 100) + '%';
+    }
+    
+    document.querySelectorAll('.weather-option').forEach(option => {
+        const text = option.querySelector('span')?.textContent;
+        if (text) {
+            if (text.includes('Туман')) {
+                option.classList.toggle('active', graphicsSystem.settings.fogEffect);
+            } else if (text.includes('Дождь')) {
+                option.classList.toggle('active', graphicsSystem.settings.rainEffect);
+            } else if (text.includes('Снег')) {
+                option.classList.toggle('active', graphicsSystem.settings.snowEffect);
+            } else if (text.includes('Ветер')) {
+                option.classList.toggle('active', graphicsSystem.settings.windEffect);
+            }
+        }
+    });
+}
+
+// ======================= УПРАВЛЕНИЕ КАРТАМИ =======================
+const mapTexturePaths = {
+    forest: 'textures/maps/forest.png',
+    desert: 'textures/maps/desert.jpg',
+    mountains: 'textures/maps/mountains.jpg',
+    meadows: 'textures/maps/meadows.jpg',
+    jungle: 'textures/maps/jungle.jpg',
+    winter: 'textures/maps/winter.jpg',
+    volcano: 'textures/maps/volcano.jpg',
+    swamp: 'textures/maps/swamp.jpg',
+    autumn: 'textures/maps/autumn.jpg',
+    steppe: 'textures/maps/steppe.jpg',
+    coastal: 'textures/maps/coastal.jpg',
+    ruins: 'textures/maps/ruins.jpg',
+    canyon: 'textures/maps/canyon.jpg',
+    lava: 'textures/maps/lava.jpg',
+    cloud: 'textures/maps/cloud.jpg',
+    cherry: 'textures/maps/cherry.jpg',
+    dark: 'textures/maps/dark.jpg',
+    heaven: 'textures/maps/heaven.jpg'
+};
+
+async function loadMapTexture(mapKey) {
+    const texturePath = mapTexturePaths[mapKey];
+    if (!texturePath) return;
+    
+    await graphicsSystem.loadMapTexture(mapKey, texturePath);
+}
+
+function updateWeatherInfo() {
+    const weatherInfo = graphicsSystem.getWeatherInfo();
+    const weatherElement = document.getElementById('weather-info');
+    const weatherIcon = document.getElementById('weather-icon');
+    const weatherText = document.getElementById('weather-text');
+    
+    if (weatherElement && graphicsSystem.settings.weatherEffects && document.getElementById('show-weather-info').checked) {
+        let icon = '🌤️';
+        let text = '';
+        
+        switch (weatherInfo.effect) {
+            case 'fog':
+                icon = '🌫️';
+                text = `Туман ${weatherInfo.intensity > 0.5 ? 'густой' : 'легкий'}`;
+                break;
+            case 'rain':
+                icon = '🌧️';
+                text = `Дождь ${weatherInfo.intensity > 0.5 ? 'сильный' : 'легкий'}`;
+                break;
+            case 'snow':
+                icon = '❄️';
+                text = `Снег ${weatherInfo.intensity > 0.5 ? 'сильный' : 'легкий'}`;
+                break;
+            case 'wind':
+                icon = '💨';
+                text = `Ветер ${weatherInfo.windStrength > 0.5 ? 'сильный' : 'легкий'}`;
+                break;
+            default:
+                text = weatherInfo.timeOfDay;
+        }
+        
+        text += `, ${weatherInfo.temperature}°C`;
+        
+        weatherIcon.textContent = icon;
+        weatherText.textContent = text;
+        weatherElement.style.display = 'flex';
+    } else if (weatherElement) {
+        weatherElement.style.display = 'none';
+    }
+}
+
+// ======================= FPS СЧЕТЧИК =======================
+function updateFPS() {
+    if (!showFPS) return;
+    
+    const now = performance.now();
+    frameCount++;
+    
+    if (now >= lastFrameTime + 1000) {
+        fps = Math.round((frameCount * 1000) / (now - lastFrameTime));
+        frameCount = 0;
+        lastFrameTime = now;
+
+        const fpsElement = document.getElementById('fps-counter');
+        fpsElement.textContent = `FPS: ${fps}`;
+        if (fps >= 60) fpsElement.style.color = '#0f0';
+        else if (fps >= 30) fpsElement.style.color = '#ff0';
+        else fpsElement.style.color = '#f00';
+    }
+}
+
+function toggleFPS(show) {
+    showFPS = show;
+    document.getElementById('fps-counter').style.display = show ? 'block' : 'none';
+}
+
+// ======================= ФУНКЦИИ ДЛЯ КНОПОК =======================
+function setSpeed(newSpeed) {
+    speed = newSpeed;
+    
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    event.target.classList.add('active');
+    
+    showNotification(`Скорость игры: x${speed}`, "info");
+}
+
+function togglePause() {
+    gamePaused = !gamePaused;
+    
+    const pauseBtn = document.getElementById('pause-btn');
+    const pauseIndicator = document.getElementById('pause-indicator');
+    
+    if (gamePaused) {
+        pauseBtn.textContent = '▶️ Продолжить';
+        pauseBtn.classList.add('paused');
+        pauseIndicator.classList.add('active');
+        showNotification("Игра на паузе", "warning");
+    } else {
+        pauseBtn.textContent = '⏸️ Пауза';
+        pauseBtn.classList.remove('paused');
+        pauseIndicator.classList.remove('active');
+        showNotification("Игра продолжена", "success");
+    }
+}
+
+// ======================= ФУНКЦИИ ДЛЯ МАСТЕРСКОЙ, КАМЕРЫ ПЫТОК И КУЗНИЦЫ =======================
+function getUpgradeDiscount() {
+    let discount = 0;
+    const workshop = buildings.find(b => b.type === 'workshop');
+    
+    if (workshop) {
+        const building = balance.buildings.workshop;
+        discount = building.production.upgradeDiscount[workshop.lvl - 1];
+    }
+    
+    return discount;
+}
+
+function getEnemySlowEffect() {
+    let slowEffect = 0;
+    const tortureChamber = buildings.find(b => b.type === 'torture_chamber');
+    
+    if (tortureChamber) {
+        const building = balance.buildings.torture_chamber;
+        slowEffect = building.production.slowEffect[tortureChamber.lvl - 1];
+    }
+    
+    return slowEffect;
+}
+
+function getBlacksmithDamageBonus() {
+    const blacksmith = buildings.find(b => b.type === 'blacksmith');
+    if (!blacksmith) return 0;
+    return balance.buildings.blacksmith.production.damageBonus[blacksmith.lvl - 1];
+}
+
+function applySlowEffectToEnemies() {
+    const slowEffect = getEnemySlowEffect();
+    if (slowEffect <= 0) return;
+    
+    const tortureChamber = buildings.find(b => b.type === 'torture_chamber');
+    if (!tortureChamber) return;
+    
+    const building = balance.buildings.torture_chamber;
+    
+    enemies.forEach(enemy => {
+        const distance = Math.hypot(enemy.x - tortureChamber.x, enemy.y - tortureChamber.y);
+        if (distance <= building.radius) {
+            enemy.slowEffect = slowEffect;
+            enemy.originalSpeed = enemy.originalSpeed || enemy.speed;
+            enemy.speed = enemy.originalSpeed * (1 - slowEffect);
+        } else if (enemy.slowEffect) {
+            enemy.speed = enemy.originalSpeed || enemy.speed;
+            enemy.slowEffect = 0;
+        }
+    });
+}
+
+function getActualUpgradeCost(baseCost) {
+    const discount = getUpgradeDiscount();
+    return {
+        coins: Math.floor(baseCost.coins * (1 - discount)),
+        wood: Math.floor(baseCost.wood * (1 - discount)),
+        stone: Math.floor(baseCost.stone * (1 - discount)),
+        iron: baseCost.iron ? Math.floor(baseCost.iron * (1 - discount)) : 0
+    };
+}
+
+function upgradeNearest() {
+    if (gamePaused) {
+        showNotification("Игра на паузе!", "warning");
+        return;
+    }
+    
+    if (buildings.length === 0) {
+        showNotification("Нет зданий для улучшения", "warning");
+        return;
+    }
+    
+    let nearest = null;
+    let minDist = Infinity;
+    
+    for (let b of buildings) {
+        const dist = Math.hypot(b.x - player.x, b.y - player.y);
+        if (dist < minDist && dist < 50) {
+            minDist = dist;
+            nearest = b;
+        }
+    }
+    
+    if (!nearest) {
+        showNotification("Подойдите ближе к зданию", "warning");
+        return;
+    }
+    
+    const building = balance.buildings[nearest.type];
+    const baseCost = building.upgradeCost;
+    const actualCost = getActualUpgradeCost(baseCost);
+    
+    if (coins < actualCost.coins || wood < actualCost.wood || stone < actualCost.stone || (actualCost.iron && iron < actualCost.iron)) {
+        showNotification("Недостаточно ресурсов для улучшения", "danger");
+        return;
+    }
+    
+    coins -= actualCost.coins;
+    wood -= actualCost.wood;
+    stone -= actualCost.stone;
+    if (actualCost.iron) iron -= actualCost.iron;
+    nearest.lvl = Math.min(3, nearest.lvl + 1);
+    
+    updateUI();
+    
+    const discount = getUpgradeDiscount();
+    const discountText = discount > 0 ? ` (со скидкой ${(discount*100).toFixed(0)}%)` : '';
+    
+    let effectText = '';
+    if (nearest.type === 'workshop') {
+        effectText = ` Скидка на улучшения: ${(building.production.upgradeDiscount[nearest.lvl-1]*100).toFixed(0)}%`;
+    } else if (nearest.type === 'torture_chamber') {
+        effectText = ` Замедление врагов: ${(building.production.slowEffect[nearest.lvl-1]*100).toFixed(0)}%`;
+    } else if (nearest.type === 'deep_quarry') {
+        effectText = ` Добыча камня: ${(building.production.stone * Math.pow(building.upgradeMultiplier, nearest.lvl-1)).toFixed(1)}/сек`;
+    } else if (nearest.type === 'blacksmith') {
+        effectText = ` Бонус урона: ${(building.production.damageBonus[nearest.lvl-1]*100).toFixed(0)}%`;
+    }
+    
+    showNotification(`${building.name} улучшена до уровня ${nearest.lvl}!${discountText}${effectText}`, "success");
+    
+    if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+        for (let i = 0; i < 15; i++) {
+            graphicsSystem.createParticle(nearest.x, nearest.y, nearest.type === 'torture_chamber' ? 'slow' : 
+                                        nearest.type === 'deep_quarry' ? 'stone' : 
+                                        nearest.type === 'blacksmith' ? 'fire' :
+                                        'spark');
+        }
+    }
+}
+
+function sellNearest() {
+    if (gamePaused) {
+        showNotification("Игра на паузе!", "warning");
+        return;
+    }
+    
+    if (buildings.length === 0) {
+        showNotification("Нет зданий для продажи", "warning");
+        return;
+    }
+    
+    let nearest = null;
+    let minDist = Infinity;
+    
+    for (let b of buildings) {
+        const dist = Math.hypot(b.x - player.x, b.y - player.y);
+        if (dist < minDist && dist < 50) {
+            minDist = dist;
+            nearest = b;
+        }
+    }
+    
+    if (!nearest) {
+        showNotification("Подойдите ближе к зданию", "warning");
+        return;
+    }
+    
+    const building = balance.buildings[nearest.type];
+    const baseCost = getBuildingCost(nearest.type) / 2;
+    const refund = Math.floor(baseCost * balance.player.sellRefund * nearest.lvl);
+    
+    coins += refund;
+    
+    buildings = buildings.filter(b => b !== nearest);
+
+    updateUI();
+    
+    showNotification(`${building.name} продана за ${refund}💰!`, "success");
+    
+    if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+        for (let i = 0; i < 20; i++) {
+            graphicsSystem.createParticle(nearest.x, nearest.y, 'magic');
+        }
+    }
+}
+
+// ======================= НОВЫЕ ФУНКЦИИ ДЛЯ КНОПОК ПОБЕДЫ/ПОРАЖЕНИЯ =======================
+function restartGame() {
+    document.getElementById('end-screen-buttons').style.display = 'none';
+    
+    gameOver = false;
+    victory = false;
+    gamePaused = false;
+    
+    const currentLevel = levelSystem.getCurrentLevel();
+    startLevel(currentLevel);
+}
+
+function showEndScreenButtons() {
+    const overlay = document.getElementById('end-screen-buttons');
+    if (!overlay) return;
+
+    const isVictory = victory;
+    const levelData = levelSystem.getLevelData();
+
+    document.getElementById('end-icon').textContent = isVictory ? '🏆' : '💀';
+    document.getElementById('end-title').textContent = isVictory ? 'ПОБЕДА!' : 'ПОРАЖЕНИЕ';
+    document.getElementById('end-subtitle').textContent = isVictory
+        ? `Уровень пройден — ${levelData.name}`
+        : `Уровень ${levelSystem.getCurrentLevel()} — ${levelData.name}`;
+
+    const statsEl = document.getElementById('end-stats');
+    statsEl.innerHTML = `
+        <div class="end-stat"><span class="end-stat-icon">🌊</span><span class="end-stat-label">Волна</span><span class="end-stat-val">${waveNumber}</span></div>
+        <div class="end-stat"><span class="end-stat-icon">👑</span><span class="end-stat-label">Боссы</span><span class="end-stat-val">${bossKilled}/${levelSystem.getTotalBosses()}</span></div>
+        <div class="end-stat"><span class="end-stat-icon">💰</span><span class="end-stat-label">Монет</span><span class="end-stat-val">${coins}</span></div>
+    `;
+
+    const card = document.getElementById('end-card');
+    const glow = document.getElementById('end-card-glow');
+    card.className = 'end-card ' + (isVictory ? 'end-card-victory' : 'end-card-defeat');
+    glow.className = 'end-card-glow ' + (isVictory ? 'glow-victory' : 'glow-defeat');
+
+    overlay.style.display = 'flex';
+}
+
+function hideEndScreenButtons() {
+    const endButtons = document.getElementById('end-screen-buttons');
+    if (endButtons) {
+        endButtons.style.display = 'none';
+    }
+}
+
+// ======================= ОСНОВНЫЕ ФУНКЦИИ ИГРЫ =======================
+async function startLevel(level) {
+    levelSystem.setLevel(level);
+    const levelData = levelSystem.getLevelData();
+    graphicsSystem.setCurrentMap(levelData.map);
+    bossKilled = 0;
+    waveNumber = 1;
+    waveDifficulty = 0;
+    
+    time = 0;
+    gameTime = 0;
+    enemies = [];
+    buildings = [];
+    arrows = [];
+    cannonBalls = [];
+    coins = levelData.startCoins;
+    wood = 0;
+    stone = 0;
+    iron = 0;
+    bossCount = 0;
+    gameOver = false;
+    victory = false;
+    gamePaused = false;
+    
+    waveInProgress = false;
+    waveJustStarted = false;
+    waveStartTime = 0;
+
+    const playerHealthBonus = skillSystem.getPlayerHealthBonus();
+    player.hp = player.maxHp * playerHealthBonus;
+    player.maxHp = player.hp;
+    
+    player.x = currentResolution.w / 2;
+    player.y = currentResolution.h / 2;
+    player.direction = 'front';
+    
+    hideEndScreenButtons();
+    
+    document.getElementById('pause-btn').textContent = '⏸️ Пауза';
+    document.getElementById('pause-btn').classList.remove('paused');
+    document.getElementById('pause-indicator').classList.remove('active');
+    
+    await loadMapTexture(levelData.map);
+    
+    document.getElementById('level-title').textContent = levelData.name;
+    document.getElementById('current-level').textContent = level;
+    document.getElementById('graphics-level').textContent = graphicsSystem.settings.name;
+    updateUI();
+    
+    document.querySelectorAll('.level-option').forEach(opt => {
+        opt.classList.remove('active');
+        if (opt.onclick.toString().includes(`selectLevel(${level})`)) {
+            opt.classList.add('active');
+        }
+    });
+    
+    document.getElementById('levels-dropdown').classList.remove('active');
+    
+    cleanupDocumentListeners();
+
+    document.getElementById('main-menu').classList.add('hidden');
+    document.getElementById('game-container').style.display = 'block';
+
+    stopGameLoop();
+    startGameLoop();
+
+    nextBossTime = getWaveInterval();
+    
+    document.getElementById('game-state').innerHTML = `<div style="animation: fadeInSlide 0.5s ease-out;">${graphicsSystem.getTimeOfDayString()} - Волна ${waveNumber} - ${levelData.name}</div>`;
+    
+    musicSystem.start();
+    
+    showNotification(`Начата игра: Уровень ${level} - ${levelData.name}`, "info");
+}
+
+function updateUI() {
+    document.getElementById("coins").textContent = Math.floor(coins);
+    document.getElementById("wood").textContent = Math.floor(wood);
+    document.getElementById("stone").textContent = Math.floor(stone);
+    document.getElementById("iron").textContent = Math.floor(iron);
+    document.getElementById("hp").textContent = Math.floor(player.hp);
+    document.getElementById('bosses').textContent = `${bossKilled}/${levelSystem.getTotalBosses()}`;
+    document.getElementById('wave-count').textContent = waveNumber;
+    document.getElementById('wave-number').textContent = waveNumber;
+    document.getElementById('wave-difficulty').textContent = '+' + Math.floor(waveDifficulty) + '%';
+    
+    const _set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    _set('sawmill-cost', Math.floor(getBuildingCost('sawmill')));
+    _set('quarry-cost', Math.floor(getBuildingCost('quarry')));
+    _set('bank-cost', Math.floor(getBuildingCost('bank')));
+    _set('smeltery-cost', Math.floor(getBuildingCost('smeltery')));
+    _set('smeltery-wood-cost', getBuildingWoodCost('smeltery'));
+    _set('smeltery-stone-cost', getBuildingStoneCost('smeltery'));
+    _set('deep-quarry-cost', Math.floor(getBuildingCost('deep_quarry')));
+    _set('deep-quarry-wood-cost', getBuildingWoodCost('deep_quarry'));
+    _set('deep-quarry-stone-cost', getBuildingStoneCost('deep_quarry'));
+    _set('deep-quarry-iron-cost', getBuildingIronCost('deep_quarry'));
+    _set('tower-cost', Math.floor(getBuildingCost('tower')));
+    _set('cannon-cost', Math.floor(getBuildingCost('cannon')));
+    _set('cannon-stone-cost', getBuildingStoneCost('cannon'));
+    _set('workshop-cost', Math.floor(getBuildingCost('workshop')));
+    _set('torture-chamber-cost', Math.floor(getBuildingCost('torture_chamber')));
+    _set('blacksmith-cost', Math.floor(getBuildingCost('blacksmith')));
+    _set('blacksmith-wood-cost', getBuildingWoodCost('blacksmith'));
+    _set('blacksmith-stone-cost', getBuildingStoneCost('blacksmith'));
+    _set('blacksmith-iron-cost', getBuildingIronCost('blacksmith'));
+}
+
+function getBuildingCost(type) {
+    const building = balance.buildings[type];
+    const count = buildings.filter(b => b.type === type).length;
+    
+    if (building.unique && count >= 1) {
+        return Infinity;
+    }
+    
+    return Math.floor(building.baseCost * Math.pow(building.costIncrease, count));
+}
+
+function getBuildingResourceCost(type, prop) {
+    return balance.buildings[type][prop] || 0;
+}
+
+function getBuildingWoodCost(type)  { return getBuildingResourceCost(type, 'woodCost');  }
+function getBuildingStoneCost(type) { return getBuildingResourceCost(type, 'stoneCost'); }
+function getBuildingIronCost(type)  { return getBuildingResourceCost(type, 'ironCost');  }
+
+// Функция для проверки требований к постройке карьера
+function canBuildDeepQuarry() {
+    // Проверяем наличие каменоломни 3 уровня
+    const quarry = buildings.find(b => b.type === 'quarry' && b.lvl >= 3);
+    return quarry !== undefined;
+}
+
+function getWaveInterval() {
+    const levelData = levelSystem.getLevelData();
+    const baseInterval = levelData.waveInterval;
+    const reduction = Math.pow(balance.waveDifficultyIncrease.waveIntervalReduction, waveNumber - 1);
+    return Math.max(3000, baseInterval * reduction);
+}
+
+function updateWaveProgress() {
+    if (nextBossTime === 0) return;
+    
+    const timeUntilWave = nextBossTime - gameTime;
+    const waveInterval = getWaveInterval();
+    const progress = Math.max(0, ((waveInterval - timeUntilWave) / waveInterval) * 100);
+    
+    document.getElementById('wave-progress-bar').style.width = progress + '%';
+    document.getElementById('next-boss').textContent = Math.max(0, Math.ceil(timeUntilWave / 60)) + ' сек';
+}
+
+function increaseWaveDifficulty() {
+    waveNumber++;
+    const levelData = levelSystem.getLevelData();
+    waveDifficulty += levelData.waveDifficultyMultiplier * 20;
+    
+    updateUI();
+    
+    showNotification(`🌊 Волна ${waveNumber}! Сложность +${Math.floor(levelData.waveDifficultyMultiplier * 20)}%`, "warning");
+}
+
+function spawnEnemy(type = null, boss = false) {
+    const level = levelSystem.getLevelData();
+    const difficultyMultiplier = 1 + (waveDifficulty / 100);
+    
+    if (boss) {
+        const baseHp = balance.baseEnemies.boss.baseHp * level.bossHpMultiplier;
+        const waveBonus = (waveNumber - 1) * balance.waveDifficultyIncrease.bossHp;
+        const hp = baseHp * (1 + waveBonus / 100) * difficultyMultiplier;
+        
+        enemies.push({
+            x: -30,
+            y: Math.random() * currentResolution.h,
+            hp,
+            maxHp: hp,
+            type: "boss",
+            speed: balance.baseEnemies.boss.speed * level.enemySpeedMultiplier,
+            damage: balance.baseEnemies.boss.damage * level.enemyMultiplier * difficultyMultiplier,
+            reward: Math.floor(balance.baseEnemies.boss.reward * waveNumber * 1.5),
+            isBoss: true
+        });
+        
+        bossCount++;
+        updateUI();
+        
+        document.getElementById('game-state').innerHTML = '<div class="boss-warning">⚠️ БОСС ПРИБЛИЖАЕТСЯ! Волна ' + waveNumber + '</div>';
+        showNotification("⚠️ Появился босс! Будьте осторожны!", "danger");
+        return;
+    }
+    
+    let enemyType;
+    if (!type) {
+        const r = Math.random() * 100;
+        if (r < 50) enemyType = "wolf";
+        else if (r < 80) enemyType = "robber";
+        else enemyType = "marauder";
+    } else {
+        enemyType = type;
+    }
+    
+    const base = balance.baseEnemies[enemyType];
+    const waveHpBonus = (waveNumber - 1) * balance.waveDifficultyIncrease.enemyHp;
+    const waveSpeedBonus = (waveNumber - 1) * balance.waveDifficultyIncrease.enemySpeed;
+    
+    const hp = base.hp * level.enemyMultiplier * (1 + waveHpBonus / 100) * difficultyMultiplier;
+    let speedEnemy = base.speed * level.enemySpeedMultiplier * (1 + waveSpeedBonus / 100);
+    let damage = base.damage * level.enemyMultiplier * difficultyMultiplier;
+    const reward = Math.floor(base.reward * (1 + waveNumber * 0.15));
+
+    if (graphicsSystem.lighting.timeOfDay < 0.25 || graphicsSystem.lighting.timeOfDay > 0.75) {
+        speedEnemy *= 1.4;
+        damage *= 1.3;
+    }
+    
+    enemies.push({
+        x: -20,
+        y: Math.random() * GAME_HEIGHT,
+        hp,
+        maxHp: hp,
+        type: enemyType,
+        speed: speedEnemy,
+        damage: damage,
+        reward: reward,
+        isBoss: false
+    });
+}
+
+function build(type) {
+    if (gamePaused) {
+        showNotification("Игра на паузе!", "warning");
+        return;
+    }
+    
+    const building = balance.buildings[type];
+    
+    // Особые проверки для карьера
+    if (type === 'deep_quarry') {
+        if (!canBuildDeepQuarry()) {
+            showNotification("Для постройки карьера нужна каменоломня 3 уровня!", "danger");
+            return;
+        }
+    }
+    
+    const cost = getBuildingCost(type);
+    const woodCost = getBuildingWoodCost(type);
+    const stoneCost = getBuildingStoneCost(type);
+    const ironCost = getBuildingIronCost(type);
+    
+    if (cost === Infinity) {
+        showNotification(`Можно построить только одну ${building.name.toLowerCase()}!`, "danger");
+        return;
+    }
+    
+    // Проверка наличия ресурсов
+    if (coins < cost || wood < woodCost || stone < stoneCost || (ironCost && iron < ironCost)) {
+        let missingResources = [];
+        if (coins < cost) missingResources.push(`${cost}💰`);
+        if (wood < woodCost) missingResources.push(`${woodCost}🌲`);
+        if (stone < stoneCost) missingResources.push(`${stoneCost}⛏`);
+        if (ironCost && iron < ironCost) missingResources.push(`${ironCost}🔥`);
+        
+        showNotification(`Недостаточно ресурсов: ${missingResources.join(', ')}`, "danger");
+        return;
+    }
+    
+    coins -= cost;
+    wood -= woodCost;
+    stone -= stoneCost;
+    if (ironCost) iron -= ironCost;
+    
+    buildings.push({
+        type,
+        x: player.x,
+        y: player.y,
+        t: 0,
+        lvl: 1,
+        productionTimer: 0,
+        cd: 0
+    });
+    
+    updateUI();
+
+    skillSystem.awardXPForAction('build');
+    
+    let effectText = '';
+    if (type === 'workshop') {
+        effectText = ' Скидка на улучшения: 1%';
+    } else if (type === 'torture_chamber') {
+        effectText = ' Замедление врагов: 1%';
+    } else if (type === 'smeltery') {
+        effectText = ' Производство железа: 1.0/сек';
+    } else if (type === 'deep_quarry') {
+        effectText = ' Добыча камня: 10.0/сек';
+    } else if (type === 'blacksmith') {
+        effectText = ' Бонус урона всех зданий: 1%';
+    }
+    
+    let costText = '';
+    if (type === 'smeltery') {
+        costText = `${cost}💰 + ${woodCost}🌲 + ${stoneCost}⛏`;
+    } else if (type === 'cannon') {
+        costText = `${cost}💰 + ${stoneCost}⛏`;
+    } else if (type === 'deep_quarry') {
+        costText = `${cost}💰 + ${woodCost}🌲 + ${stoneCost}⛏ + ${ironCost}🔥`;
+    } else if (type === 'blacksmith') {
+        costText = `${cost}💰 + ${woodCost}🌲 + ${stoneCost}⛏ + ${ironCost}🔥`;
+    } else {
+        costText = `${cost}💰`;
+    }
+    
+    showNotification(`${building.name} построена за ${costText}!${effectText}`, "success");
+    
+    if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+        for (let i = 0; i < 10; i++) {
+            graphicsSystem.createParticle(player.x, player.y, 
+                type === 'torture_chamber' ? 'slow' : 
+                type === 'smeltery' ? 'fire' : 
+                type === 'deep_quarry' ? 'stone' : 
+                type === 'blacksmith' ? 'fire' :
+                'spark');
+        }
+    }
+}
+
+function healPlayer() {
+    if (gamePaused) {
+        showNotification("Игра на паузе!", "warning");
+        return;
+    }
+    
+    if (coins >= balance.player.healCost && player.hp < player.maxHp) {
+        coins -= balance.player.healCost;
+        
+        const healingBonus = skillSystem.getHealingBonus();
+        player.hp = Math.min(player.hp + balance.player.healAmount * healingBonus, player.maxHp);
+        
+        updateUI();
+        
+        skillSystem.awardXPForAction('heal');
+        
+        showNotification("Игрок вылечен!", "success");
+        
+        if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+            for (let i = 0; i < 10; i++) {
+                graphicsSystem.createParticle(player.x, player.y, 'magic');
+            }
+        }
+    } else if (player.hp >= player.maxHp) {
+        showNotification("Здоровье уже максимальное", "warning");
+    } else {
+        showNotification("Недостаточно монет для лечения", "danger");
+    }
+}
+
+// ======================= ИНТЕРФЕЙС И УПРАВЛЕНИЕ =======================
+document.addEventListener("keydown", e => {
+    keys[e.code] = true;
+
+    // Направление игрока
+    if (keys["ArrowUp"]    || keys["KeyW"]) player.direction = 'back';
+    else if (keys["ArrowDown"]  || keys["KeyS"]) player.direction = 'front';
+    else if (keys["ArrowLeft"]  || keys["KeyA"]) player.direction = 'left';
+    else if (keys["ArrowRight"] || keys["KeyD"]) player.direction = 'right';
+
+    // Пауза: Space / P / Р (рус)
+    if (e.code === 'Space' || e.key === 'p' || e.key === 'P' || e.key === 'р' || e.key === 'Р') {
+        e.preventDefault();
+        togglePause();
+        return;
+    }
+
+    // Escape: закрыть меню / открыть настройки
+    if (e.code === 'Escape') {
+        if (document.getElementById('settings-menu').classList.contains('active')) {
+            hideSettings();
+        } else if (document.getElementById('skills-menu').classList.contains('active')) {
+            hideSkillsMenu();
+        } else {
+            showSettings();
+        }
+        return;
+    }
+
+    // Навыки: K
+    if (handleSkillsHotkey(e)) return;
+
+    // Все остальные горячие клавиши
+    hotkeysSystem.handleHotkey(e);
+});
+
+document.addEventListener("keyup", e => keys[e.code] = false);
+
+function showSettings() {
+    document.getElementById('settings-menu').classList.add('active');
+    musicSystem.initUI();
+    updateWeatherSettings();
+}
+
+function hideSettings() {
+    document.getElementById('settings-menu').classList.remove('active');
+}
+
+function switchSettingsTab(btn) {
+    document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.panel).classList.add('active');
+}
+
+function saveSettings() {
+    const settings = {
+        music: musicSystem.currentTrack,
+        map: graphicsSystem.gameState.currentMap,
+        volume: musicSystem.audio.volume,
+        speed: speed,
+        showFPS: showFPS,
+        graphics: graphicsSystem.settings,
+        musicTrackIndex: musicSystem.currentTrackIndex,
+        currentLevel: levelSystem.getCurrentLevel(),
+        showWeatherInfo: document.getElementById('show-weather-info').checked,
+        particlesEnabled: document.getElementById('particles-enabled').checked,
+        resolution: currentResolution
+    };
+    localStorage.setItem('villageDefenseSettings', JSON.stringify(settings));
+    musicSystem.saveSettings();
+    
+    skillSystem.saveSkills();
+    
+    showNotification("Настройки сохранены!", "success");
+}
+
+function changeMap(map) {
+    graphicsSystem.setCurrentMap(map);
+    loadMapTexture(map);
+    document.querySelectorAll('.map-option').forEach(opt => opt.classList.remove('active'));
+    event.target.closest('.map-option').classList.add('active');
+    showNotification(`Карта изменена: ${levelSystem.getMapName(map)}`, "info");
+}
+
+window.changeMap = changeMap;
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+    }
+}
+
+function showNotification(message, type = "info") {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+window.showNotification = showNotification;
+
+function cleanupDocumentListeners() {
+    document.removeEventListener('click', closeBurgerMenuOutside);
+    document.removeEventListener('click', closeLevelsMenuOutside);
+}
+
+function returnToMenu() {
+    stopGameLoop();
+    cleanupDocumentListeners();
+
+    gamePaused = false;
+    document.getElementById('pause-btn').textContent = '⏸️ Пауза';
+    document.getElementById('pause-btn').classList.remove('paused');
+    document.getElementById('pause-indicator').classList.remove('active');
+    
+    hideEndScreenButtons();
+    
+    document.getElementById('main-menu').classList.remove('hidden');
+    document.getElementById('game-container').style.display = 'none';
+    document.getElementById('settings-menu').classList.remove('active');
+    document.getElementById('skills-menu').classList.remove('active');
+    document.getElementById('levels-dropdown').classList.remove('active');
+    
+    document.querySelectorAll('.burger-menu-content').forEach(menu => {
+        menu.classList.remove('active');
+    });
+    
+    document.querySelectorAll('.burger-menu-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    musicSystem.stop();
+}
+
+// ======================= ИГРОВОЙ ЦИКЛ =======================
+const FIXED_STEP_MS = 1000 / 60;
+let accumulator = 0;
+
+function gameLoop(timestamp) {
+    if (!gameLoopLastTime) gameLoopLastTime = timestamp;
+    const delta = Math.min(timestamp - gameLoopLastTime, 100); // не более 100ms за раз
+    gameLoopLastTime = timestamp;
+
+    accumulator += delta;
+
+    // Логика обновляется с фиксированным шагом 60 тиков/сек независимо от FPS
+    let updated = false;
+    while (accumulator >= FIXED_STEP_MS) {
+        try { update(); } catch (e) { console.error("Ошибка update:", e); }
+        accumulator -= FIXED_STEP_MS;
+        updated = true;
+    }
+
+    // Рендер — каждый кадр (использует полный FPS монитора)
+    try { draw(); } catch (e) { console.error("Ошибка draw:", e); }
+
+    animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+function startGameLoop() {
+    if (animationFrameId) return;
+    gameLoopLastTime = 0;
+    accumulator = 0;
+    animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+function stopGameLoop() {
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+    gameLoopLastTime = 0;
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        stopGameLoop();
+    } else if (document.getElementById('game-container').style.display !== 'none') {
+        startGameLoop();
+    }
+});
+
+function update() {
+    if (gameOver || victory || gamePaused) return;
+    
+    const maxSteps = 5;
+    const steps = Math.min(speed, maxSteps);
+    
+    for(let i = 0; i < steps; i++) {
+        step();
+    }
+}
+
+function step() {
+    if (gameOver || victory || gamePaused) return;
+    
+    time++;
+    gameTime++;
+    
+    graphicsSystem.update(time);
+    
+    const timeOfDay = graphicsSystem.lighting.timeOfDay;
+
+    const level = levelSystem.getLevelData();
+    
+    updateWaveProgress();
+    
+    if (!waveInProgress && gameTime >= nextBossTime && bossCount < levelSystem.getTotalBosses()) {
+        waveInProgress = true;
+        waveJustStarted = true;
+        waveStartTime = gameTime;
+        waveEnd = gameTime + 1500; // Длительность волны - 1500 тиков
+        nextBossTime = gameTime + getWaveInterval();
+        
+        spawnEnemy(null, true);
+        
+        document.getElementById('game-state').innerHTML = '<div class="wave-indicator">🌊 ВОЛНА ' + waveNumber + '!</div>';
+        showNotification(`🌊 Началась волна ${waveNumber}!`, "warning");
+    }
+    
+    // Спавним обычных врагов во время волны
+    if (waveInProgress && gameTime < waveEnd) {
+        const spawnInterval = Math.max(15, level.spawnRate / (level.enemySpawnMultiplier * (1 + (waveNumber * balance.waveDifficultyIncrease.spawnRate / 100))));
+        if (time % Math.floor(spawnInterval) === 0) {
+            spawnEnemy();
+        }
+    }
+    
+    // Завершаем волну, если время истекло
+    if (waveInProgress && gameTime >= waveEnd) {
+        waveInProgress = false;
+        waveJustStarted = false;
+        
+        increaseWaveDifficulty();
+        
+        skillSystem.awardXPForAction('complete_wave');
+        
+        const levelData = levelSystem.getLevelData();
+        document.getElementById('game-state').innerHTML = `<div style="animation: fadeInSlide 0.5s ease-out;">${graphicsSystem.getTimeOfDayString()} - Волна ${waveNumber} - ${levelData.name}</div>`;
+    }
+    
+    // Фоновый спавн врагов (только если не идет волна)
+    if (!waveInProgress) {
+        const baseSpawnRate = level.spawnRate;
+        const waveSpawnBonus = 1 + ((waveNumber - 1) * balance.waveDifficultyIncrease.spawnRate / 100);
+        const spawnRate = Math.max(30, baseSpawnRate / (level.enemySpawnMultiplier * waveSpawnBonus));
+        
+        if (time % Math.floor(spawnRate) === 0) {
+            spawnEnemy();
+        }
+    }
+
+    if (keys["ArrowUp"] || keys["KeyW"]) { 
+        player.y -= balance.player.baseSpeed; 
+        player.dir = {x:0,y:-1};
+    }
+    if (keys["ArrowDown"] || keys["KeyS"]) { 
+        player.y += balance.player.baseSpeed; 
+        player.dir = {x:0,y:1};
+    }
+    if (keys["ArrowLeft"] || keys["KeyA"]) { 
+        player.x -= balance.player.baseSpeed; 
+        player.dir = {x:-1,y:0};
+    }
+    if (keys["ArrowRight"] || keys["KeyD"]) { 
+        player.x += balance.player.baseSpeed; 
+        player.dir = {x:1,y:0};
+    }
+
+    player.x = Math.max(20, Math.min(currentResolution.w - 20, player.x));
+    player.y = Math.max(20, Math.min(currentResolution.h - 20, player.y));
+
+    buildings.forEach(b => {
+        b.t++;
+        b.productionTimer++;
+        
+        const building = balance.buildings[b.type];
+        
+        if (b.productionTimer >= 240) {
+            b.productionTimer = 0;
+            
+            if (building.production.wood) {
+                const baseProduction = building.production.wood * b.lvl * Math.pow(building.upgradeMultiplier, b.lvl - 1);
+                const production = applySkillBonusesToProduction(b.type, baseProduction);
+                wood += production;
+            }
+            if (building.production.stone) {
+                const baseProduction = building.production.stone * b.lvl * Math.pow(building.upgradeMultiplier, b.lvl - 1);
+                const production = applySkillBonusesToProduction(b.type, baseProduction);
+                stone += production;
+            }
+            if (building.production.coins) {
+                const baseProduction = building.production.coins * b.lvl * Math.pow(building.upgradeMultiplier, b.lvl - 1);
+                const production = applySkillBonusesToProduction(b.type, baseProduction);
+                coins += production;
+            }
+            if (building.production.iron) {
+                const baseProduction = building.production.iron * b.lvl * Math.pow(building.upgradeMultiplier, b.lvl - 1);
+                const production = applySkillBonusesToProduction(b.type, baseProduction);
+                iron += production;
+            }
+            updateUI();
+        }
+        
+        if (b.type === "tower") {
+            if (!b.cd) b.cd = 0;
+            if (b.cd > 0) {
+                b.cd--;
+                return;
+            }
+            
+            const attackSpeed = Math.max(8, building.attackSpeed / (1 + (b.lvl * 0.3)));
+            let baseDamage = building.production.damage[b.lvl - 1] * Math.pow(building.upgradeMultiplier, b.lvl - 1);
+            
+            let damage = baseDamage * (1 + getBlacksmithDamageBonus()) * skillSystem.getArcherEfficiencyBonus();
+            
+            let target = enemies
+                .filter(en => Math.hypot(en.x - b.x, en.y - b.y) < building.attackRange)
+                .sort((a, b) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(b.x - b.x, b.y - b.y))[0];
+            
+            if (target) { 
+                arrows.push({
+                    x: b.x,
+                    y: b.y,
+                    tx: target,
+                    color: b.lvl === 1 ? "#eee" : b.lvl === 2 ? "#ff9800" : "#ff5252",
+                    damage: damage
+                }); 
+                target.hp -= damage; 
+                b.cd = attackSpeed; 
+            }
+        }
+        
+        if (b.type === "cannon") {
+            if (!b.cd) b.cd = 0;
+            if (b.cd > 0) {
+                b.cd--;
+                return;
+            }
+            
+            const stoneCost = building.stoneCostPerShot[b.lvl - 1];
+            if (stone < stoneCost) {
+                b.cd = 1;
+                return;
+            }
+            
+            const attackSpeed = Math.max(12, building.attackSpeed / (1 + (b.lvl * 0.2)));
+            let baseDamage = building.production.damage[b.lvl - 1] * Math.pow(building.upgradeMultiplier, b.lvl - 1);
+            
+            let damage = baseDamage * (1 + getBlacksmithDamageBonus());
+            
+            let target = enemies
+                .filter(en => Math.hypot(en.x - b.x, en.y - b.y) < building.attackRange)
+                .sort((a, b) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(b.x - b.x, b.y - b.y))[0];
+            
+            if (target) { 
+                if (target.isBoss) {
+                    damage *= skillSystem.getBossDamageBonus();
+                }
+                
+                stone -= stoneCost;
+                updateUI();
+
+                cannonBalls.push({
+                    x: b.x,
+                    y: b.y,
+                    tx: target,
+                    damage: damage,
+                    splashRadius: building.splashRadius,
+                    splashDamage: building.splashDamage,
+                    building: b,
+                    stoneCost: stoneCost
+                }); 
+                b.cd = attackSpeed; 
+            } else {
+                // Нет цели - сбрасываем кулдаун
+                b.cd = 1;
+            }
+        }
+    });
+
+    applySlowEffectToEnemies();
+    
+    graphicsSystem.updateParticles();
+
+    arrows.forEach(a => {
+        if (!a.tx || a.tx.hp <= 0) {
+            a.hit = true;
+            return;
+        }
+        
+        let dx = a.tx.x - a.x, dy = a.tx.y - a.y, d = Math.hypot(dx, dy);
+        if (d < 10) {
+            a.hit = true;
+            if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                for (let i = 0; i < 5; i++) {
+                    graphicsSystem.createParticle(a.tx.x, a.tx.y, 'spark');
+                }
+            }
+        } else {
+            a.x += dx / d * 10;
+            a.y += dy / d * 10;
+        }
+    });
+    arrows = arrows.filter(a => !a.hit);
+    
+    cannonBalls.forEach(cb => {
+        if (!cb.tx || cb.tx.hp <= 0) {
+            cb.exploded = true;
+            return;
+        }
+        
+        let dx = cb.tx.x - cb.x, dy = cb.tx.y - cb.y, d = Math.hypot(dx, dy);
+        if (d < 15) {
+            cb.tx.hp -= cb.damage;
+            
+            enemies.forEach(enemy => {
+                if (enemy !== cb.tx && enemy.hp > 0) {
+                    const distanceToExplosion = Math.hypot(enemy.x - cb.x, enemy.y - cb.y);
+                    if (distanceToExplosion < cb.splashRadius) {
+                        const splashDamage = cb.damage * cb.splashDamage;
+                        enemy.hp -= splashDamage;
+                        
+                        if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                            for (let i = 0; i < 3; i++) {
+                                graphicsSystem.createParticle(enemy.x, enemy.y, 'spark');
+                            }
+                        }
+                    }
+                }
+            });
+            
+            if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                for (let i = 0; i < 20; i++) {
+                    graphicsSystem.createParticle(cb.x, cb.y, 'explosion');
+                }
+            }
+            
+            cb.exploded = true;
+        } else {
+            cb.x += dx / d * 8;
+            cb.y += dy / d * 8;
+        }
+    });
+    cannonBalls = cannonBalls.filter(cb => !cb.exploded);
+
+    enemies.forEach(e => {
+        let dx = player.x - e.x, dy = player.y - e.y, d = Math.hypot(dx, dy);
+        e.x += dx / d * e.speed;
+        e.y += dy / d * e.speed;
+        
+        if (d < 18) {
+            const baseDamage = e.damage;
+            const playerDamageReduction = skillSystem.getPlayerHealthBonus() * 0.1;
+            const actualDamage = baseDamage * (1 - playerDamageReduction);
+            
+            player.hp -= actualDamage;
+            if (player.hp <= 0) {
+                gameOver = true;
+                player.hp = 0;
+                showEndScreenButtons();
+            }
+            if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                for (let i = 0; i < 3; i++) {
+                    graphicsSystem.createParticle(player.x, player.y, 'blood');
+                }
+            }
+        }
+    });
+
+    enemies = enemies.filter(e => {
+        if (e.hp <= 0) {
+            if (e.type === "boss") {
+                bossKilled++;
+                updateUI();
+                
+                skillSystem.awardXPForAction('kill_boss');
+            } else {
+                skillSystem.awardXPForAction('kill_enemy');
+            }
+            
+            coins += e.reward || (e.type === "boss" ? 200 : 10);
+            updateUI();
+            
+            if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                for (let i = 0; i < 20; i++) {
+                    graphicsSystem.createParticle(e.x, e.y, e.type === 'boss' ? 'magic' : 'blood');
+                }
+            }
+            return false;
+        }
+        return true;
+    });
+
+    if (bossKilled >= levelSystem.getTotalBosses()) {
+        victory = true;
+        document.getElementById('game-state').innerHTML = `<div style="color: #4caf50; animation: pulse 1s infinite;">🎉 ПОБЕДА! Пройдено ${waveNumber} волн!</div>`;
+        showEndScreenButtons();
+    }
+}
+
+function draw() {
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+    graphicsSystem.drawMap();
+    
+    graphicsSystem.applyLighting();
+    
+    graphicsSystem.drawPlayer(player);
+    
+    buildings.forEach(b => graphicsSystem.drawBuilding(b));
+    
+    enemies.forEach(e => graphicsSystem.drawEnemy(e));
+    
+    arrows.forEach(a => graphicsSystem.drawArrow(a));
+    
+    cannonBalls.forEach(cb => graphicsSystem.drawCannonBall(cb));
+    
+    graphicsSystem.drawParticles();
+    
+    graphicsSystem.drawWeather();
+    
+    
+    graphicsSystem.applyPostProcessing();
+    
+    updateFPS();
+}
+
+// ======================= ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =======================
+function applySkillBonusesToProduction(buildingType, baseProduction) {
+    // Эта функция должна быть в skills-system.js
+    // Временно возвращаем базовое производство
+    return baseProduction;
+}
+
+function handleSkillsHotkey(e) {
+    if (e.key === 'k' || e.key === 'K' || e.key === 'л' || e.key === 'Л') {
+        e.preventDefault();
+        if (document.getElementById('skills-menu').classList.contains('active')) {
+            hideSkillsMenu();
+        } else {
+            showSkillsMenu();
+        }
+        return true;
+    }
+    return false;
+}
+
+// ======================= ИНИЦИАЛИЗАЦИЯ =======================
+async function initGame() {
+    graphicsSystem = new GraphicsSystem(canvas, ctx);
+    
+    await graphicsSystem.loadAllTextures();
+    
+    document.getElementById('loading-screen').classList.add('hidden');
+    
+    levelSystem.initLevelsMenu();
+    
+    await musicSystem.checkLocalFiles();
+    musicSystem.loadSettings();
+    musicSystem.initUI();
+    
+    await loadMapTexture(graphicsSystem.gameState.currentMap);
+    
+    const savedSettings = localStorage.getItem('villageDefenseSettings');
+    if (savedSettings) {
+        try {
+            const settings = JSON.parse(savedSettings);
+            graphicsSystem.setCurrentMap(settings.map || 'forest');
+            speed = settings.speed || 1;
+            showFPS = settings.showFPS !== undefined ? settings.showFPS : true;
+            
+            if (settings.currentLevel) {
+                levelSystem.setLevel(settings.currentLevel);
+            }
+            
+            if (settings.graphics) {
+                graphicsSystem.settings = settings.graphics;
+            }
+            
+            document.getElementById('show-fps').checked = showFPS;
+            document.getElementById('fps-counter').style.display = showFPS ? 'block' : 'none';
+            
+            if (settings.showWeatherInfo !== undefined) {
+                document.getElementById('show-weather-info').checked = settings.showWeatherInfo;
+            }
+            
+            if (settings.particlesEnabled !== undefined) {
+                document.getElementById('particles-enabled').checked = settings.particlesEnabled;
+            }
+
+            if (settings.resolution) {
+                currentResolution = settings.resolution;
+                applyResolution();
+                const label = `${currentResolution.w}×${currentResolution.h}`;
+                document.getElementById('current-resolution-label').textContent = label;
+                document.querySelectorAll('.resolution-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.textContent.trim() === label);
+                });
+            }
+
+            if (graphicsSystem.settings.preset) {
+                document.querySelectorAll('.graphics-preset').forEach(el => {
+                    if (el.onclick.toString().includes(graphicsSystem.settings.preset)) {
+                        el.classList.add('active');
+                    } else {
+                        el.classList.remove('active');
+                    }
+                });
+            }
+            
+            document.querySelectorAll('.map-option').forEach(opt => {
+                if (opt.onclick.toString().includes(graphicsSystem.gameState.currentMap)) {
+                    opt.classList.add('active');
+                } else {
+                    opt.classList.remove('active');
+                }
+            });
+            
+            document.querySelectorAll('.speed-btn').forEach((btn, index) => {
+                if (index + 1 === speed) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+        } catch (e) {
+            console.error("Ошибка загрузки настроек:", e);
+        }
+    }
+    
+    graphicsSystem.applySettings();
+    
+    document.getElementById('graphics-level').textContent = graphicsSystem.settings.name;
+    
+    updateWeatherSettings();
+    
+    document.getElementById('day-night-cycle').addEventListener('change', function() {
+        graphicsSystem.updateSetting('dayNightCycle', this.checked);
+    });
+    
+    document.getElementById('dynamic-lighting').addEventListener('change', function() {
+        graphicsSystem.updateSetting('lighting', this.checked);
+    });
+    
+    document.getElementById('weather-intensity').addEventListener('input', function() {
+        graphicsSystem.weather.intensity = this.value / 100;
+        this.nextElementSibling.textContent = this.value + '%';
+    });
+    
+    const hotkeyHint = document.createElement('div');
+    hotkeyHint.className = 'hotkey-hint';
+    hotkeyHint.innerHTML =
+        '<span>🎵 <kbd>Tab</kbd> трек</span>' +
+        '<span><kbd>Ctrl+M</kbd> музыка</span>' +
+        '<span><kbd>Ctrl+↑↓</kbd> громкость</span>' +
+        '<span><kbd>F1/F2</kbd> карта</span>' +
+        '<span><kbd>U</kbd> улучшить</span>' +
+        '<span><kbd>H</kbd> лечение</span>' +
+        '<span><kbd>Q</kbd> продать</span>' +
+        '<span><kbd>1-5</kbd> скорость</span>' +
+        '<span><kbd>Space</kbd> пауза</span>';
+    document.body.appendChild(hotkeyHint);
+    
+    skillSystem.init();
+    
+    hotkeysSystem.init();
+    
+    
+}
+
+window.addEventListener('load', initGame);
+
+// ======================= ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ СИМВОЛОВ ЗДАНИЙ ПРИ ОТСУТСТВИИ ТЕКСТУР =======================
+function getBuildingSymbol(type) {
+    const symbols = {
+        'sawmill': '🌲',
+        'quarry': '⛏',
+        'bank': '💰',
+        'tower': '🏹',
+        'cannon': '🗡️',
+        'workshop': '🔧',
+        'torture_chamber': '⛓️',
+        'smeltery': '🔥',
+        'deep_quarry': '🏭',
+        'blacksmith': '🔨'
+    };
+    return symbols[type] || '🏠';
+}
+</script>
+</body>
+</html>
