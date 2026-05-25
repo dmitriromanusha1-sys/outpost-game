@@ -28,39 +28,77 @@
 
 <!-- ======================= ГЛАВНОЕ МЕНЮ ======================= -->
 <div id="main-menu">
-    <div class="menu-bg-overlay"></div>
+    <div class="med-bg">
+        <div class="med-torch med-torch-tl"></div>
+        <div class="med-torch med-torch-tr"></div>
+        <div class="med-torch med-torch-bl"></div>
+        <div class="med-torch med-torch-br"></div>
+    </div>
 
-    <div class="menu-card">
-        <!-- ЛОГОТИП -->
-        <div class="menu-logo">
-            <div class="menu-logo-icon">🏰</div>
-            <div>
-                <div class="menu-title">Outpost</div>
-                <div class="menu-subtitle">Защитите деревню от волн врагов</div>
+    <!-- ЭКРАН 1: ГЛАВНЫЙ -->
+    <div class="med-screen active" id="menu-main">
+        <div class="med-card med-card-main">
+            <div class="med-emblem">🏰</div>
+            <div class="med-title">OUTPOST</div>
+            <div class="med-subtitle">Стратегическая защита в реальном времени</div>
+            <div class="med-divider"><span>⚔</span></div>
+            <div class="med-main-buttons">
+                <button class="med-btn med-btn-primary" onclick="showMenuScreen('menu-mode')">
+                    <span class="med-btn-icon">⚔</span>
+                    <span class="med-btn-text">Играть</span>
+                </button>
+                <button class="med-btn med-btn-secondary" onclick="showSettings()">
+                    <span class="med-btn-icon">⚙</span>
+                    <span class="med-btn-text">Настройки</span>
+                </button>
+            </div>
+            <div class="med-version">Beta · v0.4 · ASPECT</div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 2: ВЫБОР РЕЖИМА -->
+    <div class="med-screen" id="menu-mode">
+        <div class="med-card">
+            <div class="med-card-header">
+                <button class="med-back-btn" onclick="showMenuScreen('menu-main')">← Назад</button>
+                <div class="med-card-title">Выбор режима</div>
+            </div>
+            <div class="med-divider"><span>⚔</span></div>
+            <div class="med-modes">
+                <div class="med-mode-card" onclick="showMenuScreen('menu-difficulty')">
+                    <div class="med-mode-icon">🌊</div>
+                    <div class="med-mode-name">Волны</div>
+                    <div class="med-mode-desc">Выживите в бесконечных волнах врагов. Стройте защиту, улучшайте здания, убивайте боссов.</div>
+                    <div class="med-mode-tag">Доступно</div>
+                </div>
+                <div class="med-mode-card med-mode-locked">
+                    <div class="med-mode-icon">📜</div>
+                    <div class="med-mode-name">Кампания</div>
+                    <div class="med-mode-desc">Пройдите уникальную историю мира Outpost с заданиями и сюжетом.</div>
+                    <div class="med-mode-tag med-mode-tag-wip">🔨 В разработке</div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- ВЫБОР УРОВНЯ -->
-        <div class="menu-section-label">Выбор уровня</div>
-        <div class="menu-level-picker">
-            <div class="levels-dropdown active" id="levels-dropdown" style="position:static; border:none; background:transparent; box-shadow:none; margin:0; padding:0; max-height: 220px; overflow-y:auto;"></div>
-        </div>
-
-        <!-- КНОПКИ -->
-        <div class="menu-actions">
-            <button class="btn menu-btn-primary" onclick="startSelectedLevel()">▶ Начать игру</button>
-            <button class="btn menu-btn-secondary" onclick="showSettings()">⚙ Настройки</button>
-        </div>
-
-        <!-- ПОДСКАЗКА ПО УПРАВЛЕНИЮ -->
-        <div class="menu-hints">
-            <span><kbd>WASD</kbd> движение</span>
-            <span><kbd>Space</kbd> пауза</span>
-            <span><kbd>U</kbd> улучшить</span>
-            <span><kbd>H</kbd> лечение</span>
-            <span><kbd>K</kbd> навыки</span>
-            <span><kbd>Tab</kbd> трек</span>
-            <span><kbd>Esc</kbd> настройки</span>
+    <!-- ЭКРАН 3: ВЫБОР СЛОЖНОСТИ -->
+    <div class="med-screen" id="menu-difficulty">
+        <div class="med-card med-card-wide">
+            <div class="med-card-header">
+                <button class="med-back-btn" onclick="showMenuScreen('menu-mode')">← Назад</button>
+                <div class="med-card-title">Выбор сложности</div>
+            </div>
+            <div class="med-divider"><span>🛡</span></div>
+            <div class="med-difficulty-grid" id="med-difficulty-grid">
+                <!-- Генерируется через JS -->
+            </div>
+            <div class="med-start-row">
+                <div class="med-selected-info" id="med-selected-info">Выберите сложность</div>
+                <button class="med-btn med-btn-primary med-btn-start" id="med-start-btn" onclick="startSelectedLevel()" disabled>
+                    <span class="med-btn-icon">▶</span>
+                    <span class="med-btn-text">Начать поход</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -767,27 +805,65 @@ const balance = {
     npcSpawnInterval: 480
 };
 
+// ======================= НАВИГАЦИЯ СРЕДНЕВЕКОВОГО МЕНЮ =======================
+let _selectedDifficulty = null;
+
+function showMenuScreen(id) {
+    document.querySelectorAll('.med-screen').forEach(s => s.classList.remove('active'));
+    const screen = document.getElementById(id);
+    if (screen) screen.classList.add('active');
+}
+
+function medievalSelectDifficulty(level) {
+    _selectedDifficulty = level;
+    document.querySelectorAll('.med-diff-card').forEach(c => c.classList.remove('active'));
+    const card = document.querySelector(`.med-diff-card[data-level="${level}"]`);
+    if (card) card.classList.add('active');
+
+    const data = levelSystem.getLevelData(level);
+    const info = document.getElementById('med-selected-info');
+    if (info) info.textContent = `${data.name} — ${data.description}`;
+
+    const btn = document.getElementById('med-start-btn');
+    if (btn) btn.disabled = false;
+}
+
+function initMedievalDifficultyGrid() {
+    const grid = document.getElementById('med-difficulty-grid');
+    if (!grid) return;
+
+    const diffIcons  = ['🌿','⚔️','🛡️','👑','⚡','❄️','🌋','💀','🦅','☠️'];
+    const mapIcons   = { forest:'🌲', desert:'🏜', mountains:'⛰', meadows:'🌿', jungle:'🌴',
+                         winter:'❄', volcano:'🌋', swamp:'🐊', autumn:'🍁', ruins:'🏛' };
+    const diffColors = ['#3a7d3a','#7d7a1a','#7a5a1a','#7a3a1a','#7a1a1a',
+                        '#1a3a7a','#6b1a1a','#2a1a2a','#5a4a1a','#3a0a0a'];
+
+    grid.innerHTML = '';
+    for (let lvl = 1; lvl <= 10; lvl++) {
+        const data = levelSystem.getLevelData(lvl);
+        const card = document.createElement('div');
+        card.className = 'med-diff-card';
+        card.dataset.level = lvl;
+        card.style.setProperty('--diff-color', diffColors[lvl - 1]);
+        card.onclick = () => medievalSelectDifficulty(lvl);
+        card.innerHTML = `
+            <div class="mdc-icon">${diffIcons[lvl - 1]}</div>
+            <div class="mdc-num">${lvl}</div>
+            <div class="mdc-name">${data.name}</div>
+            <div class="mdc-map">${mapIcons[data.map] || '🗺'} ${levelSystem.getMapName ? levelSystem.getMapName(data.map) : data.map}</div>
+            <div class="mdc-bosses">👑 ${data.bossCount} босс.</div>
+        `;
+        grid.appendChild(card);
+    }
+}
+
 // ======================= МЕНЕДЖЕР УРОВНЕЙ =======================
-function toggleLevelsMenu() { /* список уровней всегда открыт в карточке меню */ }
+function toggleLevelsMenu() {}
 function closeLevelsMenuOutside() {}
 
 function startSelectedLevel() {
-    const dropdown = document.getElementById('levels-dropdown');
-    const activeLevel = dropdown.querySelector('.level-option.active');
-    
-    if (activeLevel) {
-        const levelText = activeLevel.querySelector('.level-number').textContent;
-        const levelMatch = levelText.match(/\d+/);
-        
-        if (levelMatch) {
-            const level = parseInt(levelMatch[0]);
-            startLevel(level);
-        } else {
-            startLevel(levelSystem.getCurrentLevel());
-        }
-    } else {
-        startLevel(levelSystem.getCurrentLevel());
-    }
+    const level = _selectedDifficulty || levelSystem.getCurrentLevel();
+    startLevel(level);
 }
 
 // ======================= БУРГЕР-МЕНЮ НА ПРАВОЙ ПАНЕЛИ =======================
@@ -2320,6 +2396,7 @@ async function initGame() {
     document.getElementById('loading-screen').classList.add('hidden');
     
     levelSystem.initLevelsMenu();
+    initMedievalDifficultyGrid();
     
     await musicSystem.checkLocalFiles();
     musicSystem.loadSettings();

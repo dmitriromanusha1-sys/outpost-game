@@ -1017,153 +1017,338 @@ input[type="range"]::-webkit-slider-thumb {
 
 #main-menu.hidden { display: none; }
 
-/* Декоративный фон */
-.menu-bg-overlay {
+/* ======================= СРЕДНЕВЕКОВОЕ МЕНЮ ======================= */
+
+/* Фон — тёмный камень с факелами */
+.med-bg {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 20% 80%, rgba(255,152,0,0.05) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(76,175,80,0.04) 0%, transparent 50%);
+        radial-gradient(ellipse at 15% 15%, rgba(180,100,20,0.18) 0%, transparent 40%),
+        radial-gradient(ellipse at 85% 15%, rgba(180,100,20,0.18) 0%, transparent 40%),
+        radial-gradient(ellipse at 15% 85%, rgba(180,100,20,0.12) 0%, transparent 35%),
+        radial-gradient(ellipse at 85% 85%, rgba(180,100,20,0.12) 0%, transparent 35%),
+        radial-gradient(ellipse at 50% 50%, rgba(60,30,10,0.4) 0%, transparent 80%),
+        #0d0a06;
     pointer-events: none;
 }
 
-/* Карточка меню */
-.menu-card {
+/* Факелы по углам */
+.med-torch {
+    position: absolute;
+    width: 60px; height: 80px;
+    pointer-events: none;
+}
+.med-torch::before {
+    content: '🔥';
+    position: absolute;
+    font-size: 32px;
+    animation: torchFlicker 1.5s ease-in-out infinite alternate;
+}
+.med-torch-tl { top: 30px; left: 40px; }
+.med-torch-tr { top: 30px; right: 40px; }
+.med-torch-bl { bottom: 30px; left: 40px; }
+.med-torch-br { bottom: 30px; right: 40px; }
+
+@keyframes torchFlicker {
+    0%   { transform: scale(1) rotate(-3deg);   opacity: 0.85; }
+    50%  { transform: scale(1.1) rotate(2deg);  opacity: 1; }
+    100% { transform: scale(0.95) rotate(-1deg); opacity: 0.9; }
+}
+
+/* Экраны */
+.med-screen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+.med-screen.active { display: flex; }
+
+/* Базовая карточка */
+.med-card {
     position: relative;
-    width: min(520px, 96vw);
-    background: rgba(18, 18, 32, 0.92);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 152, 0, 0.2);
-    border-radius: 20px;
-    padding: 36px 40px 28px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04) inset;
+    width: min(480px, 94vw);
+    background:
+        linear-gradient(180deg, #1e1408 0%, #160f06 60%, #0f0a04 100%);
+    border: 2px solid #5a3a0a;
+    border-radius: 4px;
+    padding: 36px 40px 30px;
+    box-shadow:
+        0 0 0 1px #2a1a05,
+        0 0 0 4px #0d0a04,
+        0 0 60px rgba(0,0,0,0.9),
+        inset 0 1px 0 rgba(201,162,39,0.15);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 22px;
 }
 
-/* Логотип */
-.menu-logo {
+.med-card-wide {
+    width: min(700px, 96vw);
+}
+
+/* Угловые украшения */
+.med-card::before, .med-card::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-color: #c9a227;
+    border-style: solid;
+}
+.med-card::before { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
+.med-card::after  { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
+
+/* Эмблема */
+.med-emblem {
+    font-size: 64px;
+    text-align: center;
+    filter: drop-shadow(0 0 20px rgba(201,162,39,0.7));
+    animation: medFloat 4s ease-in-out infinite;
+}
+@keyframes medFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+}
+
+/* Заголовок */
+.med-title {
+    font-size: 48px;
+    font-weight: 900;
+    text-align: center;
+    letter-spacing: 8px;
+    color: #c9a227;
+    text-shadow:
+        0 0 30px rgba(201,162,39,0.6),
+        0 2px 4px rgba(0,0,0,0.8);
+    line-height: 1;
+}
+
+.med-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #7a6040;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: -10px;
+}
+
+/* Разделитель */
+.med-divider {
     display: flex;
     align-items: center;
-    gap: 16px;
-    margin-bottom: 4px;
+    gap: 10px;
+    color: #5a3a0a;
+    font-size: 12px;
+    letter-spacing: 3px;
+}
+.med-divider::before, .med-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #5a3a0a, transparent);
+}
+.med-divider span { color: #c9a227; font-size: 18px; }
+
+/* Главные кнопки */
+.med-main-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.menu-logo-icon {
-    font-size: 52px;
-    filter: drop-shadow(0 0 16px rgba(255,152,0,0.6));
-    animation: floatIcon 3s ease-in-out infinite;
-    flex-shrink: 0;
-}
-
-@keyframes floatIcon {
-    0%, 100% { transform: translateY(0); }
-    50%       { transform: translateY(-6px); }
-}
-
-.menu-title {
-    font-size: 30px;
-    font-weight: 900;
-    color: #ffcc80;
-    letter-spacing: -0.5px;
-    text-shadow: 0 0 24px rgba(255,152,0,0.5);
-    line-height: 1.1;
-}
-
-.menu-subtitle {
-    font-size: 13px;
-    color: rgba(180,180,200,0.6);
-    margin-top: 4px;
-    letter-spacing: 0.5px;
-}
-
-@keyframes glow {
-    from { text-shadow: 0 0 10px #ff9800; }
-    to   { text-shadow: 0 0 30px #ff9800, 0 0 40px rgba(255,152,0,0.5); }
-}
-
-/* Метка секции */
-.menu-section-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: rgba(255,152,0,0.6);
-    font-weight: bold;
-    margin-bottom: -12px;
-}
-
-/* Список уровней внутри карточки */
-.menu-level-picker {
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(100,100,150,0.2);
-    border-radius: 12px;
+.med-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    position: relative;
     overflow: hidden;
 }
 
-.menu-level-picker .levels-dropdown {
-    max-height: 220px !important;
-    overflow-y: auto;
-    padding: 6px !important;
-    gap: 4px !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
+.med-btn-icon { font-size: 20px; }
+.med-btn-text { font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
 
-/* Кнопки действий */
-.menu-actions {
-    display: flex;
-    gap: 10px;
+.med-btn-primary {
+    background: linear-gradient(180deg, #7a3a00 0%, #4a2000 100%);
+    border: 1px solid #c9a227;
+    color: #f0c040;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,162,39,0.2);
+    text-shadow: 0 0 10px rgba(240,192,64,0.4);
 }
-
-.menu-btn-primary {
-    flex: 2;
-    padding: 14px 0 !important;
-    font-size: 17px !important;
-    font-weight: 800 !important;
-    background: linear-gradient(135deg, #e65100, #ff9800) !important;
-    border-color: #ff9800 !important;
-    box-shadow: 0 4px 20px rgba(255,152,0,0.35) !important;
-    letter-spacing: 0.3px;
-}
-
-.menu-btn-primary:hover {
-    background: linear-gradient(135deg, #ff9800, #ffb74d) !important;
+.med-btn-primary:hover {
+    background: linear-gradient(180deg, #9a4a00 0%, #6a3000 100%);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.7), 0 0 20px rgba(201,162,39,0.25), inset 0 1px 0 rgba(201,162,39,0.3);
     transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(255,152,0,0.5) !important;
+}
+.med-btn-primary:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
 }
 
-.menu-btn-secondary {
-    flex: 1;
-    padding: 14px 0 !important;
-    font-size: 16px !important;
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
-    color: #ddd !important;
+.med-btn-secondary {
+    background: linear-gradient(180deg, #2a1e10 0%, #1a1008 100%);
+    border: 1px solid #3a2a10;
+    color: #9a7a4a;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.med-btn-secondary:hover {
+    border-color: #6a4a20;
+    color: #c9a227;
+    background: linear-gradient(180deg, #3a2810 0%, #2a1808 100%);
 }
 
-.menu-btn-secondary:hover {
-    background: rgba(255,255,255,0.12) !important;
-    color: #fff !important;
+/* Версия */
+.med-version {
+    text-align: center;
+    font-size: 11px;
+    color: #3a2a10;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-/* Подсказки по клавишам */
-.menu-hints {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 14px;
-    justify-content: center;
-    padding-top: 4px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-}
-
-.menu-hints span {
-    font-size: 12px;
-    color: rgba(180,180,200,0.55);
+/* Заголовок карточки с кнопкой назад */
+.med-card-header {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 16px;
 }
+.med-card-title {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #c9a227;
+    text-shadow: 0 0 15px rgba(201,162,39,0.4);
+    flex: 1;
+    text-align: center;
+    margin-right: 60px; /* компенсация кнопки назад */
+}
+.med-back-btn {
+    background: transparent;
+    border: 1px solid #3a2a10;
+    color: #7a6040;
+    padding: 8px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.med-back-btn:hover { border-color: #c9a227; color: #c9a227; }
+
+/* Карточки режимов */
+.med-modes {
+    display: flex;
+    gap: 16px;
+}
+.med-mode-card {
+    flex: 1;
+    background: linear-gradient(180deg, #1e1408 0%, #120e06 100%);
+    border: 1px solid #3a2a10;
+    border-radius: 3px;
+    padding: 24px 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    text-align: center;
+}
+.med-mode-card:hover:not(.med-mode-locked) {
+    border-color: #c9a227;
+    background: linear-gradient(180deg, #2e2010 0%, #1e1408 100%);
+    box-shadow: 0 0 20px rgba(201,162,39,0.15);
+    transform: translateY(-3px);
+}
+.med-mode-locked { opacity: 0.45; cursor: not-allowed; }
+.med-mode-icon   { font-size: 44px; }
+.med-mode-name   { font-size: 20px; font-weight: 800; letter-spacing: 2px; color: #c9a227; text-transform: uppercase; }
+.med-mode-desc   { font-size: 12px; color: #7a6040; line-height: 1.5; }
+.med-mode-tag    { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #4a8a4a; text-transform: uppercase; border: 1px solid #2a4a2a; padding: 3px 10px; border-radius: 2px; }
+.med-mode-tag-wip { color: #7a5a2a; border-color: #3a2a10; }
+
+/* Сетка сложностей */
+.med-difficulty-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.med-diff-card {
+    background: linear-gradient(180deg, #1e1408 0%, #120e06 100%);
+    border: 1px solid #3a2a10;
+    border-radius: 3px;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    text-align: center;
+    position: relative;
+}
+.med-diff-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--diff-color, #3a2a10);
+    border-radius: 0 0 2px 2px;
+    opacity: 0.6;
+}
+.med-diff-card:hover {
+    border-color: #6a4a20;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+.med-diff-card.active {
+    border-color: #c9a227;
+    background: linear-gradient(180deg, #2e2010 0%, #1e1208 100%);
+    box-shadow: 0 0 16px rgba(201,162,39,0.2);
+}
+.med-diff-card.active::after { opacity: 1; }
+
+.mdc-icon   { font-size: 22px; }
+.mdc-num    { font-size: 10px; color: #5a4a2a; font-weight: 700; }
+.mdc-name   { font-size: 11px; font-weight: 800; color: #c9a227; letter-spacing: 0.5px; line-height: 1.2; }
+.mdc-map    { font-size: 10px; color: #5a4a2a; }
+.mdc-bosses { font-size: 10px; color: #7a5a3a; }
+
+/* Строка старта */
+.med-start-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-top: 1px solid #2a1a08;
+    padding-top: 16px;
+    margin-top: -6px;
+}
+.med-selected-info {
+    flex: 1;
+    font-size: 13px;
+    color: #7a6040;
+    font-style: italic;
+}
+.med-btn-start {
+    flex-shrink: 0;
+    padding: 13px 28px;
+}
+.med-btn-start .med-btn-text { font-size: 15px; }
 
 /* СПИСОК УРОВНЕЙ */
 .levels-dropdown {
