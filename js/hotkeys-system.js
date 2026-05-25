@@ -1,5 +1,5 @@
 // hotkeys-system.js
-// Система горячих клавиш для Village Defense RPG
+// Система горячих клавиш для Outpost
 
 class HotkeysSystem {
     constructor() {
