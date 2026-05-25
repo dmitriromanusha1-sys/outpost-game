@@ -741,21 +741,25 @@ const balance = {
 
     npcs: {
         bear: {
-            hp: 120,
-            speed: 0.4,
-            wanderRadius: 80,
-            spawnChance: 0.4,
+            hp: 180,
+            speed: 0.45,
+            chaseSpeed: 0.85,
+            aggroRange: 130,
+            attackRange: 22,
+            attackCd: 90,
+            damage: 0.35,
             reward: { coins: 40, wood: 10 },
-            interactDist: 30,
             label: 'Медведь'
         },
         tiger: {
-            hp: 70,
-            speed: 0.9,
-            wanderRadius: 120,
-            spawnChance: 0.6,
+            hp: 90,
+            speed: 0.95,
+            chaseSpeed: 1.7,
+            aggroRange: 160,
+            attackRange: 20,
+            attackCd: 50,
+            damage: 0.28,
             reward: { coins: 25, iron: 5 },
-            interactDist: 30,
             label: 'Тигр'
         }
     },
@@ -1969,8 +1973,8 @@ function step() {
             let baseDamage = building.production.damage[b.lvl - 1] * Math.pow(building.upgradeMultiplier, b.lvl - 1);
             
             let damage = baseDamage * (1 + getBlacksmithDamageBonus()) * skillSystem.getArcherEfficiencyBonus();
-            
-            let target = enemies
+
+            let target = [...enemies, ...npcs]
                 .filter(en => Math.hypot(en.x - b.x, en.y - b.y) < building.attackRange)
                 .sort((a, b) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(b.x - b.x, b.y - b.y))[0];
             
@@ -2004,8 +2008,8 @@ function step() {
             let baseDamage = building.production.damage[b.lvl - 1] * Math.pow(building.upgradeMultiplier, b.lvl - 1);
             
             let damage = baseDamage * (1 + getBlacksmithDamageBonus());
-            
-            let target = enemies
+
+            let target = [...enemies, ...npcs]
                 .filter(en => Math.hypot(en.x - b.x, en.y - b.y) < building.attackRange)
                 .sort((a, b) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(b.x - b.x, b.y - b.y))[0];
             
@@ -2067,52 +2071,76 @@ function step() {
     npcs.forEach(npc => {
         const cfg = balance.npcs[npc.type];
 
-        // Смена направления блуждания
-        npc.wanderTimer++;
-        if (npc.wanderTimer >= 120 + Math.random() * 60) {
-            npc.wanderTimer = 0;
-            npc.wanderAngle += (Math.random() - 0.5) * Math.PI;
-        }
+        if (!npc.attackCd) npc.attackCd = 0;
+        if (npc.attackCd > 0) npc.attackCd--;
 
-        npc.x += Math.cos(npc.wanderAngle) * npc.speed;
-        npc.y += Math.sin(npc.wanderAngle) * npc.speed;
-
-        // Отскок от границ
-        if (npc.x < 20) { npc.x = 20; npc.wanderAngle = Math.PI - npc.wanderAngle; }
-        if (npc.x > currentResolution.w - 20) { npc.x = currentResolution.w - 20; npc.wanderAngle = Math.PI - npc.wanderAngle; }
-        if (npc.y < 20) { npc.y = 20; npc.wanderAngle = -npc.wanderAngle; }
-        if (npc.y > currentResolution.h - 20) { npc.y = currentResolution.h - 20; npc.wanderAngle = -npc.wanderAngle; }
-
-        // Проверяем расстояние до игрока
         const distToPlayer = Math.hypot(player.x - npc.x, player.y - npc.y);
-        npc.playerNear = distToPlayer < cfg.interactDist * 2;
 
-        // Взаимодействие (игрок подошёл вплотную)
-        if (distToPlayer < cfg.interactDist) {
-            npc.collected = true;
-            const r = cfg.reward;
-            if (r.coins) { coins += r.coins; }
-            if (r.wood)  { wood  += r.wood;  }
-            if (r.stone) { stone += r.stone; }
-            if (r.iron)  { iron  += r.iron;  }
-            updateUI();
+        if (distToPlayer < cfg.aggroRange) {
+            // Агрессивный режим — бежит к игроку
+            npc.aggressive = true;
+            npc.playerNear = true;
+            const dx = player.x - npc.x, dy = player.y - npc.y;
+            const d = Math.hypot(dx, dy);
+            npc.x += dx / d * cfg.chaseSpeed;
+            npc.y += dy / d * cfg.chaseSpeed;
 
-            const rewardParts = [];
-            if (r.coins) rewardParts.push(`+${r.coins}💰`);
-            if (r.wood)  rewardParts.push(`+${r.wood}🌲`);
-            if (r.iron)  rewardParts.push(`+${r.iron}🔥`);
-            showNotification(`${cfg.label} испугался и убежал! ${rewardParts.join(' ')}`, 'success');
-
-            skillSystem.awardXPForAction('kill_enemy');
-
-            if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
-                for (let i = 0; i < 12; i++) {
-                    graphicsSystem.createParticle(npc.x, npc.y, 'magic');
+            // Атака
+            if (distToPlayer < cfg.attackRange && npc.attackCd === 0) {
+                npc.attackCd = cfg.attackCd;
+                const dmgReduction = skillSystem.getPlayerHealthBonus() * 0.1;
+                player.hp -= cfg.damage * (1 - dmgReduction);
+                if (player.hp <= 0) {
+                    gameOver = true;
+                    player.hp = 0;
+                    showEndScreenButtons();
+                }
+                if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                    for (let i = 0; i < 3; i++) graphicsSystem.createParticle(player.x, player.y, 'blood');
                 }
             }
+        } else {
+            // Обычное блуждание
+            npc.aggressive = false;
+            npc.playerNear = distToPlayer < cfg.aggroRange * 1.3;
+            npc.wanderTimer = (npc.wanderTimer || 0) + 1;
+            if (npc.wanderTimer >= 120 + Math.random() * 60) {
+                npc.wanderTimer = 0;
+                npc.wanderAngle = (npc.wanderAngle || 0) + (Math.random() - 0.5) * Math.PI;
+            }
+            npc.x += Math.cos(npc.wanderAngle || 0) * cfg.speed;
+            npc.y += Math.sin(npc.wanderAngle || 0) * cfg.speed;
         }
+
+        // Отскок от границ
+        if (npc.x < 20) { npc.x = 20; npc.wanderAngle = Math.PI - (npc.wanderAngle || 0); }
+        if (npc.x > currentResolution.w - 20) { npc.x = currentResolution.w - 20; npc.wanderAngle = Math.PI - (npc.wanderAngle || 0); }
+        if (npc.y < 20) { npc.y = 20; npc.wanderAngle = -(npc.wanderAngle || 0); }
+        if (npc.y > currentResolution.h - 20) { npc.y = currentResolution.h - 20; npc.wanderAngle = -(npc.wanderAngle || 0); }
     });
-    npcs = npcs.filter(n => !n.collected);
+
+    // Смерть НПС
+    npcs = npcs.filter(npc => {
+        if (npc.hp <= 0) {
+            const cfg = balance.npcs[npc.type];
+            const r = cfg.reward;
+            if (r.coins) coins += r.coins;
+            if (r.wood)  wood  += r.wood;
+            if (r.iron)  iron  += r.iron;
+            updateUI();
+            const parts = [];
+            if (r.coins) parts.push(`+${r.coins}💰`);
+            if (r.wood)  parts.push(`+${r.wood}🌲`);
+            if (r.iron)  parts.push(`+${r.iron}🔥`);
+            showNotification(`${cfg.label} убит! ${parts.join(' ')}`, 'success');
+            skillSystem.awardXPForAction('kill_enemy');
+            if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                for (let i = 0; i < 15; i++) graphicsSystem.createParticle(npc.x, npc.y, 'blood');
+            }
+            return false;
+        }
+        return true;
+    });
 
     graphicsSystem.updateParticles();
 

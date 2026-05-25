@@ -801,7 +801,15 @@ class GraphicsSystem {
 
             let healthPercent = e.hp / e.maxHp;
             const healthWidth = e.type === 'boss' ? 60 : 40;
-            
+
+            // Имя врага
+            const enemyNames = { wolf: '🐺 Волк', robber: '🗡 Разбойник', marauder: '⚔️ Мародёр', boss: '💀 Босс' };
+            this.ctx.fillStyle = e.type === 'boss' ? '#ffd700' : '#fff';
+            this.ctx.font = e.type === 'boss' ? 'bold 11px Arial' : '10px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'bottom';
+            this.ctx.fillText(enemyNames[e.type] || e.type, 0, -33);
+
             this.ctx.fillStyle = "#ff0000";
             this.ctx.fillRect(-healthWidth/2, -30, healthWidth, 5);
             this.ctx.fillStyle = healthPercent > 0.5 ? "#00ff00" : healthPercent > 0.25 ? "#ffa500" : "#ff0000";
@@ -844,7 +852,15 @@ class GraphicsSystem {
 
             let healthPercent = e.hp / e.maxHp;
             const healthWidth = e.type === 'boss' ? 60 : 40;
-            
+
+            // Имя врага
+            const enemyNames = { wolf: '🐺 Волк', robber: '🗡 Разбойник', marauder: '⚔️ Мародёр', boss: '💀 Босс' };
+            this.ctx.fillStyle = e.type === 'boss' ? '#ffd700' : '#fff';
+            this.ctx.font = e.type === 'boss' ? 'bold 11px Arial' : '10px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'bottom';
+            this.ctx.fillText(enemyNames[e.type] || e.type, 0, -33);
+
             this.ctx.fillStyle = "#ff0000";
             this.ctx.fillRect(-healthWidth/2, -30, healthWidth, 5);
             this.ctx.fillStyle = healthPercent > 0.5 ? "#00ff00" : healthPercent > 0.25 ? "#ffa500" : "#ff0000";
@@ -928,19 +944,21 @@ class GraphicsSystem {
             this.ctx.fillText(npc.type === 'bear' ? '🐻' : '🐯', 0, 0);
         }
 
-        // Мигающий индикатор "подойди" если игрок близко
-        if (npc.playerNear) {
-            const pulse = Math.sin(this.gameState.time * 0.15) * 0.5 + 0.5;
-            this.ctx.strokeStyle = `rgba(255, 215, 0, ${pulse})`;
+        // Кольцо агрессии / настороженности
+        if (npc.aggressive) {
+            const pulse = Math.sin(this.gameState.time * 0.2) * 0.5 + 0.5;
+            this.ctx.strokeStyle = `rgba(255, 60, 60, ${0.5 + pulse * 0.5})`;
+            this.ctx.lineWidth = 3;
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, size/2 + 6, 0, Math.PI * 2);
+            this.ctx.stroke();
+        } else if (npc.playerNear) {
+            const pulse = Math.sin(this.gameState.time * 0.12) * 0.4 + 0.6;
+            this.ctx.strokeStyle = `rgba(255, 200, 0, ${pulse})`;
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
-            this.ctx.arc(0, 0, size/2 + 5, 0, Math.PI * 2);
+            this.ctx.arc(0, 0, size/2 + 4, 0, Math.PI * 2);
             this.ctx.stroke();
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${pulse})`;
-            this.ctx.font = '12px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'top';
-            this.ctx.fillText('E', 0, size/2 + 8);
         }
 
         this.ctx.restore();
