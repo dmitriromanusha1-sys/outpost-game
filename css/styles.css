@@ -2498,3 +2498,99 @@ input:checked + .slider:before {
     .bonus-stats { grid-template-columns: 1fr; }
     .skills-hotkey { font-size: 10px; padding: 6px 10px; bottom: 5px; right: 5px; }
 }
+
+/* ======================= СПРАВОЧНИК ======================= */
+.hb-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+}
+.hb-card {
+    background: rgba(20, 15, 5, 0.85);
+    border: 1px solid #3a2a10;
+    border-radius: 8px;
+    padding: 16px;
+    transition: border-color 0.2s;
+}
+.hb-card:hover { border-color: #7a5a20; }
+.hb-card-combat { border-color: #5a1010; }
+.hb-card-combat:hover { border-color: #aa2020; }
+.hb-card-unique { border-color: #3a2a60; }
+.hb-card-unique:hover { border-color: #7a5ab0; }
+.hb-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+.hb-img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    flex-shrink: 0;
+}
+.hb-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e8d5a0;
+    margin-bottom: 2px;
+}
+.hb-type {
+    font-size: 11px;
+    color: #7a6040;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.hb-desc {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+.hb-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.hb-table th {
+    background: rgba(201,162,39,0.12);
+    color: #c9a227;
+    padding: 4px 6px;
+    text-align: center;
+    font-size: 11px;
+}
+.hb-table td {
+    padding: 4px 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: #ccc;
+}
+.hb-table td:first-child { color: #aaa; white-space: nowrap; }
+.hb-table td:not(:first-child) { text-align: center; color: #e8d5a0; }
+.hb-req {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #c9a227;
+    background: rgba(201,162,39,0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.hb-tab {
+    background: rgba(40,30,10,0.7);
+    border: 1px solid #3a2a10;
+    color: #9a8060;
+    padding: 9px 22px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.hb-tab:hover { border-color: #7a5a20; color: #e8d5a0; }
+.hb-tab.active {
+    background: rgba(201,162,39,0.18);
+    border-color: #c9a227;
+    color: #c9a227;
+}

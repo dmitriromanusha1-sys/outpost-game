@@ -51,6 +51,10 @@
                     <span class="med-btn-icon">⚙</span>
                     <span class="med-btn-text">Настройки</span>
                 </button>
+                <button class="med-btn med-btn-secondary" onclick="openHandbook()">
+                    <span class="med-btn-icon">📖</span>
+                    <span class="med-btn-text">Справочник</span>
+                </button>
             </div>
             <div class="med-version">Beta · v0.4 · ASPECT</div>
         </div>
@@ -126,6 +130,397 @@
         </div>
     </div>
 </div>
+
+<!-- ======================= СПРАВОЧНИК ======================= -->
+<div id="handbook-overlay" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(10,8,4,0.95); overflow-y:auto;">
+    <div style="max-width:960px; margin:0 auto; padding:32px 20px 60px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+            <div style="font-family:'MedievalSharp',serif; font-size:28px; color:#c9a227; letter-spacing:2px;">📖 СПРАВОЧНИК</div>
+            <button onclick="closeHandbook()" style="background:rgba(100,60,10,0.5); border:1px solid #5a3a10; color:#c9a227; font-size:18px; padding:8px 20px; cursor:pointer; border-radius:4px;">✕ Закрыть</button>
+        </div>
+        <!-- Вкладки -->
+        <div id="hb-tabs" style="display:flex; gap:8px; margin-bottom:28px;">
+            <button class="hb-tab active" onclick="switchHbTab('buildings')">🏗 Здания</button>
+            <button class="hb-tab" onclick="switchHbTab('enemies')">⚔ Враги</button>
+            <button class="hb-tab" onclick="switchHbTab('npcs')">🐾 Существа</button>
+        </div>
+
+        <!-- ЗДАНИЯ -->
+        <div id="hb-buildings" class="hb-section">
+            <div class="hb-grid">
+
+                <!-- ЛЕСОПИЛКА -->
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/sawmill.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🪓 Лесопилка</div>
+                            <div class="hb-type">Производство</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Добывает древесину каждую секунду. Основа любого форпоста.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>🪵 Древесина/с</td><td>2</td><td>4</td><td>8</td></tr>
+                        <tr><td>💰 Цена постройки</td><td>30</td><td>—</td><td>—</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td>50🪙 25🪵 10🪨</td><td>50🪙 25🪵 10🪨</td></tr>
+                    </table>
+                </div>
+
+                <!-- КАМЕНОЛОМНЯ -->
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/quarry.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">⛏ Каменоломня</div>
+                            <div class="hb-type">Производство</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Добывает камень для строительства башен и укреплений.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>🪨 Камень/с</td><td>2</td><td>4</td><td>8</td></tr>
+                        <tr><td>💰 Цена постройки</td><td>30</td><td>—</td><td>—</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td>50🪙 10🪵 25🪨</td><td>50🪙 10🪵 25🪨</td></tr>
+                    </table>
+                </div>
+
+                <!-- БАНК -->
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/bank.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🏦 Банк</div>
+                            <div class="hb-type">Производство</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Генерирует монеты. Необходим для масштабного строительства.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>🪙 Монеты/с</td><td>1.2</td><td>2.64</td><td>5.8</td></tr>
+                        <tr><td>💰 Цена постройки</td><td>60</td><td>—</td><td>—</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td>100🪙 40🪵 40🪨</td><td>100🪙 40🪵 40🪨</td></tr>
+                    </table>
+                </div>
+
+                <!-- ПЛАВИЛЬНЯ -->
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/smeltery.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🔥 Плавильня</div>
+                            <div class="hb-type">Производство</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Производит железо — ресурс для продвинутых построек. Требует 20🪵 20🪨 при строительстве.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>⚙ Железо/с</td><td>1</td><td>2</td><td>4</td></tr>
+                        <tr><td>💰 Цена постройки</td><td>120🪙 20🪵 20🪨</td><td>—</td><td>—</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td>150🪙 40🪵 40🪨</td><td>150🪙 40🪵 40🪨</td></tr>
+                    </table>
+                </div>
+
+                <!-- КАРЬЕР -->
+                <div class="hb-card hb-card-unique">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/deep_quarry.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🏔 Карьер</div>
+                            <div class="hb-type">Производство · <span style="color:#c9a227">Уникальное</span></div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Мощная добыча камня. Требует Каменоломню 3 уровня. Строится один раз.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>🪨 Камень/с</td><td>10</td><td>25</td><td>62.5</td></tr>
+                        <tr><td>💰 Цена постройки</td><td colspan="3">500🪙 100🪵 200🪨 50⚙</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td colspan="2">1000🪙 200🪵 400🪨 100⚙</td></tr>
+                    </table>
+                    <div class="hb-req">⚠ Требует: Каменоломня Ур.3</div>
+                </div>
+
+                <!-- БАШНЯ -->
+                <div class="hb-card hb-card-combat">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/tower.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🗼 Башня</div>
+                            <div class="hb-type">Боевое</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Стреляет стрелами по ближайшим врагам в радиусе 200.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>⚔ Урон</td><td>5</td><td>15</td><td>25</td></tr>
+                        <tr><td>🎯 Дальность</td><td colspan="3">200</td></tr>
+                        <tr><td>⏱ Скорость атаки</td><td colspan="3">каждые 40 тиков</td></tr>
+                        <tr><td>💰 Цена постройки</td><td>60</td><td>—</td><td>—</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td>80🪙 30🪵 30🪨</td><td>80🪙 30🪵 30🪨</td></tr>
+                    </table>
+                </div>
+
+                <!-- ПУШКА -->
+                <div class="hb-card hb-card-combat">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/cannon.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">💣 Пушка</div>
+                            <div class="hb-type">Боевое · Область</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Наносит урон по области (радиус 60). Тратит камень на выстрелы.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>⚔ Урон (прямой)</td><td>25</td><td>50</td><td>100</td></tr>
+                        <tr><td>💥 Урон (осколки)</td><td colspan="3">40% от прямого</td></tr>
+                        <tr><td>🎯 Дальность</td><td colspan="3">250</td></tr>
+                        <tr><td>⏱ Скорость атаки</td><td colspan="3">каждые 80 тиков</td></tr>
+                        <tr><td>🪨 Камень/выстрел</td><td>1</td><td>3</td><td>5</td></tr>
+                        <tr><td>💰 Цена постройки</td><td>90🪙 10🪨</td><td>—</td><td>—</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td>120🪙 50🪵 50🪨</td><td>120🪙 50🪵 50🪨</td></tr>
+                    </table>
+                </div>
+
+                <!-- МАСТЕРСКАЯ -->
+                <div class="hb-card hb-card-unique">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/workshop.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🔧 Мастерская</div>
+                            <div class="hb-type">Поддержка · <span style="color:#c9a227">Уникальное</span></div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Снижает стоимость улучшений всех зданий. Строится один раз.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>💸 Скидка на апгрейд</td><td>1%</td><td>4%</td><td>10%</td></tr>
+                        <tr><td>💰 Цена постройки</td><td>120</td><td>—</td><td>—</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td>200🪙 80🪵 80🪨</td><td>200🪙 80🪵 80🪨</td></tr>
+                    </table>
+                </div>
+
+                <!-- КАМЕРА ПЫТОК -->
+                <div class="hb-card hb-card-unique">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/torture_chamber.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🔮 Камера пыток</div>
+                            <div class="hb-type">Поддержка · <span style="color:#c9a227">Уникальное</span></div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Замедляет врагов в радиусе 300. Строится один раз.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>🐢 Замедление</td><td>1%</td><td>4%</td><td>10%</td></tr>
+                        <tr><td>🎯 Радиус</td><td colspan="3">300</td></tr>
+                        <tr><td>💰 Цена постройки</td><td>150</td><td>—</td><td>—</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td>250🪙 100🪵 100🪨</td><td>250🪙 100🪵 100🪨</td></tr>
+                    </table>
+                </div>
+
+                <!-- КУЗНИЦА -->
+                <div class="hb-card hb-card-unique">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/blacksmith.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">⚒ Кузница</div>
+                            <div class="hb-type">Поддержка · <span style="color:#c9a227">Уникальное</span></div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Усиливает урон всех башен и пушек в радиусе 400. Строится один раз.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>⚔ Бонус к урону</td><td>1%</td><td>4%</td><td>10%</td></tr>
+                        <tr><td>🎯 Радиус</td><td colspan="3">400</td></tr>
+                        <tr><td>💰 Цена постройки</td><td>300🪙 50🪵 50🪨 30⚙</td><td>—</td><td>—</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td colspan="2">500🪙 100🪵 100🪨 50⚙</td></tr>
+                    </table>
+                </div>
+
+            </div><!-- /hb-grid -->
+        </div><!-- /hb-buildings -->
+
+        <!-- ВРАГИ -->
+        <div id="hb-enemies" class="hb-section" style="display:none;">
+            <div class="hb-grid">
+
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/enemies/wolf.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🐺 Волк</div>
+                            <div class="hb-type">Обычный · Частый</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Быстрый, но слабый. Появляется чаще всего.</div>
+                    <table class="hb-table">
+                        <tr><td>❤ HP</td><td>15</td></tr>
+                        <tr><td>💨 Скорость</td><td>1.2</td></tr>
+                        <tr><td>⚔ Урон</td><td>0.12/тик</td></tr>
+                        <tr><td>💰 Награда</td><td>10🪙</td></tr>
+                        <tr><td>🎲 Частота спауна</td><td>30%</td></tr>
+                    </table>
+                </div>
+
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/enemies/robber.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🗡 Разбойник</div>
+                            <div class="hb-type">Обычный · Частый</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Средняя угроза. Крепкий и наносит заметный урон.</div>
+                    <table class="hb-table">
+                        <tr><td>❤ HP</td><td>35</td></tr>
+                        <tr><td>💨 Скорость</td><td>0.9</td></tr>
+                        <tr><td>⚔ Урон</td><td>0.25/тик</td></tr>
+                        <tr><td>💰 Награда</td><td>18🪙</td></tr>
+                        <tr><td>🎲 Частота спауна</td><td>25%</td></tr>
+                    </table>
+                </div>
+
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/enemies/marauder.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">⚔ Мародёр</div>
+                            <div class="hb-type">Тяжёлый</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Медленный, но очень живучий. Требует много огня башен.</div>
+                    <table class="hb-table">
+                        <tr><td>❤ HP</td><td>90</td></tr>
+                        <tr><td>💨 Скорость</td><td>0.6</td></tr>
+                        <tr><td>⚔ Урон</td><td>0.5/тик</td></tr>
+                        <tr><td>💰 Награда</td><td>35🪙</td></tr>
+                        <tr><td>🎲 Частота спауна</td><td>15%</td></tr>
+                    </table>
+                </div>
+
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/enemies/Swordsman.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">⚔ Мечник</div>
+                            <div class="hb-type">Тяжёлый</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Закованный в броню воин. Наносит ощутимый урон при контакте.</div>
+                    <table class="hb-table">
+                        <tr><td>❤ HP</td><td>70</td></tr>
+                        <tr><td>💨 Скорость</td><td>0.8</td></tr>
+                        <tr><td>⚔ Урон</td><td>0.45/тик</td></tr>
+                        <tr><td>💰 Награда</td><td>28🪙</td></tr>
+                        <tr><td>🎲 Частота спауна</td><td>15%</td></tr>
+                    </table>
+                </div>
+
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/enemies/Archer.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🏹 Лучник</div>
+                            <div class="hb-type">Дальний бой</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Стреляет с расстояния 180. Не приближается к игроку — атакует издали.</div>
+                    <table class="hb-table">
+                        <tr><td>❤ HP</td><td>25</td></tr>
+                        <tr><td>💨 Скорость</td><td>1.0</td></tr>
+                        <tr><td>⚔ Урон/выстрел</td><td>0.3</td></tr>
+                        <tr><td>🎯 Дальность</td><td>180</td></tr>
+                        <tr><td>⏱ Интервал</td><td>каждые 180 тиков</td></tr>
+                        <tr><td>💰 Награда</td><td>22🪙</td></tr>
+                        <tr><td>🎲 Частота спауна</td><td>10%</td></tr>
+                    </table>
+                </div>
+
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/enemies/Cavalry.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🐴 Кавалерист</div>
+                            <div class="hb-type">Быстрый</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Самый быстрый враг. Прорывается через линию обороны раньше других.</div>
+                    <table class="hb-table">
+                        <tr><td>❤ HP</td><td>50</td></tr>
+                        <tr><td>💨 Скорость</td><td>2.0</td></tr>
+                        <tr><td>⚔ Урон</td><td>0.35/тик</td></tr>
+                        <tr><td>💰 Награда</td><td>25🪙</td></tr>
+                        <tr><td>🎲 Частота спауна</td><td>5%</td></tr>
+                    </table>
+                </div>
+
+                <div class="hb-card hb-card-combat" style="border-color:#8B0000;">
+                    <div class="hb-card-header">
+                        <img src="textures/enemies/boss.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">💀 Босс</div>
+                            <div class="hb-type" style="color:#e53e3e">Элитный · Раз в волну</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Появляется в конце каждой волны. HP и урон растут с каждой волной.</div>
+                    <table class="hb-table">
+                        <tr><td>❤ Базовый HP</td><td>500</td></tr>
+                        <tr><td>📈 Рост HP</td><td>+20% за волну</td></tr>
+                        <tr><td>💨 Скорость</td><td>0.3</td></tr>
+                        <tr><td>⚔ Урон</td><td>0.4/тик</td></tr>
+                        <tr><td>💰 Награда</td><td>200🪙</td></tr>
+                    </table>
+                </div>
+
+            </div>
+        </div><!-- /hb-enemies -->
+
+        <!-- НПС / СУЩЕСТВА -->
+        <div id="hb-npcs" class="hb-section" style="display:none;">
+            <div class="hb-grid">
+
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/enemies/bear.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🐻 Медведь</div>
+                            <div class="hb-type">Нейтральный НПС</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Бродит по карте. Агрессивен при приближении. Даёт монеты и древесину.</div>
+                    <table class="hb-table">
+                        <tr><td>❤ HP</td><td>180</td></tr>
+                        <tr><td>💨 Скорость</td><td>0.45 (погоня 0.85)</td></tr>
+                        <tr><td>👁 Агро-радиус</td><td>130</td></tr>
+                        <tr><td>⚔ Урон</td><td>0.35 каждые 90 тиков</td></tr>
+                        <tr><td>💰 Награда</td><td>40🪙 + 10🪵</td></tr>
+                    </table>
+                </div>
+
+                <div class="hb-card">
+                    <div class="hb-card-header">
+                        <img src="textures/enemies/tiger.png" class="hb-img" onerror="this.style.display='none'">
+                        <div>
+                            <div class="hb-name">🐯 Тигр</div>
+                            <div class="hb-type">Нейтральный НПС</div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Быстрый хищник. Видит дальше медведя, в погоне стремителен.</div>
+                    <table class="hb-table">
+                        <tr><td>❤ HP</td><td>90</td></tr>
+                        <tr><td>💨 Скорость</td><td>0.95 (погоня 1.7)</td></tr>
+                        <tr><td>👁 Агро-радиус</td><td>160</td></tr>
+                        <tr><td>⚔ Урон</td><td>0.28 каждые 50 тиков</td></tr>
+                        <tr><td>💰 Награда</td><td>25🪙 + 5⚙</td></tr>
+                    </table>
+                </div>
+
+            </div>
+        </div><!-- /hb-npcs -->
+
+    </div><!-- /container -->
+</div><!-- /handbook-overlay -->
 
 <!-- ======================= СЮЖЕТНАЯ ЗАСТАВКА КАМПАНИИ ======================= -->
 <div id="story-intro" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); align-items:center; justify-content:center;">
@@ -1983,6 +2378,25 @@ document.addEventListener("keydown", e => {
 });
 
 document.addEventListener("keyup", e => keys[e.code] = false);
+
+function openHandbook() {
+    document.getElementById('handbook-overlay').style.display = 'block';
+    document.addEventListener('keydown', _hbEscHandler);
+}
+function _hbEscHandler(e) {
+    if (e.key === 'Escape') closeHandbook();
+}
+function closeHandbook() {
+    document.getElementById('handbook-overlay').style.display = 'none';
+    document.removeEventListener('keydown', _hbEscHandler);
+}
+function switchHbTab(tab) {
+    document.querySelectorAll('.hb-section').forEach(s => s.style.display = 'none');
+    document.querySelectorAll('.hb-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('hb-' + tab).style.display = 'block';
+    const idx = { buildings: 0, enemies: 1, npcs: 2 }[tab];
+    document.querySelectorAll('.hb-tab')[idx].classList.add('active');
+}
 
 function showSettings() {
     document.getElementById('settings-menu').classList.add('active');
