@@ -1007,7 +1007,7 @@ input[type="range"]::-webkit-slider-thumb {
 #main-menu {
     position: fixed;
     inset: 0;
-    background: radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #0a0a14 100%);
+    background: #070503;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1019,41 +1019,104 @@ input[type="range"]::-webkit-slider-thumb {
 
 /* ======================= СРЕДНЕВЕКОВОЕ МЕНЮ ======================= */
 
-/* Фон — тёмный камень с факелами */
+/* Фон с атмосферными слоями */
 .med-bg {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse at 15% 15%, rgba(180,100,20,0.18) 0%, transparent 40%),
-        radial-gradient(ellipse at 85% 15%, rgba(180,100,20,0.18) 0%, transparent 40%),
-        radial-gradient(ellipse at 15% 85%, rgba(180,100,20,0.12) 0%, transparent 35%),
-        radial-gradient(ellipse at 85% 85%, rgba(180,100,20,0.12) 0%, transparent 35%),
-        radial-gradient(ellipse at 50% 50%, rgba(60,30,10,0.4) 0%, transparent 80%),
-        #0d0a06;
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120,60,10,0.35) 0%, transparent 60%),
+        radial-gradient(ellipse at 15% 15%, rgba(200,110,20,0.22) 0%, transparent 35%),
+        radial-gradient(ellipse at 85% 15%, rgba(200,110,20,0.22) 0%, transparent 35%),
+        radial-gradient(ellipse at 15% 85%, rgba(140,70,10,0.14) 0%, transparent 30%),
+        radial-gradient(ellipse at 85% 85%, rgba(140,70,10,0.14) 0%, transparent 30%),
+        radial-gradient(ellipse at 50% 100%, rgba(80,35,5,0.5) 0%, transparent 50%),
+        linear-gradient(180deg, #0a0602 0%, #070503 50%, #050302 100%);
+    pointer-events: none;
+}
+
+/* Тонкая каменная текстура через паттерн */
+.med-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(0,0,0,0.04) 60px, rgba(0,0,0,0.04) 61px),
+        repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(0,0,0,0.03) 80px, rgba(0,0,0,0.03) 81px);
+    pointer-events: none;
+}
+
+/* Виньетка */
+.med-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.7) 100%);
     pointer-events: none;
 }
 
 /* Факелы по углам */
 .med-torch {
     position: absolute;
-    width: 60px; height: 80px;
+    width: 70px; height: 100px;
     pointer-events: none;
+    z-index: 2;
 }
 .med-torch::before {
     content: '🔥';
     position: absolute;
-    font-size: 32px;
-    animation: torchFlicker 1.5s ease-in-out infinite alternate;
+    font-size: 38px;
+    filter: drop-shadow(0 0 12px rgba(255,140,0,0.8)) drop-shadow(0 0 30px rgba(255,80,0,0.4));
+    animation: torchFlicker 1.2s ease-in-out infinite alternate;
 }
-.med-torch-tl { top: 30px; left: 40px; }
-.med-torch-tr { top: 30px; right: 40px; }
-.med-torch-bl { bottom: 30px; left: 40px; }
-.med-torch-br { bottom: 30px; right: 40px; }
+/* Ореол факела */
+.med-torch::after {
+    content: '';
+    position: absolute;
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 60%, rgba(255,140,0,0.18) 0%, transparent 70%);
+    top: -10px; left: -16px;
+    animation: torchGlow 1.2s ease-in-out infinite alternate;
+}
+.med-torch-tl { top: 24px; left: 32px; }
+.med-torch-tr { top: 24px; right: 32px; }
+.med-torch-bl { bottom: 24px; left: 32px; }
+.med-torch-br { bottom: 24px; right: 32px; }
 
 @keyframes torchFlicker {
-    0%   { transform: scale(1) rotate(-3deg);   opacity: 0.85; }
-    50%  { transform: scale(1.1) rotate(2deg);  opacity: 1; }
-    100% { transform: scale(0.95) rotate(-1deg); opacity: 0.9; }
+    0%   { transform: scale(1) rotate(-4deg);   opacity: 0.8; }
+    30%  { transform: scale(1.08) rotate(1deg); opacity: 1; }
+    70%  { transform: scale(0.97) rotate(3deg); opacity: 0.92; }
+    100% { transform: scale(1.05) rotate(-2deg); opacity: 0.88; }
+}
+@keyframes torchGlow {
+    0%   { opacity: 0.6; transform: scale(0.9); }
+    100% { opacity: 1;   transform: scale(1.2); }
+}
+
+/* Анимированные искры */
+.med-ember {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: #ff8c00;
+    pointer-events: none;
+    animation: emberRise linear infinite;
+    z-index: 1;
+}
+@keyframes emberRise {
+    0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0.9; }
+    50%  { transform: translateY(-40vh) translateX(var(--drift, 20px)) scale(0.7); opacity: 0.6; }
+    100% { transform: translateY(-85vh) translateX(var(--drift2, -10px)) scale(0.2); opacity: 0; }
+}
+
+/* Горизонтальная линия-декор внизу */
+.med-bottom-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, rgba(201,162,39,0.3) 20%, rgba(201,162,39,0.6) 50%, rgba(201,162,39,0.3) 80%, transparent 100%);
+    pointer-events: none;
 }
 
 /* Экраны */
@@ -1069,93 +1132,148 @@ input[type="range"]::-webkit-slider-thumb {
 /* Базовая карточка */
 .med-card {
     position: relative;
-    width: min(480px, 94vw);
+    width: min(500px, 94vw);
     background:
-        linear-gradient(180deg, #1e1408 0%, #160f06 60%, #0f0a04 100%);
-    border: 2px solid #5a3a0a;
-    border-radius: 4px;
-    padding: 36px 40px 30px;
+        linear-gradient(180deg, #221708 0%, #180f05 40%, #100a03 100%);
+    border: 1px solid #6a4010;
+    border-radius: 6px;
+    padding: 38px 44px 32px;
     box-shadow:
-        0 0 0 1px #2a1a05,
-        0 0 0 4px #0d0a04,
-        0 0 60px rgba(0,0,0,0.9),
-        inset 0 1px 0 rgba(201,162,39,0.15);
+        0 0 0 1px #3a2208,
+        0 0 0 5px rgba(10,6,2,0.9),
+        0 0 0 6px #2a1606,
+        0 30px 80px rgba(0,0,0,0.95),
+        0 0 60px rgba(180,100,20,0.08),
+        inset 0 1px 0 rgba(201,162,39,0.18),
+        inset 0 -1px 0 rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 20px;
+    animation: cardAppear 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardAppear {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .med-card-wide {
-    width: min(700px, 96vw);
+    width: min(720px, 96vw);
 }
 
-/* Угловые украшения */
-.med-card::before, .med-card::after {
+/* Угловые украшения — все 4 угла */
+.med-card::before {
     content: '';
     position: absolute;
-    width: 18px; height: 18px;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid rgba(201,162,39,0.08);
+    border-radius: 3px;
+    pointer-events: none;
+}
+.med-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: linear-gradient(180deg, rgba(201,162,39,0.04) 0%, transparent 30%);
+    pointer-events: none;
+}
+/* Внешние угловые уголки */
+.med-card-main .med-corner {
+    position: absolute;
+    width: 22px; height: 22px;
     border-color: #c9a227;
     border-style: solid;
+    opacity: 0.7;
 }
-.med-card::before { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
-.med-card::after  { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
 
 /* Эмблема */
 .med-emblem {
-    font-size: 64px;
+    font-size: 72px;
     text-align: center;
-    filter: drop-shadow(0 0 20px rgba(201,162,39,0.7));
-    animation: medFloat 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 24px rgba(201,162,39,0.8)) drop-shadow(0 0 50px rgba(255,140,0,0.3));
+    animation: medFloat 5s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
 }
 @keyframes medFloat {
-    0%,100% { transform: translateY(0); }
-    50%      { transform: translateY(-8px); }
+    0%,100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-10px) rotate(1deg); }
 }
 
-/* Заголовок */
+/* Заголовок — металлический градиент */
 .med-title {
-    font-size: 48px;
+    font-size: 52px;
     font-weight: 900;
     text-align: center;
-    letter-spacing: 8px;
-    color: #c9a227;
-    text-shadow:
-        0 0 30px rgba(201,162,39,0.6),
-        0 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: 10px;
+    background: linear-gradient(180deg,
+        #ffe87a 0%,
+        #c9a227 30%,
+        #f0c040 55%,
+        #8a6510 75%,
+        #c9a227 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.8));
     line-height: 1;
+    position: relative;
+}
+/* Отражение под заголовком */
+.med-title-wrap {
+    position: relative;
+    text-align: center;
+}
+.med-title-reflection {
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: 10px;
+    color: #c9a227;
+    opacity: 0.06;
+    transform: scaleY(-0.35) translateY(-10px);
+    transform-origin: top center;
+    display: block;
+    text-align: center;
+    line-height: 0.8;
+    user-select: none;
+    pointer-events: none;
+    filter: blur(2px);
 }
 
 .med-subtitle {
     text-align: center;
-    font-size: 13px;
-    color: #7a6040;
-    letter-spacing: 1.5px;
+    font-size: 11px;
+    color: #6a5030;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    margin-top: -10px;
+    margin-top: -8px;
 }
 
-/* Разделитель */
+/* Разделитель — более орнаментальный */
 .med-divider {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #5a3a0a;
-    font-size: 12px;
-    letter-spacing: 3px;
+    gap: 12px;
+    margin: -4px 0;
 }
 .med-divider::before, .med-divider::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, transparent, #5a3a0a, transparent);
+    background: linear-gradient(90deg, transparent, #6a4010 40%, #c9a227 50%, #6a4010 60%, transparent);
 }
-.med-divider span { color: #c9a227; font-size: 18px; }
+.med-divider span {
+    color: #c9a227;
+    font-size: 20px;
+    filter: drop-shadow(0 0 8px rgba(201,162,39,0.5));
+}
 
 /* Главные кнопки */
 .med-main-buttons {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .med-btn {
@@ -1163,56 +1281,90 @@ input[type="range"]::-webkit-slider-thumb {
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding: 16px 24px;
+    padding: 15px 24px;
     border: none;
-    border-radius: 2px;
+    border-radius: 3px;
     cursor: pointer;
     font-family: inherit;
-    transition: all 0.2s;
+    transition: all 0.22s cubic-bezier(0.22,1,0.36,1);
     position: relative;
     overflow: hidden;
 }
 
+/* Эффект блика при hover */
+.med-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+    transition: left 0.35s ease;
+}
+.med-btn:hover::after { left: 150%; }
+
 .med-btn-icon { font-size: 20px; }
-.med-btn-text { font-size: 18px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+.med-btn-text { font-size: 16px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
 
 .med-btn-primary {
-    background: linear-gradient(180deg, #7a3a00 0%, #4a2000 100%);
+    background: linear-gradient(180deg, #8a4200 0%, #5a2800 50%, #3a1800 100%);
     border: 1px solid #c9a227;
-    color: #f0c040;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(201,162,39,0.2);
-    text-shadow: 0 0 10px rgba(240,192,64,0.4);
+    color: #f5d060;
+    box-shadow:
+        0 4px 20px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(201,162,39,0.1),
+        inset 0 1px 0 rgba(255,200,80,0.25),
+        inset 0 -1px 0 rgba(0,0,0,0.4);
+    text-shadow: 0 0 16px rgba(240,192,64,0.5), 0 1px 2px rgba(0,0,0,0.8);
 }
 .med-btn-primary:hover {
-    background: linear-gradient(180deg, #9a4a00 0%, #6a3000 100%);
-    box-shadow: 0 6px 24px rgba(0,0,0,0.7), 0 0 20px rgba(201,162,39,0.25), inset 0 1px 0 rgba(201,162,39,0.3);
-    transform: translateY(-2px);
+    background: linear-gradient(180deg, #aa5200 0%, #7a3800 50%, #4a2200 100%);
+    box-shadow:
+        0 6px 28px rgba(0,0,0,0.8),
+        0 0 30px rgba(201,162,39,0.2),
+        0 0 0 1px rgba(201,162,39,0.25),
+        inset 0 1px 0 rgba(255,200,80,0.3),
+        inset 0 -1px 0 rgba(0,0,0,0.5);
+    transform: translateY(-3px);
+    color: #fce87a;
 }
+.med-btn-primary:active { transform: translateY(-1px); }
 .med-btn-primary:disabled {
-    opacity: 0.35;
+    opacity: 0.3;
     cursor: not-allowed;
     transform: none;
 }
 
+/* Анимация пульсации для кнопки Играть */
+.med-btn-primary.med-btn-pulse {
+    animation: btnPulse 3s ease-in-out infinite;
+}
+@keyframes btnPulse {
+    0%,100% { box-shadow: 0 4px 20px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,162,39,0.1), inset 0 1px 0 rgba(255,200,80,0.25); }
+    50%      { box-shadow: 0 4px 20px rgba(0,0,0,0.7), 0 0 20px rgba(201,162,39,0.18), 0 0 0 1px rgba(201,162,39,0.3), inset 0 1px 0 rgba(255,200,80,0.25); }
+}
+
 .med-btn-secondary {
-    background: linear-gradient(180deg, #2a1e10 0%, #1a1008 100%);
-    border: 1px solid #3a2a10;
-    color: #9a7a4a;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    background: linear-gradient(180deg, #271a0a 0%, #1a1006 100%);
+    border: 1px solid #3a2810;
+    color: #8a6a3a;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,200,80,0.05);
 }
 .med-btn-secondary:hover {
-    border-color: #6a4a20;
+    border-color: #7a5020;
     color: #c9a227;
-    background: linear-gradient(180deg, #3a2810 0%, #2a1808 100%);
+    background: linear-gradient(180deg, #362210 0%, #231508 100%);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.7), 0 0 12px rgba(201,162,39,0.08), inset 0 1px 0 rgba(255,200,80,0.1);
+    transform: translateY(-2px);
 }
 
 /* Версия */
 .med-version {
     text-align: center;
-    font-size: 11px;
-    color: #3a2a10;
-    letter-spacing: 1px;
+    font-size: 10px;
+    color: #2e1e08;
+    letter-spacing: 2px;
     text-transform: uppercase;
+    margin-top: -4px;
 }
 
 /* Заголовок карточки с кнопкой назад */
@@ -1222,22 +1374,22 @@ input[type="range"]::-webkit-slider-thumb {
     gap: 16px;
 }
 .med-card-title {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: #c9a227;
-    text-shadow: 0 0 15px rgba(201,162,39,0.4);
+    text-shadow: 0 0 20px rgba(201,162,39,0.35);
     flex: 1;
     text-align: center;
-    margin-right: 60px; /* компенсация кнопки назад */
+    margin-right: 60px;
 }
 .med-back-btn {
-    background: transparent;
-    border: 1px solid #3a2a10;
-    color: #7a6040;
-    padding: 8px 14px;
-    border-radius: 2px;
+    background: rgba(20,12,4,0.8);
+    border: 1px solid #3a2810;
+    color: #6a5030;
+    padding: 8px 16px;
+    border-radius: 3px;
     cursor: pointer;
     font-family: inherit;
     font-size: 13px;
@@ -1245,38 +1397,47 @@ input[type="range"]::-webkit-slider-thumb {
     white-space: nowrap;
     flex-shrink: 0;
 }
-.med-back-btn:hover { border-color: #c9a227; color: #c9a227; }
+.med-back-btn:hover { border-color: #c9a227; color: #c9a227; background: rgba(40,24,8,0.9); }
 
 /* Карточки режимов */
 .med-modes {
     display: flex;
-    gap: 16px;
+    gap: 14px;
 }
 .med-mode-card {
     flex: 1;
     background: linear-gradient(180deg, #1e1408 0%, #120e06 100%);
     border: 1px solid #3a2a10;
-    border-radius: 3px;
-    padding: 24px 20px;
+    border-radius: 4px;
+    padding: 28px 20px;
     cursor: pointer;
-    transition: all 0.25s;
+    transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
     display: flex;
     flex-direction: column;
     gap: 10px;
     align-items: center;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.med-mode-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,162,39,0.2), transparent);
 }
 .med-mode-card:hover:not(.med-mode-locked) {
     border-color: #c9a227;
     background: linear-gradient(180deg, #2e2010 0%, #1e1408 100%);
-    box-shadow: 0 0 20px rgba(201,162,39,0.15);
-    transform: translateY(-3px);
+    box-shadow: 0 0 30px rgba(201,162,39,0.12), 0 8px 24px rgba(0,0,0,0.6);
+    transform: translateY(-4px);
 }
-.med-mode-locked { opacity: 0.45; cursor: not-allowed; }
-.med-mode-icon   { font-size: 44px; }
-.med-mode-name   { font-size: 20px; font-weight: 800; letter-spacing: 2px; color: #c9a227; text-transform: uppercase; }
-.med-mode-desc   { font-size: 12px; color: #7a6040; line-height: 1.5; }
-.med-mode-tag    { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #4a8a4a; text-transform: uppercase; border: 1px solid #2a4a2a; padding: 3px 10px; border-radius: 2px; }
+.med-mode-locked { opacity: 0.4; cursor: not-allowed; }
+.med-mode-icon   { font-size: 48px; filter: drop-shadow(0 0 10px rgba(201,162,39,0.3)); }
+.med-mode-name   { font-size: 18px; font-weight: 800; letter-spacing: 2px; color: #c9a227; text-transform: uppercase; }
+.med-mode-desc   { font-size: 12px; color: #6a5530; line-height: 1.6; }
+.med-mode-tag    { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #4a8a4a; text-transform: uppercase; border: 1px solid #2a4a2a; padding: 3px 12px; border-radius: 2px; }
 .med-mode-tag-wip { color: #7a5a2a; border-color: #3a2a10; }
 
 /* Сетка сложностей */
