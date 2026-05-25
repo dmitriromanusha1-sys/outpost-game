@@ -1097,6 +1097,14 @@ const player = {
     direction: 'front'
 };
 
+// ======================= КАМЕРА =======================
+const camera = {
+    zoom: 1.0,
+    minZoom: 0.4,
+    maxZoom: 3.0,
+    zoomStep: 0.12
+};
+
 // ======================= БАЛАНС И УРОВНИ =======================
 const balance = {
     waveDifficultyIncrease: {
@@ -2420,6 +2428,13 @@ document.addEventListener("keydown", e => {
 
 document.addEventListener("keyup", e => keys[e.code] = false);
 
+// ======================= ЗУМИРОВАНИЕ КАМЕРЫ =======================
+canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const dir = e.deltaY < 0 ? 1 : -1;
+    camera.zoom = Math.min(camera.maxZoom, Math.max(camera.minZoom, camera.zoom + dir * camera.zoomStep));
+}, { passive: false });
+
 function openHandbook() {
     document.getElementById('handbook-overlay').style.display = 'block';
     document.addEventListener('keydown', _hbEscHandler);
@@ -3295,30 +3310,30 @@ function draw() {
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
-    
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Применяем трансформацию камеры: центрируем на игроке + зум
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.scale(camera.zoom, camera.zoom);
+    ctx.translate(-player.x, -player.y);
+
     graphicsSystem.drawMap();
-    
     graphicsSystem.applyLighting();
-    
     graphicsSystem.drawPlayer(player);
-    
     buildings.forEach(b => graphicsSystem.drawBuilding(b));
-    
     enemies.forEach(e => graphicsSystem.drawEnemy(e));
-
     npcs.forEach(n => graphicsSystem.drawNPC(n));
-
     arrows.forEach(a => graphicsSystem.drawArrow(a));
-    
     cannonBalls.forEach(cb => graphicsSystem.drawCannonBall(cb));
-    
     graphicsSystem.drawParticles();
-    
     graphicsSystem.drawWeather();
-    
-    
+
+    ctx.restore();
+
     graphicsSystem.applyPostProcessing();
-    
+
     updateFPS();
 }
 

@@ -1135,41 +1135,34 @@ class GraphicsSystem {
     // ======================= ОТРИСОВКА КАРТЫ =======================
     
     drawMap() {
+        // Рисуем карту с запасом чтобы при минимальном зуме (0.4) не было чёрных краёв
+        const pad = this.GAME_WIDTH * 1.5;
+        const x = -pad;
+        const y = -pad;
+        const w = this.GAME_WIDTH + pad * 2;
+        const h = this.GAME_HEIGHT + pad * 2;
+
         this.ctx.fillStyle = '#111';
-        this.ctx.fillRect(0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
-        
+        this.ctx.fillRect(x, y, w, h);
+
         const texture = this.textures.maps[this.gameState.currentMap];
         if (texture && texture.complete && texture.naturalWidth > 0) {
-            this.ctx.drawImage(texture, 0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
-            
+            this.ctx.drawImage(texture, x, y, w, h);
             if (this.settings.textureQuality !== 'low') {
                 this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-                this.ctx.fillRect(0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
+                this.ctx.fillRect(x, y, w, h);
             }
         } else {
             const mapColors = {
-                'forest': '#2e7d32',
-                'desert': '#d2b48c',
-                'mountains': '#708090',
-                'meadows': '#90ee90',
-                'jungle': '#228b22',
-                'winter': '#ffffff',
-                'volcano': '#ff4500',
-                'swamp': '#556b2f',
-                'autumn': '#d2691e',
-                'steppe': '#bdb76b',
-                'coastal': '#87ceeb',
-                'ruins': '#a9a9a9',
-                'canyon': '#8b4513',
-                'lava': '#ff4500',
-                'cloud': '#f0f8ff',
-                'cherry': '#ffb6c1',
-                'dark': '#2f4f4f',
-                'heaven': '#f0f8ff'
+                'forest': '#2e7d32', 'desert': '#d2b48c', 'mountains': '#708090',
+                'meadows': '#90ee90', 'jungle': '#228b22', 'winter': '#ffffff',
+                'volcano': '#ff4500', 'swamp': '#556b2f', 'autumn': '#d2691e',
+                'steppe': '#bdb76b', 'coastal': '#87ceeb', 'ruins': '#a9a9a9',
+                'canyon': '#8b4513', 'lava': '#ff4500', 'cloud': '#f0f8ff',
+                'cherry': '#ffb6c1', 'dark': '#2f4f4f', 'heaven': '#f0f8ff'
             };
-            
             this.ctx.fillStyle = mapColors[this.gameState.currentMap] || '#111';
-            this.ctx.fillRect(0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
+            this.ctx.fillRect(x, y, w, h);
         }
     }
     
