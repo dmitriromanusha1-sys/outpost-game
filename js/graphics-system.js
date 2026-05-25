@@ -444,10 +444,20 @@ class GraphicsSystem {
     }
     
     async loadEnemyTextures() {
-        const enemies = ['wolf', 'robber', 'marauder', 'boss', 'bear', 'tiger', 'swordsman', 'archer', 'cavalry'];
+        const enemies = [
+            { key: 'wolf', file: 'wolf' },
+            { key: 'robber', file: 'robber' },
+            { key: 'marauder', file: 'marauder' },
+            { key: 'boss', file: 'boss' },
+            { key: 'bear', file: 'bear' },
+            { key: 'tiger', file: 'tiger' },
+            { key: 'swordsman', file: 'Swordsman' },
+            { key: 'archer', file: 'Archer' },
+            { key: 'cavalry', file: 'Cavalry' },
+        ];
 
         for (const enemy of enemies) {
-            await this.loadTexture(`textures/enemies/${enemy}.png`, 'enemies', enemy);
+            await this.loadTexture(`textures/enemies/${enemy.file}.png`, 'enemies', enemy.key);
         }
     }
     
