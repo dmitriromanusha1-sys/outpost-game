@@ -572,7 +572,7 @@
         <div class="med-divider" style="margin:18px 0;"><span>⚔</span></div>
         <div class="story-text" id="story-text"></div>
         <div class="story-gameplay" id="story-gameplay"></div>
-        <button class="med-btn med-btn-primary" style="margin-top:28px;" onclick="dismissStoryIntro()">
+        <button class="med-btn med-btn-primary" style="margin-top:0" onclick="dismissStoryIntro()">
             <span class="med-btn-icon">⚔</span>
             <span class="med-btn-text">В бой!</span>
         </button>
@@ -587,12 +587,12 @@
         <aside class="settings-sidebar">
             <div class="settings-logo">
                 <span class="settings-logo-icon">⚙</span>
-                <span>Настройки</span>
+                <span class="settings-logo-text">Настройки</span>
             </div>
 
             <nav class="settings-tabs">
                 <button class="stab active" data-panel="panel-graphics" onclick="switchSettingsTab(this)">
-                    <span class="stab-icon">🎮</span><span>Графика</span>
+                    <span class="stab-icon">🖥</span><span>Графика</span>
                 </button>
                 <button class="stab" data-panel="panel-music" onclick="switchSettingsTab(this)">
                     <span class="stab-icon">🎵</span><span>Музыка</span>
@@ -600,6 +600,7 @@
                 <button class="stab" data-panel="panel-extra" onclick="switchSettingsTab(this)">
                     <span class="stab-icon">🔧</span><span>Прочее</span>
                 </button>
+                <div class="stab-divider"></div>
                 <button class="stab" data-panel="panel-controls" onclick="switchSettingsTab(this)">
                     <span class="stab-icon">⌨</span><span>Управление</span>
                 </button>
@@ -620,6 +621,7 @@
 
             <!-- ГРАФИКА -->
             <div class="settings-panel active" id="panel-graphics">
+                <div class="spanel-section">
                 <div class="spanel-title">Качество графики</div>
                 <div class="graphics-options">
                     <div class="graphics-preset active" onclick="setGraphicsPreset('verylow')">
@@ -674,7 +676,10 @@
                     </div>
                 </div>
 
-                <div class="spanel-title" style="margin-top:28px;">Разрешение рендера</div>
+                </div></div><!-- /spanel-section -->
+
+                <div class="spanel-section">
+                <div class="spanel-title">Разрешение рендера</div>
                 <div class="res-buttons">
                     <button class="btn resolution-btn" onclick="setResolution(640,360)">640×360</button>
                     <button class="btn resolution-btn active" onclick="setResolution(900,500)">900×500</button>
@@ -682,16 +687,20 @@
                     <button class="btn resolution-btn" onclick="setResolution(1920,1080)">1920×1080</button>
                 </div>
                 <div class="res-hint">Текущее: <span id="current-resolution-label">900×500</span> · Применяется вместе с графикой</div>
+                </div>
 
-                <div class="spanel-title" style="margin-top:28px;">Атмосферные эффекты</div>
+                <div class="spanel-section">
+                <div class="spanel-title">Атмосферные эффекты</div>
                 <div class="weather-controls">
                     <div class="weather-option active" onclick="toggleWeatherEffect('fog')"><span>🌫 Туман</span></div>
                     <div class="weather-option" onclick="toggleWeatherEffect('rain')"><span>🌧 Дождь</span></div>
                     <div class="weather-option" onclick="toggleWeatherEffect('snow')"><span>❄ Снег</span></div>
                     <div class="weather-option" onclick="toggleWeatherEffect('wind')"><span>💨 Ветер</span></div>
                 </div>
+                </div>
 
-                <div class="spanel-title" style="margin-top:28px;">Освещение и время</div>
+                <div class="spanel-section">
+                <div class="spanel-title">Освещение и время</div>
                 <div class="toggle-rows">
                     <div class="toggle-row">
                         <span>🌙 Цикл дня и ночи</span>
@@ -702,15 +711,19 @@
                         <label class="switch"><input type="checkbox" id="dynamic-lighting" checked><span class="slider"></span></label>
                     </div>
                 </div>
+                </div>
 
-                <div class="spanel-title" style="margin-top:28px;">Интенсивность погоды</div>
+                <div class="spanel-section">
+                <div class="spanel-title">Интенсивность погоды</div>
                 <div class="slider-row">
                     <span>0%</span>
                     <input type="range" id="weather-intensity" min="0" max="100" value="50">
                     <span class="weather-intensity">50%</span>
                 </div>
+                </div>
 
-                <div class="spanel-title" style="margin-top:28px;">Выбор карты</div>
+                <div class="spanel-section">
+                <div class="spanel-title">Выбор карты</div>
                 <div class="map-options">
                     <div class="map-option active" onclick="changeMap('forest')"><div class="map-icon">🌲</div><div class="map-name">Лес</div><div class="map-desc">Классический лес</div></div>
                     <div class="map-option" onclick="changeMap('desert')"><div class="map-icon">🏜</div><div class="map-name">Пустыня</div><div class="map-desc">Жаркие пески</div></div>
@@ -730,6 +743,7 @@
                     <div class="map-option" onclick="changeMap('cherry')"><div class="map-icon">🌸</div><div class="map-name">Сакура</div><div class="map-desc">Цветущая сакура</div></div>
                     <div class="map-option" onclick="changeMap('dark')"><div class="map-icon">🌑</div><div class="map-name">Тьма</div><div class="map-desc">Тёмное царство</div></div>
                     <div class="map-option" onclick="changeMap('heaven')"><div class="map-icon">😇</div><div class="map-name">Рай</div><div class="map-desc">Небесные сады</div></div>
+                </div>
                 </div>
             </div>
 
@@ -774,6 +788,7 @@
 
             <!-- ПРОЧЕЕ -->
             <div class="settings-panel" id="panel-extra">
+                <div class="spanel-section">
                 <div class="spanel-title">Скорость игры</div>
                 <div class="speed-row">
                     <button class="btn speed-btn active" onclick="setSpeed(1)">×1</button>
@@ -782,8 +797,10 @@
                     <button class="btn speed-btn" onclick="setSpeed(4)">×4</button>
                     <button class="btn speed-btn" onclick="setSpeed(5)">×5</button>
                 </div>
+                </div>
 
-                <div class="spanel-title" style="margin-top:28px;">Камера</div>
+                <div class="spanel-section">
+                <div class="spanel-title">Камера</div>
                 <div class="camera-mode-row">
                     <div class="camera-mode-card active" id="cam-mode-classic" onclick="setCameraMode('classic')">
                         <div class="cam-mode-icon">🗺</div>
@@ -796,8 +813,10 @@
                         <div class="cam-mode-desc">Камера следует за персонажем, зум колёсиком мыши</div>
                     </div>
                 </div>
+                </div>
 
-                <div class="spanel-title" style="margin-top:28px;">Интерфейс</div>
+                <div class="spanel-section">
+                <div class="spanel-title">Интерфейс</div>
                 <div class="toggle-rows">
                     <div class="toggle-row">
                         <span>📊 Показывать FPS</span>
@@ -812,10 +831,12 @@
                         <label class="switch"><input type="checkbox" id="particles-enabled" checked><span class="slider"></span></label>
                     </div>
                 </div>
+                </div>
             </div>
 
             <!-- УПРАВЛЕНИЕ -->
             <div class="settings-panel" id="panel-controls">
+                <div class="spanel-section">
                 <div class="spanel-title">Клавиши управления</div>
                 <div class="controls-grid">
                     <div class="controls-group">
@@ -846,7 +867,7 @@
                         <div class="control-row"><kbd>F2</kbd><span>Следующая карта</span></div>
                     </div>
                 </div>
-            </div>
+                </div></div><!-- /spanel-section /panel-controls -->
 
             <!-- О ИГРЕ -->
             <div class="settings-panel" id="panel-about">
