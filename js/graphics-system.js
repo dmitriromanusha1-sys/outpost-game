@@ -285,6 +285,24 @@ class GraphicsSystem {
         };
         
         this.initPostProcessing();
+
+        // ── Плавающие числа урона / текст ──
+        this.floatingTexts = [];
+
+        // ── Экранный шейк ──
+        this.screenShake = { x: 0, y: 0, intensity: 0, duration: 0, time: 0 };
+
+        // ── Хит-флеш: entityId → timer (0..1) ──
+        this.hitFlashes = {};
+
+        // ── Атмосферные частицы (светлячки, пыль) ──
+        this.ambientParticles = [];
+
+        // ── Трейлы снарядов ──
+        this.projectileTrails = [];
+
+        // ── Low-HP screen effect ──
+        this.playerHpRatio = 1.0;
     }
     
     // ======================= СИСТЕМА УДАЛЕНИЯ ФОНА =======================
@@ -550,14 +568,13 @@ class GraphicsSystem {
         }
         
         const playerHealthPercent = player.hp / player.maxHp;
-        this.ctx.fillStyle = "#ff0000";
-        this.ctx.fillRect(player.x - 20, player.y - 35, 40, 4);
-        this.ctx.fillStyle = playerHealthPercent > 0.5 ? "#00ff00" : playerHealthPercent > 0.25 ? "#ffa500" : "#ff0000";
-        this.ctx.fillRect(player.x - 20, player.y - 35, 40 * playerHealthPercent, 4);
-        
-        this.ctx.fillStyle = "#ffffff";
+        this.playerHpRatio = playerHealthPercent;
+        this.drawHealthBar(player.x, player.y - 30, 48, playerHealthPercent, true, false);
+
+        // Индикатор направления
+        this.ctx.fillStyle = "rgba(255,255,255,0.7)";
         this.ctx.beginPath();
-        this.ctx.arc(player.x + player.dir.x * 18, player.y + player.dir.y * 18, 5, 0, Math.PI * 2);
+        this.ctx.arc(player.x + player.dir.x * 18, player.y + player.dir.y * 18, 4, 0, Math.PI * 2);
         this.ctx.fill();
 
         // Индикатор конюшни
@@ -604,14 +621,23 @@ class GraphicsSystem {
             
             this.ctx.drawImage(textureToUse, -size/2, -size/2, size, size);
             
-            this.ctx.strokeStyle = b.lvl === 1 ? "#aaa" : b.lvl === 2 ? "#ff9800" : "#ff5252";
-            this.ctx.lineWidth = this.settings.textureQuality === 'ultra' ? 4 : 3;
+            // Рамка по уровню
+            const lvlColor = b.lvl === 1 ? 'rgba(180,180,180,0.6)' : b.lvl === 2 ? 'rgba(255,165,0,0.7)' : 'rgba(255,80,80,0.8)';
+            this.ctx.strokeStyle = lvlColor;
+            this.ctx.lineWidth = b.lvl === 3 ? 3 : 2;
             this.ctx.strokeRect(-size/2, -size/2, size, size);
-            
-            this.ctx.fillStyle = "#fff";
-            this.ctx.font = "bold 12px Arial";
-            this.ctx.textAlign = "center";
-            this.ctx.fillText(`Lvl ${b.lvl}`, 0, -size/2 - 8);
+
+            // Бейдж уровня
+            const badgeY = -size/2 - 5;
+            const badgeW = 28, badgeH = 13;
+            this.ctx.fillStyle = b.lvl === 1 ? 'rgba(80,80,80,0.85)' : b.lvl === 2 ? 'rgba(140,80,0,0.9)' : 'rgba(140,20,20,0.9)';
+            this._roundRect(-badgeW/2, badgeY - badgeH, badgeW, badgeH, 3);
+            this.ctx.fill();
+            this.ctx.fillStyle = b.lvl === 1 ? '#ccc' : b.lvl === 2 ? '#ffcc44' : '#ff8080';
+            this.ctx.font = 'bold 9px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(`LVL ${b.lvl}`, 0, badgeY - badgeH/2);
             
             if (b.type === "workshop" && this.settings.textureQuality !== 'low') {
                 const pulse = Math.sin(this.gameState.time * 0.05) * 0.3 + 0.7;
@@ -840,47 +866,66 @@ class GraphicsSystem {
                 this.drawShadow(e.x - shadowSize/2, e.y - shadowSize/2, shadowSize, shadowSize, 0.4);
             }
 
-            let healthPercent = e.hp / e.maxHp;
-            const healthWidth = e.type === 'boss' ? 60 : 40;
-
-            // Имя врага
-            const enemyNames = { wolf: '🐺 Волк', robber: '🗡 Разбойник', marauder: '⚔️ Мародёр', boss: '💀 Босс', swordsman: '⚔️ Мечник', archer: '🏹 Лучник', cavalry: '🐴 Кавалерист' };
-            this.ctx.fillStyle = e.type === 'boss' ? '#ffd700' : '#fff';
-            this.ctx.font = e.type === 'boss' ? 'bold 11px Arial' : '10px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'bottom';
-            this.ctx.fillText(enemyNames[e.type] || e.type, 0, -33);
-
-            this.ctx.fillStyle = "#ff0000";
-            this.ctx.fillRect(-healthWidth/2, -30, healthWidth, 5);
-            this.ctx.fillStyle = healthPercent > 0.5 ? "#00ff00" : healthPercent > 0.25 ? "#ffa500" : "#ff0000";
-            this.ctx.fillRect(-healthWidth/2, -30, healthWidth * healthPercent, 5);
-
+            const healthPercent = e.hp / e.maxHp;
+            const healthWidth = e.type === 'boss' ? 64 : 44;
             const size = e.type === 'boss' ? 50 : e.type === 'marauder' ? 32 : e.type === 'swordsman' ? 30 : e.type === 'cavalry' ? 36 : e.type === 'robber' ? 28 : 24;
-            
-            const processedTexture = this.getProcessedTexture('enemies', e.type);
-            const textureToUse = processedTexture || enemyTexture;
-            
-            this.ctx.drawImage(textureToUse, -size/2, -size/2, size, size);
-            
-            if (e.type === "boss") {
-                const pulse = Math.sin(this.gameState.time * 0.1) * 0.3 + 0.7;
-                this.ctx.strokeStyle = `rgba(255, 215, 0, ${0.4 * pulse})`;
-                this.ctx.lineWidth = 5;
+
+            // Хит-флеш
+            const flashVal = this.hitFlashes[e.id] || 0;
+            if (flashVal > 0) {
+                this.ctx.globalAlpha = flashVal * 0.7;
+                this.ctx.fillStyle = '#ffffff';
                 this.ctx.beginPath();
-                this.ctx.arc(0, 0, 30, 0, Math.PI * 2);
-                this.ctx.stroke();
-            }
-            
-            if (e.slowEffect && e.slowEffect > 0) {
-                this.ctx.globalAlpha = 0.5;
-                this.ctx.fillStyle = "#800080";
-                this.ctx.beginPath();
-                this.ctx.arc(0, 0, size/2 + 2, 0, Math.PI * 2);
+                this.ctx.arc(0, 0, size / 2 + 2, 0, Math.PI * 2);
                 this.ctx.fill();
                 this.ctx.globalAlpha = 1;
             }
-            
+
+            const processedTexture = this.getProcessedTexture('enemies', e.type);
+            const textureToUse = processedTexture || enemyTexture;
+            this.ctx.drawImage(textureToUse, -size/2, -size/2, size, size);
+
+            // Эффект замедления
+            if (e.slowEffect && e.slowEffect > 0) {
+                const pulse = Math.sin(this.gameState.time * 0.12) * 0.3 + 0.7;
+                this.ctx.globalAlpha = 0.35 * pulse;
+                this.ctx.fillStyle = '#9c27b0';
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, size/2 + 3, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.globalAlpha = 1;
+            }
+
+            // Босс — пульсирующее кольцо
+            if (e.type === 'boss') {
+                const pulse = Math.sin(this.gameState.time * 0.08) * 0.4 + 0.6;
+                this.ctx.strokeStyle = `rgba(255,215,0,${0.5 * pulse})`;
+                this.ctx.lineWidth = 4;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, size / 2 + 6, 0, Math.PI * 2);
+                this.ctx.stroke();
+                // Второе кольцо
+                this.ctx.strokeStyle = `rgba(255,100,0,${0.3 * pulse})`;
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, size / 2 + 14, 0, Math.PI * 2);
+                this.ctx.stroke();
+            }
+
+            // Имя врага
+            const enemyNames = { wolf: '🐺 Волк', robber: '🗡 Разбойник', marauder: '⚔️ Мародёр', boss: '💀 Босс', swordsman: '⚔️ Мечник', archer: '🏹 Лучник', cavalry: '🐴 Кавалерист', bear: '🐻 Медведь', tiger: '🐯 Тигр' };
+            this.ctx.fillStyle = e.type === 'boss' ? '#ffd700' : 'rgba(255,255,255,0.85)';
+            this.ctx.font = e.type === 'boss' ? 'bold 10px Arial' : '9px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'bottom';
+            this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            this.ctx.shadowBlur = 3;
+            this.ctx.fillText(enemyNames[e.type] || e.type, 0, -size/2 - 8);
+            this.ctx.shadowBlur = 0;
+
+            // Новая HP-bar
+            this.drawHealthBar(0, -size/2 - 7, healthWidth, healthPercent, false, e.type === 'boss');
+
             this.ctx.restore();
         } else {
             this.ctx.save();
@@ -891,58 +936,56 @@ class GraphicsSystem {
                 this.drawShadow(e.x - shadowSize/2, e.y - shadowSize/2, shadowSize, shadowSize, 0.4);
             }
 
-            let healthPercent = e.hp / e.maxHp;
-            const healthWidth = e.type === 'boss' ? 60 : 40;
+            const healthPercent = e.hp / e.maxHp;
+            const healthWidth = e.type === 'boss' ? 64 : 44;
 
-            // Имя врага
-            const enemyNames = { wolf: '🐺 Волк', robber: '🗡 Разбойник', marauder: '⚔️ Мародёр', boss: '💀 Босс' };
-            this.ctx.fillStyle = e.type === 'boss' ? '#ffd700' : '#fff';
-            this.ctx.font = e.type === 'boss' ? 'bold 11px Arial' : '10px Arial';
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'bottom';
-            this.ctx.fillText(enemyNames[e.type] || e.type, 0, -33);
-
-            this.ctx.fillStyle = "#ff0000";
-            this.ctx.fillRect(-healthWidth/2, -30, healthWidth, 5);
-            this.ctx.fillStyle = healthPercent > 0.5 ? "#00ff00" : healthPercent > 0.25 ? "#ffa500" : "#ff0000";
-            this.ctx.fillRect(-healthWidth/2, -30, healthWidth * healthPercent, 5);
-
-            this.ctx.fillStyle = e.type === 'wolf' ? '#6b8e23' :
-                                e.type === 'robber' ? '#b22222' :
-                                e.type === 'marauder' ? '#daa520' :
-                                e.type === 'swordsman' ? '#4169e1' :
-                                e.type === 'archer' ? '#228b22' :
-                                e.type === 'cavalry' ? '#8b6914' :
-                                '#dc143c';
-
+            const eColor = e.type === 'wolf' ? '#6b8e23' : e.type === 'robber' ? '#b22222' :
+                           e.type === 'marauder' ? '#daa520' : e.type === 'swordsman' ? '#4169e1' :
+                           e.type === 'archer' ? '#228b22' : e.type === 'cavalry' ? '#8b6914' : '#dc143c';
             const size = e.type === 'boss' ? 22 : e.type === 'marauder' ? 16 : e.type === 'swordsman' ? 15 : e.type === 'cavalry' ? 18 : e.type === 'robber' ? 14 : 12;
-            
+
+            // Хит-флеш для fallback
+            const flashVal2 = this.hitFlashes[e.id] || 0;
+
+            const grad = this.ctx.createRadialGradient(0, -size*0.2, 0, 0, 0, size);
+            grad.addColorStop(0, flashVal2 > 0 ? '#ffffff' : eColor);
+            grad.addColorStop(1, flashVal2 > 0 ? 'rgba(255,200,200,0.5)' : 'rgba(0,0,0,0.5)');
+            this.ctx.fillStyle = grad;
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, size, 0, Math.PI * 2);
+            this.ctx.fill();
+
             if (e.type === 'boss') {
+                const pulse = Math.sin(this.gameState.time * 0.08) * 0.4 + 0.6;
+                this.ctx.strokeStyle = `rgba(255,215,0,${0.5 * pulse})`;
+                this.ctx.lineWidth = 4;
                 this.ctx.beginPath();
-                this.ctx.arc(0, 0, size, 0, Math.PI * 2);
-                this.ctx.fill();
-                
-                const pulse = Math.sin(this.gameState.time * 0.1) * 0.3 + 0.7;
-                this.ctx.strokeStyle = `rgba(255, 215, 0, ${0.4 * pulse})`;
-                this.ctx.lineWidth = 5;
-                this.ctx.beginPath();
-                this.ctx.arc(0, 0, 30, 0, Math.PI * 2);
+                this.ctx.arc(0, 0, size + 5, 0, Math.PI * 2);
                 this.ctx.stroke();
-            } else {
-                this.ctx.beginPath();
-                this.ctx.arc(0, 0, size, 0, Math.PI * 2);
-                this.ctx.fill();
             }
-            
+
             if (e.slowEffect && e.slowEffect > 0) {
-                this.ctx.globalAlpha = 0.5;
-                this.ctx.fillStyle = "#800080";
+                const pulse = Math.sin(this.gameState.time * 0.12) * 0.3 + 0.7;
+                this.ctx.globalAlpha = 0.35 * pulse;
+                this.ctx.fillStyle = '#9c27b0';
                 this.ctx.beginPath();
-                this.ctx.arc(0, 0, size + 1, 0, Math.PI * 2);
+                this.ctx.arc(0, 0, size + 3, 0, Math.PI * 2);
                 this.ctx.fill();
                 this.ctx.globalAlpha = 1;
             }
-            
+
+            // Имя + HP
+            const enemyNames2 = { wolf: '🐺', robber: '🗡', marauder: '⚔️', boss: '💀', swordsman: '⚔️', archer: '🏹', cavalry: '🐴' };
+            this.ctx.fillStyle = e.type === 'boss' ? '#ffd700' : 'rgba(255,255,255,0.85)';
+            this.ctx.font = '9px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'bottom';
+            this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            this.ctx.shadowBlur = 3;
+            this.ctx.fillText((enemyNames2[e.type] || '') + ' ' + (e.type || ''), 0, -size - 8);
+            this.ctx.shadowBlur = 0;
+            this.drawHealthBar(0, -size - 7, healthWidth, healthPercent, false, e.type === 'boss');
+
             this.ctx.restore();
         }
     }
@@ -1080,29 +1123,37 @@ class GraphicsSystem {
     
     // ======================= СИСТЕМА ЧАСТИЦ =======================
     
-    createParticle(x, y, type) {
-        if (this.particles.length >= Math.min(this.settings.maxParticles, 100)) {
-            if (this.particles.length > 0) {
+    createParticle(x, y, type, count = 1) {
+        for (let i = 0; i < count; i++) {
+            if (this.particles.length >= Math.min(this.settings.maxParticles, 200)) {
                 this.particles.shift();
             }
+            const angle = Math.random() * Math.PI * 2;
+            const speed = type === 'explosion' ? (Math.random() * 5 + 2) :
+                          type === 'blood' ? (Math.random() * 4 + 1) :
+                          type === 'spark' ? (Math.random() * 6 + 2) : (Math.random() * 3 + 1);
+            const particle = {
+                x, y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed - (type === 'explosion' || type === 'spark' ? 2 : 0),
+                life: 1.0,
+                decay: type === 'spark' ? (0.04 + Math.random() * 0.04) :
+                       type === 'blood' ? (0.025 + Math.random() * 0.02) :
+                       (0.02 + Math.random() * 0.025),
+                size: type === 'explosion' ? (Math.random() * 5 + 3) :
+                      type === 'blood' ? (Math.random() * 4 + 2) :
+                      type === 'spark' ? (Math.random() * 2 + 1) : (Math.random() * 3 + 1.5),
+                glow: type === 'explosion' || type === 'spark' || type === 'magic',
+                color: type === 'blood' ? `hsl(${0 + Math.random()*10},100%,${35+Math.random()*20}%)` :
+                       type === 'spark' ? `hsl(${40+Math.random()*20},100%,${60+Math.random()*30}%)` :
+                       type === 'magic' ? `hsl(${180+Math.random()*60},100%,${60+Math.random()*30}%)` :
+                       type === 'explosion' ? `hsl(${20+Math.random()*25},100%,${50+Math.random()*30}%)` :
+                       type === 'slow' ? `hsl(${280+Math.random()*40},80%,${50+Math.random()*20}%)` :
+                       type === 'heal' ? `hsl(${120+Math.random()*30},80%,${55+Math.random()*20}%)` :
+                       type === 'smoke' ? `rgba(${100+Math.random()*60},${100+Math.random()*60},${100+Math.random()*60},0.6)` : '#ffffff'
+            };
+            this.particles.push(particle);
         }
-        
-        const particle = {
-            x: x,
-            y: y,
-            vx: (Math.random() - 0.5) * 4,
-            vy: (Math.random() - 0.5) * 4 - 2,
-            life: 1.0,
-            decay: 0.02 + Math.random() * 0.03,
-            size: Math.random() * 3 + 2,
-            color: type === 'blood' ? '#ff0000' : 
-                   type === 'spark' ? '#ffff00' : 
-                   type === 'magic' ? '#00ffff' : 
-                   type === 'explosion' ? '#ff8800' : 
-                   type === 'slow' ? '#800080' : '#ffffff'
-        };
-        
-        this.particles.push(particle);
     }
     
     updateParticles() {
@@ -1121,25 +1172,28 @@ class GraphicsSystem {
     
     drawParticles() {
         if (!this.settings.particles) return;
-        
-        this.particles.forEach(p => {
-            this.ctx.globalAlpha = p.life;
-            this.ctx.fillStyle = p.color;
-            
-            if (this.settings.textureQuality === 'ultra') {
-                const gradient = this.ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-                gradient.addColorStop(0, p.color);
-                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-                this.ctx.fillStyle = gradient;
-                this.ctx.beginPath();
-                this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                this.ctx.fill();
+        const ctx = this.ctx;
+        ctx.save();
+        for (const p of this.particles) {
+            ctx.globalAlpha = p.life * 0.9;
+            if (p.glow && this.settings.textureQuality !== 'low') {
+                const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 2.5);
+                grad.addColorStop(0, p.color);
+                grad.addColorStop(0.5, p.color.replace('hsl', 'hsla').replace(')', ',0.4)').replace('hsla', 'hsl'));
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
+                ctx.fill();
             } else {
-                this.ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
             }
-            
-            this.ctx.globalAlpha = 1;
-        });
+        }
+        ctx.globalAlpha = 1;
+        ctx.restore();
     }
     
     // ======================= ОТРИСОВКА КАРТЫ =======================
@@ -1624,12 +1678,18 @@ class GraphicsSystem {
     }
     
     applyPostProcessing() {
+        // Виньетка — на medium и выше
+        this.drawVignette();
+
+        // Low-HP overlay
+        this.drawLowHpVignette(this.playerHpRatio);
+
         if (!this.settings.postProcessing && !this.settings.bloom) return;
-        
+
         if (this.settings.bloom) {
             this.applyBloomEffect();
         }
-        
+
         if (this.settings.postProcessing && this.settings.textureQuality === 'ultra') {
             this.applyDepthOfField();
         }
@@ -1714,17 +1774,391 @@ class GraphicsSystem {
     }
     
     // ======================= ОБНОВЛЕНИЕ =======================
-    
+
     update(time) {
         this.gameState.time = time;
         this.updateWeather(time);
         this.updateParticles();
+        this.updateFloatingTexts();
+        this.updateScreenShake();
+        this.updateAmbientParticles();
+        this.updateProjectileTrails();
+        // Угасание хит-флешей
+        for (const id in this.hitFlashes) {
+            this.hitFlashes[id] -= 0.08;
+            if (this.hitFlashes[id] <= 0) delete this.hitFlashes[id];
+        }
     }
-    
+
     render() {
         this.applyLighting();
         this.drawWeather();
         this.applyPostProcessing();
+    }
+
+    // ======================= ПЛАВАЮЩИЙ ТЕКСТ =======================
+
+    createFloatingText(x, y, text, color = '#fff', size = 16, bold = true) {
+        this.floatingTexts.push({
+            x, y,
+            text: String(text),
+            color,
+            size,
+            bold,
+            vy: -(1.5 + Math.random() * 0.8),
+            vx: (Math.random() - 0.5) * 0.8,
+            life: 1.0,
+            decay: 0.022 + Math.random() * 0.01,
+            scale: 1.0,
+            scaleTarget: 1.3
+        });
+    }
+
+    updateFloatingTexts() {
+        for (let i = this.floatingTexts.length - 1; i >= 0; i--) {
+            const t = this.floatingTexts[i];
+            t.x += t.vx;
+            t.y += t.vy;
+            t.vy *= 0.96;
+            t.vx *= 0.96;
+            t.life -= t.decay;
+            t.scale += (t.scaleTarget - t.scale) * 0.15;
+            t.scaleTarget = 1.0;
+            if (t.life <= 0) this.floatingTexts.splice(i, 1);
+        }
+    }
+
+    drawFloatingTexts() {
+        if (!this.settings.particles) return;
+        const ctx = this.ctx;
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (const t of this.floatingTexts) {
+            const alpha = Math.min(1, t.life * 2);
+            ctx.globalAlpha = alpha;
+            ctx.save();
+            ctx.translate(t.x, t.y);
+            ctx.scale(t.scale, t.scale);
+            ctx.font = `${t.bold ? 'bold ' : ''}${t.size}px Arial`;
+            // Тень для читаемости
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowBlur = 4;
+            ctx.fillStyle = t.color;
+            ctx.fillText(t.text, 0, 0);
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        }
+        ctx.globalAlpha = 1;
+        ctx.restore();
+    }
+
+    // ======================= ЭКРАННЫЙ ШЕЙК =======================
+
+    triggerScreenShake(intensity = 6, duration = 300) {
+        if (this.screenShake.intensity < intensity) {
+            this.screenShake.intensity = intensity;
+            this.screenShake.duration = duration;
+            this.screenShake.time = 0;
+        }
+    }
+
+    updateScreenShake() {
+        const s = this.screenShake;
+        if (s.intensity <= 0) { s.x = 0; s.y = 0; return; }
+        s.time += 16;
+        const decay = Math.max(0, 1 - s.time / s.duration);
+        const amp = s.intensity * decay;
+        s.x = (Math.random() - 0.5) * amp * 2;
+        s.y = (Math.random() - 0.5) * amp * 2;
+        if (s.time >= s.duration) { s.intensity = 0; s.x = 0; s.y = 0; }
+    }
+
+    applyScreenShake() {
+        if (this.screenShake.intensity > 0 && this.settings.postProcessing) {
+            this.ctx.translate(this.screenShake.x, this.screenShake.y);
+        }
+    }
+
+    // ======================= ХИТ-ФЛЕШ =======================
+
+    triggerHitFlash(entityId) {
+        this.hitFlashes[entityId] = 1.0;
+    }
+
+    // ======================= АТМОСФЕРНЫЕ ЧАСТИЦЫ =======================
+
+    initAmbientParticles(mapKey) {
+        this.ambientParticles = [];
+        const W = this.GAME_WIDTH, H = this.GAME_HEIGHT;
+
+        // Светлячки — для лесных карт
+        const fireflyMaps = ['forest', 'jungle', 'swamp', 'autumn', 'meadows', 'cherry'];
+        const dustMaps = ['desert', 'steppe', 'canyon', 'ruins'];
+        const emberMaps = ['volcano', 'lava', 'smeltery'];
+        const snowMaps = ['winter'];
+
+        const count = fireflyMaps.includes(mapKey) ? 18 :
+                      dustMaps.includes(mapKey) ? 14 :
+                      emberMaps.includes(mapKey) ? 20 :
+                      snowMaps.includes(mapKey) ? 22 : 8;
+
+        for (let i = 0; i < count; i++) {
+            if (fireflyMaps.includes(mapKey)) {
+                this.ambientParticles.push({
+                    type: 'firefly', x: Math.random() * W, y: Math.random() * H,
+                    vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+                    phase: Math.random() * Math.PI * 2, size: Math.random() * 2.5 + 1,
+                    color: `hsl(${60 + Math.random() * 60}, 100%, 70%)`
+                });
+            } else if (dustMaps.includes(mapKey)) {
+                this.ambientParticles.push({
+                    type: 'dust', x: Math.random() * W, y: Math.random() * H,
+                    vx: Math.random() * 0.5 + 0.2, vy: -(Math.random() * 0.2),
+                    size: Math.random() * 1.5 + 0.5, life: Math.random()
+                });
+            } else if (emberMaps.includes(mapKey)) {
+                this.ambientParticles.push({
+                    type: 'ember', x: Math.random() * W, y: H + Math.random() * 100,
+                    vx: (Math.random() - 0.5) * 1.2, vy: -(Math.random() * 2 + 1),
+                    size: Math.random() * 2 + 0.5, life: Math.random(),
+                    color: `hsl(${15 + Math.random() * 30}, 100%, ${50 + Math.random() * 30}%)`
+                });
+            } else if (snowMaps.includes(mapKey)) {
+                this.ambientParticles.push({
+                    type: 'snowflake', x: Math.random() * W, y: Math.random() * H,
+                    vx: (Math.random() - 0.5) * 0.5, vy: Math.random() * 0.8 + 0.3,
+                    size: Math.random() * 2 + 1, life: Math.random(),
+                    rot: Math.random() * Math.PI * 2
+                });
+            } else {
+                this.ambientParticles.push({
+                    type: 'mote', x: Math.random() * W, y: Math.random() * H,
+                    vx: (Math.random() - 0.5) * 0.3, vy: -(Math.random() * 0.3 + 0.1),
+                    size: Math.random() + 0.5, phase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+    }
+
+    updateAmbientParticles() {
+        if (!this.settings.particles) return;
+        const W = this.GAME_WIDTH, H = this.GAME_HEIGHT;
+        const t = this.gameState.time * 0.01;
+
+        for (const p of this.ambientParticles) {
+            if (p.type === 'firefly') {
+                p.phase += 0.025;
+                p.x += p.vx + Math.sin(p.phase * 0.7) * 0.3;
+                p.y += p.vy + Math.cos(p.phase * 0.5) * 0.3;
+                if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+                if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+            } else if (p.type === 'dust') {
+                p.x += p.vx; p.y += p.vy;
+                p.life += 0.003;
+                if (p.x > W || p.life > 1) { p.x = 0; p.y = Math.random() * H; p.life = 0; }
+            } else if (p.type === 'ember') {
+                p.x += p.vx + Math.sin(t + p.y * 0.01) * 0.4;
+                p.y += p.vy;
+                p.life += 0.01;
+                if (p.y < -20 || p.life > 1) { p.y = H + 10; p.x = Math.random() * W; p.life = 0; }
+            } else if (p.type === 'snowflake') {
+                p.x += p.vx + Math.sin(t * 0.3 + p.y * 0.02) * 0.5;
+                p.y += p.vy;
+                p.rot += 0.02;
+                if (p.y > H + 10) { p.y = -10; p.x = Math.random() * W; }
+            } else if (p.type === 'mote') {
+                p.phase += 0.01;
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+                if (p.y < -10) p.y = H;
+            }
+        }
+    }
+
+    drawAmbientParticles() {
+        if (!this.settings.particles || this.ambientParticles.length === 0) return;
+        const ctx = this.ctx;
+        const t = this.gameState.time * 0.02;
+        ctx.save();
+        for (const p of this.ambientParticles) {
+            if (p.type === 'firefly') {
+                const glow = Math.sin(p.phase * 2 + t) * 0.5 + 0.5;
+                ctx.globalAlpha = glow * 0.85;
+                const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
+                grad.addColorStop(0, p.color);
+                grad.addColorStop(1, 'rgba(255,255,0,0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (p.type === 'dust') {
+                const alpha = Math.sin(p.life * Math.PI) * 0.3;
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = 'rgba(210,190,140,1)';
+                ctx.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size);
+            } else if (p.type === 'ember') {
+                const alpha = (1 - p.life) * 0.9;
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (p.type === 'snowflake') {
+                ctx.globalAlpha = 0.6;
+                ctx.fillStyle = 'rgba(220,240,255,1)';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (p.type === 'mote') {
+                ctx.globalAlpha = (Math.sin(p.phase + t) * 0.3 + 0.4) * 0.5;
+                ctx.fillStyle = 'rgba(255,255,200,1)';
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        ctx.globalAlpha = 1;
+        ctx.restore();
+    }
+
+    // ======================= ТРЕЙЛЫ СНАРЯДОВ =======================
+
+    addProjectileTrail(x, y, color, size = 3) {
+        if (!this.settings.particles) return;
+        this.projectileTrails.push({ x, y, color, size, life: 0.7, decay: 0.1 });
+        if (this.projectileTrails.length > 200) this.projectileTrails.shift();
+    }
+
+    updateProjectileTrails() {
+        for (let i = this.projectileTrails.length - 1; i >= 0; i--) {
+            const t = this.projectileTrails[i];
+            t.life -= t.decay;
+            if (t.life <= 0) this.projectileTrails.splice(i, 1);
+        }
+    }
+
+    drawProjectileTrails() {
+        if (!this.settings.particles) return;
+        const ctx = this.ctx;
+        ctx.save();
+        for (const t of this.projectileTrails) {
+            ctx.globalAlpha = t.life * 0.6;
+            ctx.fillStyle = t.color;
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, t.size * t.life, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        ctx.restore();
+    }
+
+    // ======================= УЛУЧШЕННАЯ ПОЛОСА HP =======================
+
+    drawHealthBar(x, y, width, hpRatio, isPlayer = false, isBoss = false) {
+        const ctx = this.ctx;
+        const h = isBoss ? 7 : isPlayer ? 6 : 5;
+        const bx = x - width / 2;
+        const by = y;
+        const r = h / 2;
+
+        // Фон
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        this._roundRect(bx - 1, by - 1, width + 2, h + 2, r + 1);
+        ctx.fill();
+
+        // Трек
+        ctx.fillStyle = 'rgba(60,20,20,0.8)';
+        this._roundRect(bx, by, width, h, r);
+        ctx.fill();
+
+        // Заполнение с градиентом
+        const fillW = Math.max(0, width * hpRatio);
+        if (fillW > 0) {
+            const grad = ctx.createLinearGradient(bx, by, bx + fillW, by);
+            if (hpRatio > 0.5) {
+                grad.addColorStop(0, '#4caf50');
+                grad.addColorStop(1, '#8bc34a');
+            } else if (hpRatio > 0.25) {
+                grad.addColorStop(0, '#ff8f00');
+                grad.addColorStop(1, '#ffca28');
+            } else {
+                grad.addColorStop(0, '#c62828');
+                grad.addColorStop(1, '#ef5350');
+                // Пульсация при низком HP
+                if (isPlayer) {
+                    const pulse = Math.sin(this.gameState.time * 0.15) * 0.2 + 0.8;
+                    ctx.globalAlpha = pulse;
+                }
+            }
+            ctx.fillStyle = grad;
+            this._roundRect(bx, by, fillW, h, r);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+
+            // Блик сверху
+            ctx.fillStyle = 'rgba(255,255,255,0.18)';
+            this._roundRect(bx, by, fillW, h / 2, r);
+            ctx.fill();
+        }
+
+        // Рамка
+        ctx.strokeStyle = isBoss ? 'rgba(255,215,0,0.5)' : 'rgba(0,0,0,0.5)';
+        ctx.lineWidth = 0.5;
+        this._roundRect(bx, by, width, h, r);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    _roundRect(x, y, w, h, r) {
+        const ctx = this.ctx;
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.arcTo(x + w, y, x + w, y + r, r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+        ctx.lineTo(x + r, y + h);
+        ctx.arcTo(x, y + h, x, y + h - r, r);
+        ctx.lineTo(x, y + r);
+        ctx.arcTo(x, y, x + r, y, r);
+        ctx.closePath();
+    }
+
+    // ======================= ВИНЬЕТКА И POST-FX =======================
+
+    drawLowHpVignette(hpRatio) {
+        if (hpRatio > 0.35 || !this.settings.postProcessing) return;
+        const ctx = this.ctx;
+        const intensity = (0.35 - hpRatio) / 0.35;
+        const pulse = Math.sin(this.gameState.time * 0.12) * 0.4 + 0.6;
+        const alpha = intensity * pulse * 0.45;
+        ctx.save();
+        const grad = ctx.createRadialGradient(
+            this.GAME_WIDTH / 2, this.GAME_HEIGHT / 2, this.GAME_HEIGHT * 0.2,
+            this.GAME_WIDTH / 2, this.GAME_HEIGHT / 2, this.GAME_HEIGHT * 0.75
+        );
+        grad.addColorStop(0, 'rgba(180,0,0,0)');
+        grad.addColorStop(1, `rgba(180,0,0,${alpha})`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
+        ctx.restore();
+    }
+
+    drawVignette() {
+        if (this.settings.textureQuality === 'low' || this.settings.textureQuality === 'verylow') return;
+        const ctx = this.ctx;
+        ctx.save();
+        const grad = ctx.createRadialGradient(
+            this.GAME_WIDTH / 2, this.GAME_HEIGHT / 2, this.GAME_HEIGHT * 0.4,
+            this.GAME_WIDTH / 2, this.GAME_HEIGHT / 2, this.GAME_HEIGHT * 0.85
+        );
+        grad.addColorStop(0, 'rgba(0,0,0,0)');
+        grad.addColorStop(1, 'rgba(0,0,0,0.35)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
+        ctx.restore();
     }
 }
 

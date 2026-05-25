@@ -2820,6 +2820,7 @@ function saveSettings() {
 
 function changeMap(map) {
     graphicsSystem.setCurrentMap(map);
+    graphicsSystem.initAmbientParticles(map);
     loadMapTexture(map);
     document.querySelectorAll('.map-option').forEach(opt => opt.classList.remove('active'));
     event.target.closest('.map-option').classList.add('active');
@@ -3084,8 +3085,13 @@ function step() {
                     color: b.lvl === 1 ? "#eee" : b.lvl === 2 ? "#ff9800" : "#ff5252",
                     damage: damage
                 }); 
-                target.hp -= damage; 
-                b.cd = attackSpeed; 
+                target.hp -= damage;
+                if (target.id === undefined) target.id = Math.random();
+                graphicsSystem.triggerHitFlash(target.id);
+                if (graphicsSystem.settings.particles) {
+                    graphicsSystem.createFloatingText(target.x, target.y - 20, `-${Math.round(damage)}`, b.lvl === 3 ? '#ff5252' : b.lvl === 2 ? '#ffb74d' : '#ffffff', 13);
+                }
+                b.cd = attackSpeed;
             }
         }
         
@@ -3261,6 +3267,7 @@ function step() {
         } else {
             a.x += dx / d * 10;
             a.y += dy / d * 10;
+            graphicsSystem.addProjectileTrail(a.x, a.y, a.color === '#ff5252' ? 'rgba(255,100,50,0.5)' : a.color === '#ff9800' ? 'rgba(255,180,50,0.5)' : 'rgba(220,220,180,0.4)', 2);
         }
     });
     arrows = arrows.filter(a => !a.hit);
@@ -3274,6 +3281,10 @@ function step() {
         let dx = cb.tx.x - cb.x, dy = cb.tx.y - cb.y, d = Math.hypot(dx, dy);
         if (d < 15) {
             cb.tx.hp -= cb.damage;
+            if (cb.tx.id === undefined) cb.tx.id = Math.random();
+            graphicsSystem.triggerHitFlash(cb.tx.id);
+            graphicsSystem.triggerScreenShake(5, 250);
+            graphicsSystem.createFloatingText(cb.tx.x, cb.tx.y - 25, `-${Math.round(cb.damage)}`, '#ff6b35', 15, true);
 
             const splashTargets = [...enemies, ...npcs]
                 .filter(en => en !== cb.tx && en.hp > 0 && Math.hypot(en.x - cb.x, en.y - cb.y) < cb.splashRadius)
@@ -3282,12 +3293,18 @@ function step() {
 
             splashTargets.forEach(enemy => {
                 enemy.hp -= cb.damage * cb.splashDamage;
+                if (enemy.id === undefined) enemy.id = Math.random();
+                graphicsSystem.triggerHitFlash(enemy.id);
                 if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
-                    for (let i = 0; i < 3; i++) graphicsSystem.createParticle(enemy.x, enemy.y, 'spark');
+                    graphicsSystem.createParticle(enemy.x, enemy.y, 'spark', 4);
+                    graphicsSystem.createFloatingText(enemy.x, enemy.y - 18, `-${Math.round(cb.damage * cb.splashDamage)}`, '#ff9800', 11);
                 }
             });
-            
+
             if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                graphicsSystem.createParticle(cb.x, cb.y, 'explosion', 20);
+                graphicsSystem.createParticle(cb.x, cb.y, 'spark', 8);
+                graphicsSystem.createParticle(cb.x, cb.y, 'smoke', 5);
                 for (let i = 0; i < 20; i++) {
                     graphicsSystem.createParticle(cb.x, cb.y, 'explosion');
                 }
@@ -3395,6 +3412,8 @@ function draw() {
 
     graphicsSystem.drawMap();
     graphicsSystem.applyLighting();
+    graphicsSystem.drawAmbientParticles();
+    graphicsSystem.drawProjectileTrails();
     graphicsSystem.drawPlayer(player);
     buildings.forEach(b => graphicsSystem.drawBuilding(b));
     enemies.forEach(e => graphicsSystem.drawEnemy(e));
@@ -3403,6 +3422,7 @@ function draw() {
     cannonBalls.forEach(cb => graphicsSystem.drawCannonBall(cb));
     graphicsSystem.drawParticles();
     graphicsSystem.drawWeather();
+    graphicsSystem.drawFloatingTexts();
 
     if (camera.mode === 'follow') {
         ctx.restore();
@@ -3449,6 +3469,7 @@ async function initGame() {
     musicSystem.initUI();
     
     await loadMapTexture(graphicsSystem.gameState.currentMap);
+    graphicsSystem.initAmbientParticles(graphicsSystem.gameState.currentMap);
     
     const savedSettings = localStorage.getItem('villageDefenseSettings');
     if (savedSettings) {
