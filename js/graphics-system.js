@@ -1632,17 +1632,18 @@ class GraphicsSystem {
     // ======================= УПРАВЛЕНИЕ ТЕКСТУРАМИ КАРТ =======================
     
     loadMapTexture(mapKey, texturePath) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
+            if (this.textures.maps[mapKey]) { resolve(); return; }
             const img = new Image();
-            img.onload = () => {
-                this.textures.maps[mapKey] = img;
+            const done = (loaded) => {
+                this.textures.maps[mapKey] = loaded ? img : null;
                 resolve();
             };
-            img.onerror = () => {
-                this.textures.maps[mapKey] = null;
-                resolve();
-            };
+            img.onload = () => done(true);
+            img.onerror = () => done(false);
             img.src = texturePath;
+            // If already cached, onload may not fire — check immediately after setting src
+            if (img.complete) done(true);
         });
     }
     
