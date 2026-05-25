@@ -175,7 +175,9 @@ class GraphicsSystem {
                 wolf: null,
                 robber: null,
                 marauder: null,
-                boss: null
+                boss: null,
+                bear: null,
+                tiger: null
             },
             projectiles: {
                 arrow: null,
@@ -436,7 +438,7 @@ class GraphicsSystem {
     }
     
     async loadEnemyTextures() {
-        const enemies = ['wolf', 'robber', 'marauder', 'boss'];
+        const enemies = ['wolf', 'robber', 'marauder', 'boss', 'bear', 'tiger'];
         
         for (const enemy of enemies) {
             await this.loadTexture(`textures/enemies/${enemy}.png`, 'enemies', enemy);
@@ -884,7 +886,66 @@ class GraphicsSystem {
             this.ctx.restore();
         }
     }
-    
+
+    drawNPC(npc) {
+        const texture = this.textures.enemies[npc.type];
+        const size = npc.type === 'bear' ? 38 : 30;
+
+        this.ctx.save();
+        this.ctx.translate(npc.x, npc.y);
+
+        if (this.settings.shadows) {
+            this.drawShadow(npc.x - size/2, npc.y - size/2, size, size, 0.3);
+        }
+
+        // HP bar (синяя — дружественный НПС)
+        const healthPercent = npc.hp / npc.maxHp;
+        const barW = size + 10;
+        this.ctx.fillStyle = '#333';
+        this.ctx.fillRect(-barW/2, -size/2 - 12, barW, 5);
+        this.ctx.fillStyle = '#4fc3f7';
+        this.ctx.fillRect(-barW/2, -size/2 - 12, barW * healthPercent, 5);
+
+        // Имя
+        this.ctx.fillStyle = '#fff';
+        this.ctx.font = 'bold 10px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'bottom';
+        this.ctx.fillText(npc.type === 'bear' ? '🐻 Медведь' : '🐯 Тигр', 0, -size/2 - 14);
+
+        if (texture && texture.complete && this.settings.textureQuality !== 'low') {
+            const processedTexture = this.getProcessedTexture('enemies', npc.type);
+            this.ctx.drawImage(processedTexture || texture, -size/2, -size/2, size, size);
+        } else {
+            this.ctx.fillStyle = npc.type === 'bear' ? '#8B4513' : '#FF8C00';
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, size/2, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.fillStyle = '#fff';
+            this.ctx.font = `${Math.floor(size * 0.65)}px serif`;
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'middle';
+            this.ctx.fillText(npc.type === 'bear' ? '🐻' : '🐯', 0, 0);
+        }
+
+        // Мигающий индикатор "подойди" если игрок близко
+        if (npc.playerNear) {
+            const pulse = Math.sin(this.gameState.time * 0.15) * 0.5 + 0.5;
+            this.ctx.strokeStyle = `rgba(255, 215, 0, ${pulse})`;
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            this.ctx.arc(0, 0, size/2 + 5, 0, Math.PI * 2);
+            this.ctx.stroke();
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${pulse})`;
+            this.ctx.font = '12px Arial';
+            this.ctx.textAlign = 'center';
+            this.ctx.textBaseline = 'top';
+            this.ctx.fillText('E', 0, size/2 + 8);
+        }
+
+        this.ctx.restore();
+    }
+
     drawArrow(a) {
         const arrowTexture = this.textures.projectiles.arrow;
         

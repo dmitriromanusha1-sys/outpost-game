@@ -569,7 +569,7 @@ let animationFrameId = null;
 let gameLoopLastTime = 0;
 
 // Игровые переменные
-let time = 0, keys = {}, enemies = [], buildings = [], arrows = [], cannonBalls = [];
+let time = 0, keys = {}, enemies = [], buildings = [], arrows = [], cannonBalls = [], npcs = [];
 let coins = 100, wood = 0, stone = 0, iron = 0;
 let bossCount = 0, bossKilled = 0;
 let waveEnd = 0, speed = 1, gameOver = false, victory = false;
@@ -737,7 +737,30 @@ const balance = {
         healAmount: 50,
         sellRefund: 0.75,
         baseSpeed: 2.5
-    }
+    },
+
+    npcs: {
+        bear: {
+            hp: 120,
+            speed: 0.4,
+            wanderRadius: 80,
+            spawnChance: 0.4,
+            reward: { coins: 40, wood: 10 },
+            interactDist: 30,
+            label: 'Медведь'
+        },
+        tiger: {
+            hp: 70,
+            speed: 0.9,
+            wanderRadius: 120,
+            spawnChance: 0.6,
+            reward: { coins: 25, iron: 5 },
+            interactDist: 30,
+            label: 'Тигр'
+        }
+    },
+    npcMaxCount: 4,
+    npcSpawnInterval: 480
 };
 
 // ======================= МЕНЕДЖЕР УРОВНЕЙ =======================
@@ -1278,6 +1301,7 @@ async function startLevel(level) {
     time = 0;
     gameTime = 0;
     enemies = [];
+    npcs = [];
     buildings = [];
     arrows = [];
     cannonBalls = [];
@@ -2012,7 +2036,84 @@ function step() {
     });
 
     applySlowEffectToEnemies();
-    
+
+    // ======================= НПС: МЕДВЕДИ И ТИГРЫ =======================
+    // Спавн
+    if (time % balance.npcSpawnInterval === 0 && npcs.length < balance.npcMaxCount) {
+        const types = ['bear', 'tiger'];
+        const type = types[Math.floor(Math.random() * types.length)];
+        const cfg = balance.npcs[type];
+        const side = Math.floor(Math.random() * 4);
+        let sx, sy;
+        if (side === 0) { sx = Math.random() * currentResolution.w; sy = 30; }
+        else if (side === 1) { sx = Math.random() * currentResolution.w; sy = currentResolution.h - 30; }
+        else if (side === 2) { sx = 30; sy = Math.random() * currentResolution.h; }
+        else { sx = currentResolution.w - 30; sy = Math.random() * currentResolution.h; }
+
+        npcs.push({
+            type,
+            x: sx,
+            y: sy,
+            hp: cfg.hp,
+            maxHp: cfg.hp,
+            speed: cfg.speed,
+            wanderAngle: Math.random() * Math.PI * 2,
+            wanderTimer: 0,
+            playerNear: false
+        });
+    }
+
+    // Обновление НПС
+    npcs.forEach(npc => {
+        const cfg = balance.npcs[npc.type];
+
+        // Смена направления блуждания
+        npc.wanderTimer++;
+        if (npc.wanderTimer >= 120 + Math.random() * 60) {
+            npc.wanderTimer = 0;
+            npc.wanderAngle += (Math.random() - 0.5) * Math.PI;
+        }
+
+        npc.x += Math.cos(npc.wanderAngle) * npc.speed;
+        npc.y += Math.sin(npc.wanderAngle) * npc.speed;
+
+        // Отскок от границ
+        if (npc.x < 20) { npc.x = 20; npc.wanderAngle = Math.PI - npc.wanderAngle; }
+        if (npc.x > currentResolution.w - 20) { npc.x = currentResolution.w - 20; npc.wanderAngle = Math.PI - npc.wanderAngle; }
+        if (npc.y < 20) { npc.y = 20; npc.wanderAngle = -npc.wanderAngle; }
+        if (npc.y > currentResolution.h - 20) { npc.y = currentResolution.h - 20; npc.wanderAngle = -npc.wanderAngle; }
+
+        // Проверяем расстояние до игрока
+        const distToPlayer = Math.hypot(player.x - npc.x, player.y - npc.y);
+        npc.playerNear = distToPlayer < cfg.interactDist * 2;
+
+        // Взаимодействие (игрок подошёл вплотную)
+        if (distToPlayer < cfg.interactDist) {
+            npc.collected = true;
+            const r = cfg.reward;
+            if (r.coins) { coins += r.coins; }
+            if (r.wood)  { wood  += r.wood;  }
+            if (r.stone) { stone += r.stone; }
+            if (r.iron)  { iron  += r.iron;  }
+            updateUI();
+
+            const rewardParts = [];
+            if (r.coins) rewardParts.push(`+${r.coins}💰`);
+            if (r.wood)  rewardParts.push(`+${r.wood}🌲`);
+            if (r.iron)  rewardParts.push(`+${r.iron}🔥`);
+            showNotification(`${cfg.label} испугался и убежал! ${rewardParts.join(' ')}`, 'success');
+
+            skillSystem.awardXPForAction('kill_enemy');
+
+            if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                for (let i = 0; i < 12; i++) {
+                    graphicsSystem.createParticle(npc.x, npc.y, 'magic');
+                }
+            }
+        }
+    });
+    npcs = npcs.filter(n => !n.collected);
+
     graphicsSystem.updateParticles();
 
     arrows.forEach(a => {
@@ -2146,7 +2247,9 @@ function draw() {
     buildings.forEach(b => graphicsSystem.drawBuilding(b));
     
     enemies.forEach(e => graphicsSystem.drawEnemy(e));
-    
+
+    npcs.forEach(n => graphicsSystem.drawNPC(n));
+
     arrows.forEach(a => graphicsSystem.drawArrow(a));
     
     cannonBalls.forEach(cb => graphicsSystem.drawCannonBall(cb));
