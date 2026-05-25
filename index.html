@@ -319,6 +319,24 @@
                     </table>
                 </div>
 
+                <!-- КОНЮШНЯ -->
+                <div class="hb-card hb-card-unique" onclick="openHbDetail('stable')" style="cursor:pointer">
+                    <div class="hb-card-header">
+                        <img src="textures/buildings/stable.png" class="hb-img" onerror="this.style.fontSize='40px';this.style.display='flex';this.style.alignItems='center';this.style.justifyContent='center';this.textContent='🐴'">
+                        <div>
+                            <div class="hb-name">🐴 Конюшня</div>
+                            <div class="hb-type">Поддержка · <span style="color:#c9a227">Уникальное</span></div>
+                        </div>
+                    </div>
+                    <div class="hb-desc">Даёт игроку лошадь. Многократно увеличивает скорость передвижения. Очень дорогое улучшение.</div>
+                    <table class="hb-table">
+                        <tr><th></th><th>Ур. 1</th><th>Ур. 2</th><th>Ур. 3</th></tr>
+                        <tr><td>💨 Скорость ×</td><td>×2</td><td>×3</td><td>×4</td></tr>
+                        <tr><td>💰 Цена постройки</td><td colspan="3">100🪙 + 80🪵 + 50🪨</td></tr>
+                        <tr><td>💰 Улучшение</td><td>—</td><td>2000🪙 600🪵 800🪨 200⚙</td><td>6000🪙 1800🪵 2400🪨 600⚙</td></tr>
+                    </table>
+                </div>
+
                 <!-- КУЗНИЦА -->
                 <div class="hb-card hb-card-unique" onclick="openHbDetail('blacksmith')" style="cursor:pointer">
                     <div class="hb-card-header">
@@ -996,6 +1014,7 @@
                     <button class="hbtn" onclick="build('cannon')"><span class="hbtn-icon">🗡</span><span class="hbtn-name">Пушка</span></button>
                     <button class="hbtn" onclick="build('blacksmith')" title="Увеличивает урон зданий"><span class="hbtn-icon">🔨</span><span class="hbtn-name">Кузница</span></button>
                     <button class="hbtn" onclick="build('torture_chamber')" title="Замедляет врагов"><span class="hbtn-icon">⛓</span><span class="hbtn-name">Камера</span></button>
+                    <button class="hbtn" onclick="build('stable')" title="Увеличивает скорость игрока ×2/3/4"><span class="hbtn-icon">🐴</span><span class="hbtn-name">Конюшня</span></button>
                 </div>
                 <div class="hud-divider"></div>
                 <div class="hud-category">
@@ -1203,16 +1222,28 @@ const balance = {
         blacksmith: {
             name: "Кузница",
             baseCost: 300,
-            costIncrease: 1.0, // Только одну можно построить
-            production: { damageBonus: [0.01, 0.04, 0.10] }, // 1%, 4%, 10% бонус урона
+            costIncrease: 1.0,
+            production: { damageBonus: [0.01, 0.04, 0.10] },
             upgradeCost: { coins: 500, wood: 100, stone: 100, iron: 50 },
             upgradeMultiplier: 1.0,
-            color: "#D2691E", // Коричневый/медный цвет
+            color: "#D2691E",
             woodCost: 50,
             stoneCost: 50,
             ironCost: 30,
             unique: true,
-            radius: 400 // Радиус действия бонуса
+            radius: 400
+        },
+        stable: {
+            name: "Конюшня",
+            baseCost: 100,
+            costIncrease: 1.0,
+            production: { speedMultiplier: [2, 3, 4] }, // ×2, ×3, ×4 к скорости
+            upgradeCost: { coins: 2000, wood: 600, stone: 800, iron: 200 },
+            upgradeMultiplier: 3.0, // Lv2→3: ×3 дороже
+            color: "#8B6914",
+            woodCost: 80,
+            stoneCost: 50,
+            unique: true
         }
     },
     
@@ -2502,6 +2533,17 @@ const _hbData = {
             { title: '🔨 Стоимость улучшения (×1 — без роста)', rows: [['→ Ур. 2', '250🪙 + 100🪵 + 100🪨'], ['→ Ур. 3', '250🪙 + 100🪵 + 100🪨']] }
         ]
     },
+    stable: {
+        name: '🐴 Конюшня', type: 'Поддержка · Уникальное', img: 'textures/buildings/stable.png',
+        lore: 'Благородный скакун позволяет игроку передвигаться с невероятной скоростью. Строится один раз. Улучшение стоит целое состояние — но результат того стоит.',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '100🪙'], ['Дерево', '80🪵'], ['Камень', '50🪨']] },
+            { title: '💨 Скорость игрока', rows: [['Ур. 1', '×2 (Обычная лошадь)'], ['Ур. 2', '×3 (Боевой конь)'], ['Ур. 3', '×4 (Рыцарский дестриэ)']] },
+            { title: '🔨 Улучшение → Ур. 2', rows: [['Монеты', '2 000🪙'], ['Дерево', '600🪵'], ['Камень', '800🪨'], ['Железо', '200⚙']] },
+            { title: '🔨 Улучшение → Ур. 3 (×3 дороже)', rows: [['Монеты', '6 000🪙'], ['Дерево', '1 800🪵'], ['Камень', '2 400🪨'], ['Железо', '600⚙']] },
+            { title: 'ℹ Особенности', rows: [['Тип', 'Уникальная — 1 шт.'], ['Визуал', 'Иконка 🐴 рядом с игроком'], ['Кольцо', 'Коричневое / серебро / золото по уровню']] }
+        ]
+    },
     blacksmith: {
         name: '⚒ Кузница', type: 'Поддержка · Уникальное', img: 'textures/buildings/blacksmith.png',
         lore: 'Кует наконечники стрел и ядра повышенного качества. Увеличивает урон всех башен и пушек в радиусе 400.',
@@ -2875,7 +2917,9 @@ function step() {
         }
     }
 
-    const _spd = balance.player.baseSpeed * skillSystem.getHorseSpeedMultiplier();
+    const _stable = buildings.find(b => b.type === 'stable');
+    const _stableSpeedMult = _stable ? balance.buildings.stable.production.speedMultiplier[_stable.lvl - 1] : 1;
+    const _spd = balance.player.baseSpeed * _stableSpeedMult;
     if (keys["ArrowUp"] || keys["KeyW"]) {
         player.y -= _spd;
         player.dir = {x:0,y:-1};

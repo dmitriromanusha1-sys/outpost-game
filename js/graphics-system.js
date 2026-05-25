@@ -402,7 +402,7 @@ class GraphicsSystem {
     async loadAllTextures() {
         const loadingStatus = document.getElementById('texture-loading-status');
         
-        this.totalTextures = 3 + 11 + 9 + 2; // player + buildings + enemies(6 base + swordsman,archer,cavalry) + projectiles
+        this.totalTextures = 3 + 12 + 9 + 2; // player + buildings(+stable) + enemies + projectiles
         
         if (loadingStatus) {
             loadingStatus.textContent = `Загрузка текстур: 0/${this.totalTextures}`;
@@ -430,7 +430,7 @@ class GraphicsSystem {
     async loadBuildingTextures() {
         const buildings = [
             'sawmill', 'quarry', 'bank', 'tower', 'cannon', 'workshop', 'torture_chamber',
-            'smeltery', 'deep_quarry', 'blacksmith'
+            'smeltery', 'deep_quarry', 'blacksmith', 'stable'
         ];
         
         for (const building of buildings) {
@@ -545,23 +545,26 @@ class GraphicsSystem {
         this.ctx.arc(player.x + player.dir.x * 18, player.y + player.dir.y * 18, 5, 0, Math.PI * 2);
         this.ctx.fill();
 
-        // Индикатор коня
-        if (typeof skillSystem !== 'undefined' && skillSystem.isHorseMounted()) {
-            const hLvl = skillSystem.getHorseLevel();
-            const ringColor = hLvl >= 3 ? '#c0a000' : hLvl >= 2 ? '#808080' : '#8B4513';
-            this.ctx.save();
-            this.ctx.strokeStyle = ringColor;
-            this.ctx.lineWidth = 2;
-            this.ctx.setLineDash([4, 4]);
-            this.ctx.beginPath();
-            this.ctx.arc(player.x, player.y, 22, 0, Math.PI * 2);
-            this.ctx.stroke();
-            this.ctx.setLineDash([]);
-            this.ctx.font = '14px serif';
-            this.ctx.textAlign = 'center';
-            this.ctx.textBaseline = 'middle';
-            this.ctx.fillText('🐴', player.x + 18, player.y - 22);
-            this.ctx.restore();
+        // Индикатор конюшни
+        if (typeof buildings !== 'undefined') {
+            const stableBuilding = buildings.find(b => b.type === 'stable');
+            if (stableBuilding) {
+                const hLvl = stableBuilding.lvl;
+                const ringColor = hLvl >= 3 ? '#c0a000' : hLvl >= 2 ? '#aaaaaa' : '#8B4513';
+                this.ctx.save();
+                this.ctx.strokeStyle = ringColor;
+                this.ctx.lineWidth = 2;
+                this.ctx.setLineDash([4, 4]);
+                this.ctx.beginPath();
+                this.ctx.arc(player.x, player.y, 22, 0, Math.PI * 2);
+                this.ctx.stroke();
+                this.ctx.setLineDash([]);
+                this.ctx.font = '13px serif';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                this.ctx.fillText('🐴', player.x + 19, player.y - 22);
+                this.ctx.restore();
+            }
         }
     }
     

@@ -174,22 +174,6 @@ class SkillSystem {
                 requirements: ['archeryMastery', 'siegeWarfare']
             },
             
-            // Конный навык
-            horsemanship: {
-                id: 'horsemanship',
-                name: 'Верховая езда',
-                description: 'Покупка и улучшение боевого коня. Увеличивает скорость передвижения и даёт бонус к урону в атаке.',
-                icon: '🐴',
-                maxLevel: 3,
-                currentLevel: 0,
-                cost: 2,
-                speedBonus: [0.6, 1.2, 2.0],   // +60%, +120%, +200% к скорости
-                damageBonus: [0.1, 0.2, 0.35],  // +10%, +20%, +35% к урону
-                labels: ['Обычная лошадь', 'Боевой конь', 'Рыцарский дестриэ'],
-                unlocked: false,
-                requirements: ['defensiveTactics']
-            },
-
             // Экспертные навыки
             warMastery: {
                 id: 'warMastery',
@@ -231,11 +215,7 @@ class SkillSystem {
             critChance: 0.0,
             globalMilitaryMultiplier: 1.0,
 
-            // Конный бонус
-            horseSpeedMultiplier: 1.0,
-            horseDamageBonus: 0.0,
-            horseMounted: false,
-            horseLevel: 0
+            // (конный бонус перенесён в здание Конюшня)
         };
         
         // Опыт и уровни игрока
@@ -531,21 +511,6 @@ class SkillSystem {
             this.activeBonuses.globalMilitaryMultiplier += 0.25;
         }
 
-        // Верховая езда
-        const horseSkill = this.militarySkills.horsemanship;
-        if (horseSkill.currentLevel > 0) {
-            const lvl = horseSkill.currentLevel - 1;
-            this.activeBonuses.horseMounted = true;
-            this.activeBonuses.horseLevel = horseSkill.currentLevel;
-            this.activeBonuses.horseSpeedMultiplier = 1.0 + horseSkill.speedBonus[lvl];
-            this.activeBonuses.horseDamageBonus = horseSkill.damageBonus[lvl];
-            this.activeBonuses.playerDamageMultiplier += horseSkill.damageBonus[lvl];
-        } else {
-            this.activeBonuses.horseMounted = false;
-            this.activeBonuses.horseLevel = 0;
-            this.activeBonuses.horseSpeedMultiplier = 1.0;
-            this.activeBonuses.horseDamageBonus = 0.0;
-        }
         
         // Применяем глобальные бонусы
         for (const key in this.activeBonuses) {
@@ -618,17 +583,7 @@ class SkillSystem {
         return this.activeBonuses.critChance;
     }
 
-    getHorseSpeedMultiplier() {
-        return this.activeBonuses.horseSpeedMultiplier;
-    }
 
-    isHorseMounted() {
-        return this.activeBonuses.horseMounted;
-    }
-
-    getHorseLevel() {
-        return this.activeBonuses.horseLevel;
-    }
     
     // Добавление опыта
     addXP(amount) {
@@ -778,11 +733,6 @@ class SkillSystem {
             this.militarySkills[skillId].currentLevel = 0;
             this.militarySkills[skillId].unlocked = skillId === 'basicTraining' || skillId === 'defensiveTactics';
         }
-        this.activeBonuses.horseMounted = false;
-        this.activeBonuses.horseSpeedMultiplier = 1.0;
-        this.activeBonuses.horseDamageBonus = 0.0;
-        this.activeBonuses.horseLevel = 0;
-        
         // Возврат очков навыков
         this.skillPoints = this.spentSkillPoints;
         this.spentSkillPoints = 0;
@@ -1082,10 +1032,6 @@ class SkillSystem {
             <div class="bonus-stat-item">
                 <div class="bonus-stat-label">Шанс крита</div>
                 <div class="bonus-stat-value military">${(this.activeBonuses.critChance * 100).toFixed(1)}%</div>
-            </div>
-            <div class="bonus-stat-item">
-                <div class="bonus-stat-label">🐴 Конь</div>
-                <div class="bonus-stat-value military">${this.activeBonuses.horseMounted ? this.militarySkills.horsemanship.labels[this.activeBonuses.horseLevel - 1] + ' (×' + this.activeBonuses.horseSpeedMultiplier.toFixed(1) + ' скор.)' : 'Нет'}</div>
             </div>
         `;
     }
