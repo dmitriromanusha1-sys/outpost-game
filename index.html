@@ -71,12 +71,36 @@
                     <div class="med-mode-desc">Выживите в бесконечных волнах врагов. Стройте защиту, улучшайте здания, убивайте боссов.</div>
                     <div class="med-mode-tag">Доступно</div>
                 </div>
-                <div class="med-mode-card med-mode-locked">
+                <div class="med-mode-card" onclick="showMenuScreen('menu-campaign'); initCampaignList()">
                     <div class="med-mode-icon">📜</div>
                     <div class="med-mode-name">Кампания</div>
                     <div class="med-mode-desc">Пройдите уникальную историю мира Outpost с заданиями и сюжетом.</div>
-                    <div class="med-mode-tag med-mode-tag-wip">🔨 В разработке</div>
+                    <div class="med-mode-tag" style="color:#c9a227;border-color:#5a3a10;">⚔ Бастион</div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЭКРАН 4: КАМПАНИЯ -->
+    <div class="med-screen" id="menu-campaign">
+        <div class="med-card med-card-wide">
+            <div class="med-card-header">
+                <button class="med-back-btn" onclick="showMenuScreen('menu-mode')">← Назад</button>
+                <div class="med-card-title">⚔ Кампания: Бастион</div>
+            </div>
+            <div class="med-divider"><span>📜</span></div>
+            <div class="camp-layout">
+                <div class="camp-list" id="camp-list"><!-- JS --></div>
+                <div class="camp-detail" id="camp-detail">
+                    <div class="camp-detail-placeholder">← Выберите миссию</div>
+                </div>
+            </div>
+            <div class="med-start-row">
+                <div class="med-selected-info" id="camp-selected-info">Выберите миссию для начала похода</div>
+                <button class="med-btn med-btn-primary med-btn-start" id="camp-start-btn" onclick="startCampaignLevel()" disabled>
+                    <span class="med-btn-icon">⚔</span>
+                    <span class="med-btn-text">В поход!</span>
+                </button>
             </div>
         </div>
     </div>
@@ -100,6 +124,22 @@
                 </button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- ======================= СЮЖЕТНАЯ ЗАСТАВКА КАМПАНИИ ======================= -->
+<div id="story-intro" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); align-items:center; justify-content:center;">
+    <div class="story-inner">
+        <div class="story-rank" id="story-rank"></div>
+        <div class="story-num" id="story-num"></div>
+        <div class="story-name" id="story-name"></div>
+        <div class="med-divider" style="margin:18px 0;"><span>⚔</span></div>
+        <div class="story-text" id="story-text"></div>
+        <div class="story-gameplay" id="story-gameplay"></div>
+        <button class="med-btn med-btn-primary" style="margin-top:28px;" onclick="dismissStoryIntro()">
+            <span class="med-btn-icon">⚔</span>
+            <span class="med-btn-text">В бой!</span>
+        </button>
     </div>
 </div>
 
@@ -855,6 +895,173 @@ function initMedievalDifficultyGrid() {
         `;
         grid.appendChild(card);
     }
+}
+
+// ======================= КАМПАНИЯ: БАСТИОН =======================
+const CAMPAIGN_DATA = [
+    {
+        num: 1, title: 'Последняя жатва', rank: 'Ополченец (Староста деревни)',
+        map: 'forest', diff: 1,
+        story: 'Вражеская орда пересекла границу. Ваша задача — не победить, а задержать врага, пока мирные жители уходят вглубь страны.',
+        gameplay: 'Оборона деревянных заграждений подручными средствами.',
+        icon: '🌿'
+    },
+    {
+        num: 2, title: 'Дозор у пепелища', rank: 'Сержант пограничья',
+        map: 'ruins', diff: 2,
+        story: 'Вы отступили к заброшенному каменному блокпосту. Нужно восстановить стены из руин и отразить ночные вылазки лёгкой кавалерии врага.',
+        gameplay: 'Знакомство с механикой ремонта и первыми каменными укреплениями.',
+        icon: '🏛'
+    },
+    {
+        num: 3, title: 'Теснина Мертвеца', rank: 'Лейтенант',
+        map: 'canyon', diff: 3,
+        story: 'Единственный путь в столицу лежит через узкое горное ущелье. Вам приказано удерживать проход любой ценой. Здесь враг впервые применяет осадные лестницы.',
+        gameplay: 'Узкая карта, фокус на высокой плотности войск в проходе.',
+        icon: '⛰'
+    },
+    {
+        num: 4, title: 'Капитан речной стражи', rank: 'Капитан гарнизона',
+        map: 'coastal', diff: 4,
+        story: 'Враг пытается форсировать реку на баржах. Вам нужно укрепить береговую линию и не дать десанту закрепиться на вашем берегу.',
+        gameplay: 'Оборона береговой линии, использование лучников и огненных стрел.',
+        icon: '🌊'
+    },
+    {
+        num: 5, title: 'Гнев Цитадели', rank: 'Комендант малого замка',
+        map: 'mountains', diff: 5,
+        story: 'Вы возглавляете гарнизон замка, который оказался в глубоком тылу врага. Вы — кость в горле захватчиков. Нужно выстоять под длительной осадой.',
+        gameplay: 'Менеджмент ресурсов в условиях полной изоляции.',
+        icon: '🏰'
+    },
+    {
+        num: 6, title: 'Наместник железных копей', rank: 'Страж ресурсов (Магистр)',
+        map: 'volcano', diff: 6,
+        story: 'Армии нужны мечи. Вы защищаете главный промышленный центр — рудники. Враг пытается перерезать снабжение королевства.',
+        gameplay: 'Защита нескольких входов в шахты одновременно.',
+        icon: '⚒'
+    },
+    {
+        num: 7, title: 'Снежный заслон', rank: 'Бригадный командир',
+        map: 'winter', diff: 7,
+        story: 'Война затянулась до зимы. Нужно удерживать лагерь в метель, отбиваясь от одичавших от голода элитных отрядов врага.',
+        gameplay: 'Механика обморожения войск и сниженной видимости.',
+        icon: '❄'
+    },
+    {
+        num: 8, title: 'Преданный город', rank: 'Военный губернатор',
+        map: 'ruins', diff: 8,
+        story: 'Один из городов открыл ворота врагу. Вы должны закрепиться на центральной площади и выбить захватчиков изнутри.',
+        gameplay: 'Городские бои, баррикады на узких улицах.',
+        icon: '🗡'
+    },
+    {
+        num: 9, title: 'Маршал Отреченных', rank: 'Главнокомандующий обороной',
+        map: 'dark', diff: 9,
+        story: 'Враг подвёл к столице гигантские осадные башни и требушеты. Вы командуете внешней линией обороны столицы. Позади — тронный зал, отступать некуда.',
+        gameplay: 'Эпическая битва с использованием всех видов ловушек и тяжёлых орудий.',
+        icon: '💀'
+    },
+    {
+        num: 10, title: 'Генерал «Вечного Мира»', rank: 'Протектор Королевства',
+        map: 'heaven', diff: 10,
+        story: 'Финальный штурм. Враг бросает в бой все резервы. Ваша задача — продержаться до момента, пока союзный флот не зайдёт врагу в тыл.',
+        gameplay: 'Survival-режим: выстоять против бесконечных волн врага.',
+        icon: '👑'
+    }
+];
+
+let _selectedCampaignLevel = null;
+let _gameMode = 'waves'; // 'waves' | 'campaign'
+
+function getCampaignProgress() {
+    try { return JSON.parse(localStorage.getItem('bastionProgress') || '{}'); } catch { return {}; }
+}
+function setCampaignProgress(lvl) {
+    const p = getCampaignProgress();
+    p[lvl] = true;
+    localStorage.setItem('bastionProgress', JSON.stringify(p));
+}
+
+function initCampaignList() {
+    const list = document.getElementById('camp-list');
+    if (!list) return;
+    const progress = getCampaignProgress();
+    list.innerHTML = '';
+    CAMPAIGN_DATA.forEach((m, i) => {
+        const unlocked = i === 0 || progress[i]; // миссия 1 всегда открыта, остальные — если предыдущая пройдена
+        const done = progress[m.num];
+        const item = document.createElement('div');
+        item.className = 'camp-item' + (unlocked ? '' : ' camp-locked') + (done ? ' camp-done' : '');
+        item.dataset.num = m.num;
+        item.innerHTML = `
+            <div class="camp-item-icon">${m.icon}</div>
+            <div class="camp-item-body">
+                <div class="camp-item-num">Миссия ${m.num}</div>
+                <div class="camp-item-name">${m.title}</div>
+                <div class="camp-item-rank">${m.rank}</div>
+            </div>
+            <div class="camp-item-status">${done ? '✔' : (unlocked ? '▶' : '🔒')}</div>
+        `;
+        if (unlocked) item.onclick = () => selectCampaignLevel(m.num);
+        list.appendChild(item);
+    });
+}
+
+function selectCampaignLevel(num) {
+    _selectedCampaignLevel = num;
+    const m = CAMPAIGN_DATA[num - 1];
+
+    document.querySelectorAll('.camp-item').forEach(el => el.classList.remove('active'));
+    const active = document.querySelector(`.camp-item[data-num="${num}"]`);
+    if (active) active.classList.add('active');
+
+    const detail = document.getElementById('camp-detail');
+    detail.innerHTML = `
+        <div class="camp-detail-num">Миссия ${m.num} из 10</div>
+        <div class="camp-detail-icon">${m.icon}</div>
+        <div class="camp-detail-title">${m.title}</div>
+        <div class="camp-detail-rank">⚔ ${m.rank}</div>
+        <div class="camp-detail-divider"></div>
+        <div class="camp-detail-story">${m.story}</div>
+        <div class="camp-detail-gameplay">🎮 ${m.gameplay}</div>
+    `;
+
+    document.getElementById('camp-selected-info').textContent = `${m.title} · Сложность ${m.diff}/10`;
+    document.getElementById('camp-start-btn').disabled = false;
+}
+
+function startCampaignLevel() {
+    if (!_selectedCampaignLevel) return;
+    _gameMode = 'campaign';
+    const m = CAMPAIGN_DATA[_selectedCampaignLevel - 1];
+
+    // показываем сюжетную заставку, затем запускаем уровень
+    document.getElementById('story-rank').textContent = m.rank;
+    document.getElementById('story-num').textContent = `Миссия ${m.num}: `;
+    document.getElementById('story-name').textContent = m.title;
+    document.getElementById('story-text').textContent = m.story;
+    document.getElementById('story-gameplay').textContent = '🎮 ' + m.gameplay;
+
+    // запустить уровень (он сам скроет main-menu и покажет game-container)
+    startLevel(m.diff);
+    graphicsSystem.setCurrentMap(m.map);
+
+    // скрыть игру и показать заставку поверх
+    document.getElementById('game-container').style.display = 'none';
+    const intro = document.getElementById('story-intro');
+    intro.style.display = 'flex';
+}
+
+function dismissStoryIntro() {
+    document.getElementById('story-intro').style.display = 'none';
+    document.getElementById('game-container').style.display = 'block';
+}
+
+// Хук победы в кампании: разблокировать следующую миссию
+function onCampaignVictory() {
+    if (_gameMode !== 'campaign' || !_selectedCampaignLevel) return;
+    setCampaignProgress(_selectedCampaignLevel);
 }
 
 // ======================= МЕНЕДЖЕР УРОВНЕЙ =======================
@@ -1851,7 +2058,10 @@ function returnToMenu() {
     
     hideEndScreenButtons();
     
+    _gameMode = 'waves';
+    document.getElementById('story-intro').style.display = 'none';
     document.getElementById('main-menu').classList.remove('hidden');
+    document.getElementById('main-menu').style.display = '';
     document.getElementById('game-container').style.display = 'none';
     document.getElementById('settings-menu').classList.remove('active');
     document.getElementById('skills-menu').classList.remove('active');
@@ -2331,6 +2541,7 @@ function step() {
     if (bossKilled >= levelSystem.getTotalBosses()) {
         victory = true;
         document.getElementById('game-state').innerHTML = `<div style="color: #4caf50; animation: pulse 1s infinite;">🎉 ПОБЕДА! Пройдено ${waveNumber} волн!</div>`;
+        onCampaignVictory();
         showEndScreenButtons();
     }
 }
