@@ -758,9 +758,9 @@ class SkillSystem {
     
     // Создание UI системы навыков
     createSkillsUI() {
-        const skillsMenu = document.createElement('div');
-        skillsMenu.id = 'skills-menu';
-        skillsMenu.className = 'skills-menu';
+        // Используем существующий элемент из HTML вместо создания дублирующего
+        const skillsMenu = document.getElementById('skills-menu');
+        if (!skillsMenu) return;
 
         const xpPct = Math.round(this.playerXP / this.xpToNextLevel * 100);
         skillsMenu.innerHTML = `
@@ -811,8 +811,6 @@ class SkillSystem {
                 </div>
             </div>
         `;
-
-        document.body.appendChild(skillsMenu);
 
         // Инициализация вкладок
         this.initTabs();
