@@ -402,7 +402,7 @@ class GraphicsSystem {
     async loadAllTextures() {
         const loadingStatus = document.getElementById('texture-loading-status');
         
-        this.totalTextures = 3 + 12 + 9 + 2; // player + buildings(+stable) + enemies + projectiles
+        this.totalTextures = 3 + 14 + 9 + 2; // player + buildings(stabling + tower 3lvls) + enemies + projectiles
         
         if (loadingStatus) {
             loadingStatus.textContent = `Загрузка текстур: 0/${this.totalTextures}`;
@@ -429,13 +429,18 @@ class GraphicsSystem {
     
     async loadBuildingTextures() {
         const buildings = [
-            'sawmill', 'quarry', 'bank', 'tower', 'cannon', 'workshop', 'torture_chamber',
-            'smeltery', 'deep_quarry', 'blacksmith', 'stable'
+            'sawmill', 'quarry', 'bank', 'cannon', 'workshop', 'torture_chamber',
+            'smeltery', 'deep_quarry', 'blacksmith'
         ];
-        
         for (const building of buildings) {
             await this.loadTexture(`textures/buildings/${building}.png`, 'buildings', building);
         }
+        // Конюшня
+        await this.loadTexture('textures/buildings/stabling.png', 'buildings', 'stable');
+        // Башня — три уровня
+        await this.loadTexture('textures/buildings/tower 1lvl.jpg', 'buildings', 'tower_1');
+        await this.loadTexture('textures/buildings/tower 2lvl.jpg', 'buildings', 'tower_2');
+        await this.loadTexture('textures/buildings/tower 3lvl.jpg', 'buildings', 'tower_3');
     }
     
     async loadEnemyTextures() {
@@ -571,17 +576,20 @@ class GraphicsSystem {
     drawBuilding(b) {
         let size = 20 + b.lvl * 10;
         const building = this.balance.buildings[b.type];
-        const buildingTexture = this.textures.buildings[b.type];
-        
+
+        // Башня использует текстуру по уровню
+        const textureKey = b.type === 'tower' ? `tower_${b.lvl}` : b.type;
+        const buildingTexture = this.textures.buildings[textureKey] || this.textures.buildings[b.type];
+
         if (buildingTexture && buildingTexture.complete && this.settings.textureQuality !== 'low') {
             this.ctx.save();
             this.ctx.translate(b.x, b.y);
-            
+
             if (this.settings.shadows) {
                 this.drawShadow(b.x - size/2, b.y - size/2, size, size, 0.4);
             }
-            
-            const processedTexture = this.getProcessedTexture('buildings', b.type);
+
+            const processedTexture = this.getProcessedTexture('buildings', textureKey);
             const textureToUse = processedTexture || buildingTexture;
             
             this.ctx.drawImage(textureToUse, -size/2, -size/2, size, size);
