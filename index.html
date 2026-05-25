@@ -2059,8 +2059,8 @@ function startLevel(level) {
     waveStartTime = 0;
 
     const playerHealthBonus = skillSystem.getPlayerHealthBonus();
-    player.hp = player.maxHp * playerHealthBonus;
-    player.maxHp = player.hp;
+    player.maxHp = 100 * playerHealthBonus;
+    player.hp = player.maxHp;
 
     player.x = currentResolution.w / 2;
     player.y = currentResolution.h / 2;
