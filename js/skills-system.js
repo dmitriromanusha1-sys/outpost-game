@@ -758,96 +758,87 @@ class SkillSystem {
     
     // Создание UI системы навыков
     createSkillsUI() {
-        // Создаем меню навыков
         const skillsMenu = document.createElement('div');
         skillsMenu.id = 'skills-menu';
         skillsMenu.className = 'skills-menu';
-        
+
+        const xpPct = Math.round(this.playerXP / this.xpToNextLevel * 100);
         skillsMenu.innerHTML = `
             <div class="skills-container">
-                <div class="skills-title">
-                    <span>🌳 Древо навыков</span>
-                </div>
-                
-                <div class="skills-header">
-                    <div class="skill-points-display">
-                        <span>Очки навыков:</span>
-                        <span class="skill-points-value" id="skill-points-value">${this.skillPoints}</span>
-                        <span class="skill-points-cost">(Использовано: ${this.spentSkillPoints})</span>
-                    </div>
-                    <div>
-                        <span style="color: #4fc3f7;">Уровень: ${this.playerLevel}</span>
-                        <div style="font-size: 14px; color: #aaa; margin-top: 5px;">
-                            XP: ${this.playerXP}/${this.xpToNextLevel}
+                <!-- Шапка -->
+                <div class="sk-header">
+                    <div class="sk-header-left">
+                        <div class="sk-title">🌳 Древо навыков</div>
+                        <div class="sk-level-row">
+                            <span class="sk-level-badge">Ур. <span id="sk-player-level">${this.playerLevel}</span></span>
+                            <div class="sk-xp-bar-wrap">
+                                <div class="sk-xp-bar-fill" id="sk-xp-bar" style="width:${xpPct}%"></div>
+                            </div>
+                            <span class="sk-xp-text" id="sk-xp-text">${this.playerXP}/${this.xpToNextLevel} XP</span>
                         </div>
                     </div>
+                    <div class="sk-header-right">
+                        <div class="sk-pts-block">
+                            <div class="sk-pts-value" id="skill-points-value">${this.skillPoints}</div>
+                            <div class="sk-pts-label">очков</div>
+                        </div>
+                        <button class="sk-close-btn" onclick="hideSkillsMenu()">✕</button>
+                    </div>
                 </div>
-                
-                <div class="skill-tree-tabs" id="skill-tree-tabs" style="display: none;">
-                    <button class="skill-tree-tab active" data-tree="economy">💰 Экономика</button>
-                    <button class="skill-tree-tab" data-tree="military">⚔️ Военное дело</button>
+
+                <!-- Вкладки -->
+                <div class="sk-tabs" id="skill-tree-tabs">
+                    <button class="sk-tab active" data-tree="economy">💰 Экономика <span class="sk-tab-badge" id="sk-econ-badge">${this.getEconomySkillLevel()}/18</span></button>
+                    <button class="sk-tab" data-tree="military">⚔️ Военное дело <span class="sk-tab-badge" id="sk-mil-badge">${this.getMilitarySkillLevel()}/21</span></button>
                 </div>
-                
+
+                <!-- Деревья -->
                 <div class="skills-trees">
-                    <div class="skill-tree active" id="economy-tree">
-                        <div class="skill-tree-title">
-                            <span>💰 Экономика</span>
-                            <span class="skill-tree-badge">Ур. ${this.getEconomySkillLevel()}/18</span>
-                        </div>
-                        <div class="skill-tree-description">
-                            Улучшайте экономические показатели: увеличивайте доходы, снижайте затраты и оптимизируйте производство
-                        </div>
-                        <div class="skill-nodes" id="economy-skill-nodes">
-                            <!-- Навыки будут добавлены через JavaScript -->
-                        </div>
+                    <div class="skill-tree economy active" id="economy-tree">
+                        <div class="skill-nodes" id="economy-skill-nodes"></div>
                     </div>
-                    
-                    <div class="skill-tree" id="military-tree">
-                        <div class="skill-tree-title">
-                            <span>⚔️ Военное дело</span>
-                            <span class="skill-tree-badge">Ур. ${this.getMilitarySkillLevel()}/21</span>
-                        </div>
-                        <div class="skill-tree-description">
-                            Улучшайте боевые характеристики: увеличивайте урон, здоровье и эффективность в бою
-                        </div>
-                        <div class="skill-nodes" id="military-skill-nodes">
-                            <!-- Навыки будут добавлены через JavaScript -->
-                        </div>
+                    <div class="skill-tree military" id="military-tree">
+                        <div class="skill-nodes" id="military-skill-nodes"></div>
                     </div>
                 </div>
-                
-                <div class="bonus-stats" id="bonus-stats">
-                    <!-- Статистика бонусов будет добавлена через JavaScript -->
-                </div>
-                
-                <div class="skill-buttons">
-                    <button class="btn btn-danger" onclick="skillSystem.resetSkills()">
-                        🔄 Сбросить навыки (500💰)
-                    </button>
-                    <button class="btn" onclick="hideSkillsMenu()">
-                        ❌ Закрыть
-                    </button>
+
+                <!-- Бонусы -->
+                <div class="sk-bonus-bar" id="bonus-stats"></div>
+
+                <!-- Кнопки -->
+                <div class="sk-footer">
+                    <button class="sk-reset-btn" onclick="skillSystem.resetSkills()">🔄 Сбросить (500💰)</button>
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(skillsMenu);
-        
-        // Инициализация переключения веток на мобильных устройствах
-        this.initMobileTreeSwitcher();
-        
+
+        // Инициализация вкладок
+        this.initTabs();
+
         const hotkeyHint = document.createElement('div');
         hotkeyHint.className = 'skills-hotkey';
         hotkeyHint.id = 'skills-hotkey';
         document.body.appendChild(hotkeyHint);
-        
-        // Добавляем кнопку навыков в игровой интерфейс
+
         this.addSkillButtonToGameUI();
-        
-        // Инициализация древа навыков
         this.renderSkillTree();
         this.updateBonusStats();
         this.updateAvailableSkillsIndicators();
+    }
+
+    // Инициализация вкладок
+    initTabs() {
+        document.querySelectorAll('.sk-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.sk-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const tree = tab.dataset.tree;
+                document.querySelectorAll('.skill-tree').forEach(t => t.classList.remove('active'));
+                document.getElementById(`${tree}-tree`).classList.add('active');
+            });
+        });
     }
     
     // Получение общего уровня экономических навыков
@@ -868,68 +859,7 @@ class SkillSystem {
         return total;
     }
     
-    // Инициализация переключателя веток для мобильных устройств
-    initMobileTreeSwitcher() {
-        const tabsContainer = document.getElementById('skill-tree-tabs');
-        const economyTree = document.getElementById('economy-tree');
-        const militaryTree = document.getElementById('military-tree');
-        
-        if (window.innerWidth <= 768) {
-            tabsContainer.style.display = 'flex';
-            
-            // Скрываем военную ветку по умолчанию на мобильных
-            militaryTree.classList.remove('active');
-            
-            // Обработчики для вкладок
-            document.querySelectorAll('.skill-tree-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // Обновляем активную вкладку
-                    document.querySelectorAll('.skill-tree-tab').forEach(t => {
-                        t.classList.remove('active');
-                    });
-                    tab.classList.add('active');
-                    
-                    // Показываем соответствующую ветку
-                    const treeType = tab.getAttribute('data-tree');
-                    economyTree.classList.remove('active');
-                    militaryTree.classList.remove('active');
-                    
-                    if (treeType === 'economy') {
-                        economyTree.classList.add('active');
-                        this.activeTreeOnMobile = 'economy';
-                    } else {
-                        militaryTree.classList.add('active');
-                        this.activeTreeOnMobile = 'military';
-                    }
-                });
-            });
-        }
-        
-        // Обработчик изменения размера окна
-        window.addEventListener('resize', () => {
-            if (window.innerWidth <= 768) {
-                tabsContainer.style.display = 'flex';
-                
-                // Показываем активную ветку на мобильных
-                if (this.activeTreeOnMobile === 'economy') {
-                    economyTree.classList.add('active');
-                    militaryTree.classList.remove('active');
-                    document.querySelector('.skill-tree-tab[data-tree="economy"]').classList.add('active');
-                    document.querySelector('.skill-tree-tab[data-tree="military"]').classList.remove('active');
-                } else {
-                    militaryTree.classList.add('active');
-                    economyTree.classList.remove('active');
-                    document.querySelector('.skill-tree-tab[data-tree="military"]').classList.add('active');
-                    document.querySelector('.skill-tree-tab[data-tree="economy"]').classList.remove('active');
-                }
-            } else {
-                tabsContainer.style.display = 'none';
-                // На десктопе показываем обе ветки
-                economyTree.classList.add('active');
-                militaryTree.classList.add('active');
-            }
-        });
-    }
+    // (заменён на initTabs)
     
     // Добавление кнопки в игровой интерфейс
     addSkillButtonToGameUI() {
@@ -973,67 +903,45 @@ class SkillSystem {
     
     // Обновление UI навыков
     updateSkillUI() {
-        const pointsElement = document.getElementById('skill-points-value');
-        const hotkeyElement = document.getElementById('skills-hotkey');
-        
-        if (pointsElement) {
-            pointsElement.textContent = this.skillPoints;
+        const el = id => document.getElementById(id);
+        if (el('skill-points-value')) el('skill-points-value').textContent = this.skillPoints;
+
+        const xpPct = Math.round(this.playerXP / this.xpToNextLevel * 100);
+        if (el('sk-player-level')) el('sk-player-level').textContent = this.playerLevel;
+        if (el('sk-xp-bar'))      el('sk-xp-bar').style.width = xpPct + '%';
+        if (el('sk-xp-text'))     el('sk-xp-text').textContent = `${this.playerXP}/${this.xpToNextLevel} XP`;
+        if (el('sk-econ-badge'))  el('sk-econ-badge').textContent = `${this.getEconomySkillLevel()}/18`;
+        if (el('sk-mil-badge'))   el('sk-mil-badge').textContent = `${this.getMilitarySkillLevel()}/21`;
+
+        const hotkey = el('skills-hotkey');
+        if (hotkey) {
+            hotkey.innerHTML = `<span>⭐ Ур. ${this.playerLevel}</span><span class="skills-xp-bar-wrap"><span class="skills-xp-bar-fill" style="width:${xpPct}%"></span></span><span>${this.playerXP}/${this.xpToNextLevel} XP</span><span><kbd>K</kbd> Навыки</span>`;
         }
-        
-        if (hotkeyElement) {
-            hotkeyElement.innerHTML = `<span>⭐ Ур. ${this.playerLevel}</span><span class="skills-xp-bar-wrap"><span class="skills-xp-bar-fill" style="width:${Math.round(this.playerXP/this.xpToNextLevel*100)}%"></span></span><span>${this.playerXP}/${this.xpToNextLevel} XP</span><span><kbd>K</kbd> Навыки</span>`;
-        }
-        
-        // Обновляем бейджи с уровнями веток
-        const economyBadge = document.querySelector('#economy-tree .skill-tree-badge');
-        const militaryBadge = document.querySelector('#military-tree .skill-tree-badge');
-        
-        if (economyBadge) {
-            economyBadge.textContent = `Ур. ${this.getEconomySkillLevel()}/18`;
-        }
-        
-        if (militaryBadge) {
-            militaryBadge.textContent = `Ур. ${this.getMilitarySkillLevel()}/21`;
-        }
-        
-        // Обновляем прогресс уровня в игровом интерфейсе
+
         this.updateLevelProgressInGameUI();
-        
-        // Обновляем статистику бонусов
         this.updateBonusStats();
     }
     
     // Обновление статистики бонусов
     updateBonusStats() {
-        const bonusStats = document.getElementById('bonus-stats');
-        if (!bonusStats) return;
-        
-        bonusStats.innerHTML = `
-            <div class="bonus-stat-item">
-                <div class="bonus-stat-label">Доход от зданий</div>
-                <div class="bonus-stat-value economy">${(this.activeBonuses.buildingIncomeMultiplier * 100).toFixed(1)}%</div>
-            </div>
-            <div class="bonus-stat-item">
-                <div class="bonus-stat-label">Стоимость улучшений</div>
-                <div class="bonus-stat-value economy">${(this.activeBonuses.upgradeCostMultiplier * 100).toFixed(1)}%</div>
-            </div>
-            <div class="bonus-stat-item">
-                <div class="bonus-stat-label">Урон игрока</div>
-                <div class="bonus-stat-value military">${(this.activeBonuses.playerDamageMultiplier * 100).toFixed(1)}%</div>
-            </div>
-            <div class="bonus-stat-item">
-                <div class="bonus-stat-label">Здоровье игрока</div>
-                <div class="bonus-stat-value military">${(this.activeBonuses.playerHealthMultiplier * 100).toFixed(1)}%</div>
-            </div>
-            <div class="bonus-stat-item">
-                <div class="bonus-stat-label">Кол-во союзников</div>
-                <div class="bonus-stat-value military">+${this.activeBonuses.allyCountBonus}</div>
-            </div>
-            <div class="bonus-stat-item">
-                <div class="bonus-stat-label">Шанс крита</div>
-                <div class="bonus-stat-value military">${(this.activeBonuses.critChance * 100).toFixed(1)}%</div>
-            </div>
-        `;
+        const el = document.getElementById('bonus-stats');
+        if (!el) return;
+        const b = this.activeBonuses;
+        const stats = [
+            { label: '💰 Доход', val: `${(b.buildingIncomeMultiplier*100).toFixed(0)}%`, type: 'econ' },
+            { label: '📦 Ресурсы', val: `${(b.resourceProductionMultiplier*100).toFixed(0)}%`, type: 'econ' },
+            { label: '🏦 Банк', val: `${(b.bankIncomeMultiplier*100).toFixed(0)}%`, type: 'econ' },
+            { label: '💸 Продажа', val: `${(b.sellPriceMultiplier*100).toFixed(0)}%`, type: 'econ' },
+            { label: '⚔️ Урон', val: `${(b.playerDamageMultiplier*100).toFixed(0)}%`, type: 'mil' },
+            { label: '❤️ Здоровье', val: `${(b.playerHealthMultiplier*100).toFixed(0)}%`, type: 'mil' },
+            { label: '🏹 Лучники', val: `${(b.archerEfficiencyMultiplier*100).toFixed(0)}%`, type: 'mil' },
+            { label: '👥 Союзники', val: `+${b.allyCountBonus}`, type: 'mil' },
+            { label: '💉 Лечение', val: `${(b.healingMultiplier*100).toFixed(0)}%`, type: 'mil' },
+            { label: '🎯 Крит', val: `${(b.critChance*100).toFixed(0)}%`, type: 'mil' },
+        ];
+        el.innerHTML = stats.map(s =>
+            `<div class="sk-bonus-item ${s.type}"><span class="sk-bonus-label">${s.label}</span><span class="sk-bonus-val">${s.val}</span></div>`
+        ).join('');
     }
     
     // Обновление прогресса уровня в основном интерфейсе
@@ -1057,173 +965,101 @@ class SkillSystem {
     
     // Отрисовка древа навыков
     renderSkillTree() {
-        // Отрисовка экономической ветки
         this.renderSkillBranch('economy', this.economySkills, [
-            'basicIncome',
-            'resourceManagement',
-            'efficientProduction',
-            'investmentStrategy',
-            'taxOptimization',
-            'economicDominance'
+            ['basicIncome', 'resourceManagement'],
+            ['efficientProduction'],
+            ['investmentStrategy', 'taxOptimization'],
+            ['economicDominance']
         ]);
-        
-        // Отрисовка военной ветки
         this.renderSkillBranch('military', this.militarySkills, [
-            'basicTraining',
-            'defensiveTactics',
-            'archeryMastery',
-            'siegeWarfare',
-            'leadership',
-            'combatMedicine',
-            'warMastery'
+            ['basicTraining', 'defensiveTactics'],
+            ['archeryMastery', 'siegeWarfare'],
+            ['leadership', 'combatMedicine'],
+            ['warMastery']
         ]);
     }
-    
-    // Отрисовка ветки навыков
-    renderSkillBranch(branchId, skills, skillOrder) {
+
+    // Отрисовка ветки навыков (tier — массив массивов)
+    renderSkillBranch(branchId, skills, tiers) {
         const container = document.getElementById(`${branchId}-skill-nodes`);
         if (!container) return;
-        
         container.innerHTML = '';
-        
-        // Функция для получения статуса навыка
-        const getSkillStatus = (skill) => {
+
+        const getStatus = (skill) => {
             if (skill.currentLevel >= skill.maxLevel) return 'max';
             if (!skill.unlocked) return 'locked';
             if (this.canUpgradeSkill(skill.id)) return 'available';
             return 'unavailable';
         };
-        
-        // Создаем узлы навыков
-        skillOrder.forEach(skillId => {
-            const skill = skills[skillId];
-            if (!skill) return;
-            
-            const status = getSkillStatus(skill);
-            const progressPercent = (skill.currentLevel / skill.maxLevel) * 100;
-            const isAvailable = this.canUpgradeSkill(skill.id);
-            
-            const node = document.createElement('div');
-            node.className = `skill-node ${status} ${isAvailable ? 'available' : ''}`;
-            node.id = `skill-node-${skill.id}`;
-            node.title = status === 'available' ? 'Нажмите для улучшения' : '';
-            
-            if (status === 'available') {
-                node.onclick = () => this.upgradeSkill(skill.id);
-                node.style.cursor = 'pointer';
-            } else if (status === 'locked') {
-                node.style.cursor = 'not-allowed';
-            } else {
-                node.style.cursor = 'default';
+
+        const effectText = (skill) => {
+            const e = skill.effect;
+            switch (skill.id) {
+                case 'basicIncome':         return `+${(e*100).toFixed(0)}% доход/ур.`;
+                case 'resourceManagement':  return `-${(e*100).toFixed(0)}% стоимость/ур.`;
+                case 'efficientProduction': return `+${(e*100).toFixed(0)}% ресурсы/ур.`;
+                case 'investmentStrategy':  return `+${(e*100).toFixed(0)}% банк/ур.`;
+                case 'taxOptimization':     return `+${(e*100).toFixed(0)}% продажа/ур.`;
+                case 'economicDominance':   return `+${(e*100).toFixed(0)}% экономика`;
+                case 'basicTraining':       return `+${(e*100).toFixed(0)}% урон/ур.`;
+                case 'defensiveTactics':    return `+${(e*100).toFixed(0)}% HP/ур.`;
+                case 'archeryMastery':      return `+${(e*100).toFixed(0)}% лучники/ур.`;
+                case 'siegeWarfare':        return `+${(e*100).toFixed(0)}% боссы/ур.`;
+                case 'leadership':          return `+${(e*100).toFixed(0)}% союзники/ур.`;
+                case 'combatMedicine':      return `+${(e*100).toFixed(0)}% лечение/ур.`;
+                case 'warMastery':          return `+${(e.damageBonus*100).toFixed(0)}% урон, ${(e.critChance*100).toFixed(0)}% крит`;
+                default:                    return '';
             }
-            
-            // Описание эффекта
-            let effectDescription = '';
-            switch(skill.id) {
-                // Экономические навыки
-                case 'basicIncome':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% доход от зданий за уровень`;
-                    break;
-                case 'resourceManagement':
-                    effectDescription = `-${(skill.effect * 100).toFixed(0)}% стоимость улучшений за уровень`;
-                    break;
-                case 'efficientProduction':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% производство ресурсов за уровень`;
-                    break;
-                case 'investmentStrategy':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% доход от банков за уровень`;
-                    break;
-                case 'taxOptimization':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% стоимость продажи за уровень`;
-                    break;
-                case 'economicDominance':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% ко всем экономическим показателям`;
-                    break;
-                
-                // Военные навыки
-                case 'basicTraining':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% урон игрока и союзников за уровень`;
-                    break;
-                case 'defensiveTactics':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% здоровье игрока и союзников за уровень`;
-                    break;
-                case 'archeryMastery':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% эффективность лучников за уровень`;
-                    break;
-                case 'siegeWarfare':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% урон по боссам за уровень`;
-                    break;
-                case 'leadership':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% сила союзников и +1 союзник за уровень`;
-                    break;
-                case 'combatMedicine':
-                    effectDescription = `+${(skill.effect * 100).toFixed(0)}% эффективность лечения за уровень`;
-                    break;
-                case 'warMastery':
-                    effectDescription = `+${(skill.effect.damageBonus * 100).toFixed(0)}% урон, +${(skill.effect.healthBonus * 100).toFixed(0)}% здоровье, ${(skill.effect.critChance * 100).toFixed(0)}% крит`;
-                    break;
+        };
+
+        tiers.forEach((tier, ti) => {
+            // Разделитель между тирами
+            if (ti > 0) {
+                const sep = document.createElement('div');
+                sep.className = 'sk-tier-sep';
+                sep.innerHTML = '<div class="sk-tier-line"></div>';
+                container.appendChild(sep);
             }
-            
-            // Требования
-            let requirementsText = '';
-            if (skill.requirements.length > 0) {
-                const reqNames = skill.requirements.map(reqId => {
-                    let reqSkill = this.economySkills[reqId] || this.militarySkills[reqId];
-                    return reqSkill ? reqSkill.name : reqId;
-                });
-                requirementsText = `Требуется: ${reqNames.join(', ')}`;
-            }
-            
-            // Иконка статуса
-            let statusIcon = '🔓';
-            if (status === 'max') statusIcon = '✅';
-            else if (status === 'locked') statusIcon = '🔒';
-            else if (status === 'unavailable') statusIcon = '⏳';
-            
-            node.innerHTML = `
-                <div class="skill-node-header">
-                    <div class="skill-node-name">
-                        <span>${skill.icon}</span>
-                        <span>${skill.name}</span>
+
+            const tierDiv = document.createElement('div');
+            tierDiv.className = 'sk-tier';
+
+            tier.forEach(skillId => {
+                const skill = skills[skillId];
+                if (!skill) return;
+
+                const status = getStatus(skill);
+                const canUpgrade = status === 'available';
+
+                // Pip-индикаторы
+                const pips = Array.from({ length: skill.maxLevel }, (_, i) =>
+                    `<span class="sk-pip ${i < skill.currentLevel ? 'filled' : ''}"></span>`
+                ).join('');
+
+                const node = document.createElement('div');
+                node.className = `skill-node ${status}`;
+                node.id = `skill-node-${skill.id}`;
+                if (canUpgrade) {
+                    node.onclick = () => this.upgradeSkill(skill.id);
+                    node.title = 'Нажмите для улучшения';
+                }
+
+                node.innerHTML = `
+                    <div class="sn-icon">${skill.icon}</div>
+                    <div class="sn-name">${skill.name}</div>
+                    <div class="sn-effect">${effectText(skill)}</div>
+                    <div class="sn-pips">${pips}</div>
+                    <div class="sn-footer">
+                        <span class="sn-level">${skill.currentLevel}/${skill.maxLevel}</span>
+                        <span class="sn-cost">${skill.cost}⭐</span>
                     </div>
-                    <div class="skill-node-level">
-                        Ур. ${skill.currentLevel}/${skill.maxLevel}
-                    </div>
-                </div>
-                
-                <div class="skill-node-description">
-                    ${skill.description}
-                </div>
-                
-                <div class="skill-node-stats">
-                    <div class="skill-node-effect">
-                        ${effectDescription}
-                    </div>
-                    <div class="skill-node-cost">
-                        ${statusIcon} ${skill.cost} очк.
-                    </div>
-                </div>
-                
-                ${skill.currentLevel > 0 ? `
-                    <div class="skill-node-progress">
-                        <div class="skill-node-progress-bar" style="width: ${progressPercent}%"></div>
-                    </div>
-                ` : ''}
-                
-                ${requirementsText ? `
-                    <div class="skill-node-requirements">
-                        ${requirementsText}
-                    </div>
-                ` : ''}
-                
-                ${status === 'available' ? `
-                    <div style="font-size: 12px; color: #4fc3f7; margin-top: 8px; text-align: center;">
-                        🔼 Нажмите для улучшения
-                    </div>
-                ` : ''}
-            `;
-            
-            container.appendChild(node);
+                    ${canUpgrade ? '<div class="sn-upgrade-hint">▲ Улучшить</div>' : ''}
+                `;
+
+                tierDiv.appendChild(node);
+            });
+
+            container.appendChild(tierDiv);
         });
     }
 }
