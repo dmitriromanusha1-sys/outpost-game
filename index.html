@@ -1014,21 +1014,21 @@
     <div class="ui-overlay">
         <div id="game-state"></div>
 
-        <!-- ── ВЕР ХНЯ Я ПАНЕЛЬ ── -->
+        <!-- ── ВЕРХНЯЯ ПАНЕЛЬ ── -->
         <div class="hud-top">
-            <div class="hud-title">🏰 Outpost — <span id="level-title">Уровень 1</span></div>
+            <div class="hud-title">🏰 <span id="level-title">Уровень 1</span></div>
             <div class="hud-resources">
-                <div class="hud-res">💰 <span id="coins">100</span></div>
-                <div class="hud-res">🌲 <span id="wood">0</span></div>
-                <div class="hud-res">⛏ <span id="stone">0</span></div>
-                <div class="hud-res">🔥 <span id="iron">0</span></div>
+                <div class="hud-res hud-res-coins">💰 <span id="coins">100</span></div>
+                <div class="hud-res hud-res-wood">🌲 <span id="wood">0</span></div>
+                <div class="hud-res hud-res-stone">⛏ <span id="stone">0</span></div>
+                <div class="hud-res hud-res-iron">🔥 <span id="iron">0</span></div>
                 <div class="hud-res hud-res-hp">❤️ <span id="hp">100</span>/100</div>
             </div>
             <div class="hud-badges">
-                <div class="hud-badge">👑 <span id="bosses">0/3</span></div>
-                <div class="hud-badge">🌊 <span id="wave-count">1</span></div>
-                <div class="hud-badge">⚔️ <span id="current-level">1</span></div>
-                <div class="hud-badge hud-badge-xp">🌳 <span id="player-level">1</span></div>
+                <div class="hud-badge hud-badge-boss" title="Боссы убиты">👑 <span id="bosses">0/3</span></div>
+                <div class="hud-badge hud-badge-wave" title="Текущая волна">🌊 <span id="wave-count">1</span></div>
+                <div class="hud-badge hud-badge-kills" title="Убийств">⚔️ <span id="current-level">1</span></div>
+                <div class="hud-badge hud-badge-xp" title="Уровень игрока">Ур.<span id="player-level">1</span></div>
                 <span id="graphics-level" style="display:none">Средняя</span>
             </div>
         </div>
@@ -1039,12 +1039,11 @@
                 <div class="wave-card-header">
                     <span class="wave-card-icon">🌊</span>
                     <span class="wave-card-title">Волна <span id="wave-number">1</span></span>
+                    <span class="wave-card-diff-badge"><span id="wave-difficulty">+0%</span></span>
                 </div>
-                <div class="wave-card-diff">Сложность: <span id="wave-difficulty">+0%</span></div>
                 <div class="wave-progress"><div class="wave-progress-bar" id="wave-progress-bar"></div></div>
                 <div class="wave-card-timer">⏱ <span id="next-boss">30 сек</span></div>
             </div>
-            <button class="hud-left-btn" onclick="toggleFullscreen()">⛶ Полный экран</button>
         </div>
 
         <!-- ── ПРАВАЯ ПАНЕЛЬ ── -->
@@ -1064,27 +1063,33 @@
         <div class="hud-bottom">
             <!-- Ряд зданий -->
             <div class="hud-build-row">
-                <div class="hud-category">
-                    <span class="hud-cat-label">💰</span>
-                    <button class="hbtn" onclick="build('sawmill')"><span class="hbtn-icon">🌲</span><span class="hbtn-name">Лесопилка</span></button>
-                    <button class="hbtn" onclick="build('quarry')"><span class="hbtn-icon">⛏</span><span class="hbtn-name">Каменоломня</span></button>
-                    <button class="hbtn" onclick="build('bank')"><span class="hbtn-icon">🏦</span><span class="hbtn-name">Банк</span></button>
-                    <button class="hbtn" onclick="build('smeltery')"><span class="hbtn-icon">🔥</span><span class="hbtn-name">Плавильня</span></button>
-                    <button class="hbtn" onclick="build('deep_quarry')" title="Требует каменоломню 3 ур."><span class="hbtn-icon">🏭</span><span class="hbtn-name">Карьер</span></button>
+                <div class="hud-category hud-cat-econ">
+                    <span class="hud-cat-label">Экономика</span>
+                    <div class="hud-cat-btns">
+                        <button class="hbtn" onclick="build('sawmill')"><span class="hbtn-icon">🌲</span><span class="hbtn-name">Лесопилка</span></button>
+                        <button class="hbtn" onclick="build('quarry')"><span class="hbtn-icon">⛏</span><span class="hbtn-name">Каменоломня</span></button>
+                        <button class="hbtn" onclick="build('bank')"><span class="hbtn-icon">🏦</span><span class="hbtn-name">Банк</span></button>
+                        <button class="hbtn" onclick="build('smeltery')"><span class="hbtn-icon">🔥</span><span class="hbtn-name">Плавильня</span></button>
+                        <button class="hbtn" onclick="build('deep_quarry')" title="Требует каменоломню 3 ур."><span class="hbtn-icon">🏭</span><span class="hbtn-name">Карьер</span></button>
+                    </div>
                 </div>
                 <div class="hud-divider"></div>
-                <div class="hud-category">
-                    <span class="hud-cat-label">🛡</span>
-                    <button class="hbtn" onclick="build('tower')"><span class="hbtn-icon">🏹</span><span class="hbtn-name">Башня</span></button>
-                    <button class="hbtn" onclick="build('cannon')"><span class="hbtn-icon">🗡</span><span class="hbtn-name">Пушка</span></button>
-                    <button class="hbtn" onclick="build('blacksmith')" title="Увеличивает урон зданий"><span class="hbtn-icon">🔨</span><span class="hbtn-name">Кузница</span></button>
-                    <button class="hbtn" onclick="build('torture_chamber')" title="Замедляет врагов"><span class="hbtn-icon">⛓</span><span class="hbtn-name">Камера</span></button>
-                    <button class="hbtn" onclick="build('stable')" title="Увеличивает скорость игрока ×2/3/4"><span class="hbtn-icon">🐴</span><span class="hbtn-name">Конюшня</span></button>
+                <div class="hud-category hud-cat-defense">
+                    <span class="hud-cat-label">Оборона</span>
+                    <div class="hud-cat-btns">
+                        <button class="hbtn" onclick="build('tower')"><span class="hbtn-icon">🏹</span><span class="hbtn-name">Башня</span></button>
+                        <button class="hbtn" onclick="build('cannon')"><span class="hbtn-icon">🗡</span><span class="hbtn-name">Пушка</span></button>
+                        <button class="hbtn" onclick="build('blacksmith')" title="Увеличивает урон зданий"><span class="hbtn-icon">🔨</span><span class="hbtn-name">Кузница</span></button>
+                        <button class="hbtn" onclick="build('torture_chamber')" title="Замедляет врагов"><span class="hbtn-icon">⛓</span><span class="hbtn-name">Камера</span></button>
+                        <button class="hbtn" onclick="build('stable')" title="Увеличивает скорость игрока ×2/3/4"><span class="hbtn-icon">🐴</span><span class="hbtn-name">Конюшня</span></button>
+                    </div>
                 </div>
                 <div class="hud-divider"></div>
-                <div class="hud-category">
-                    <span class="hud-cat-label">🔧</span>
-                    <button class="hbtn" onclick="build('workshop')"><span class="hbtn-icon">🔧</span><span class="hbtn-name">Мастерская</span></button>
+                <div class="hud-category hud-cat-special">
+                    <span class="hud-cat-label">Спец.</span>
+                    <div class="hud-cat-btns">
+                        <button class="hbtn" onclick="build('workshop')"><span class="hbtn-icon">🔧</span><span class="hbtn-name">Мастерская</span></button>
+                    </div>
                 </div>
             </div>
             <!-- Ряд действий -->
