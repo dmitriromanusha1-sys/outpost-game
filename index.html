@@ -2875,20 +2875,21 @@ function step() {
         }
     }
 
-    if (keys["ArrowUp"] || keys["KeyW"]) { 
-        player.y -= balance.player.baseSpeed; 
+    const _spd = balance.player.baseSpeed * skillSystem.getHorseSpeedMultiplier();
+    if (keys["ArrowUp"] || keys["KeyW"]) {
+        player.y -= _spd;
         player.dir = {x:0,y:-1};
     }
-    if (keys["ArrowDown"] || keys["KeyS"]) { 
-        player.y += balance.player.baseSpeed; 
+    if (keys["ArrowDown"] || keys["KeyS"]) {
+        player.y += _spd;
         player.dir = {x:0,y:1};
     }
-    if (keys["ArrowLeft"] || keys["KeyA"]) { 
-        player.x -= balance.player.baseSpeed; 
+    if (keys["ArrowLeft"] || keys["KeyA"]) {
+        player.x -= _spd;
         player.dir = {x:-1,y:0};
     }
-    if (keys["ArrowRight"] || keys["KeyD"]) { 
-        player.x += balance.player.baseSpeed; 
+    if (keys["ArrowRight"] || keys["KeyD"]) {
+        player.x += _spd;
         player.dir = {x:1,y:0};
     }
 
