@@ -624,55 +624,70 @@
                 <div class="spanel-section">
                 <div class="spanel-title">Качество графики</div>
                 <div class="graphics-options">
-                    <div class="graphics-preset active" onclick="setGraphicsPreset('verylow')">
+                    <div class="graphics-preset gfx-verylow active" onclick="setGraphicsPreset('verylow')">
                         <div class="graphics-label">
-                            <div class="graphics-icon">🔵</div>
+                            <div class="gfx-tier-icon">⚡</div>
                             <div>
-                                <div>Очень низкая</div>
+                                <div class="graphics-name">Очень низкая</div>
                                 <div class="graphics-desc">Без эффектов, максимальная производительность</div>
                             </div>
                         </div>
-                        <div class="gfx-fps good">60+ FPS</div>
+                        <div class="gfx-right">
+                            <div class="gfx-quality-bar"><span class="qb-fill"></span><span></span><span></span><span></span><span></span></div>
+                            <div class="gfx-fps good">60+ FPS</div>
+                        </div>
                     </div>
-                    <div class="graphics-preset" onclick="setGraphicsPreset('low')">
+                    <div class="graphics-preset gfx-low" onclick="setGraphicsPreset('low')">
                         <div class="graphics-label">
-                            <div class="graphics-icon">🟢</div>
+                            <div class="gfx-tier-icon">🌿</div>
                             <div>
-                                <div>Низкая</div>
+                                <div class="graphics-name">Низкая</div>
                                 <div class="graphics-desc">Базовые эффекты, средняя детализация</div>
                             </div>
                         </div>
-                        <div class="gfx-fps good">45+ FPS</div>
+                        <div class="gfx-right">
+                            <div class="gfx-quality-bar"><span class="qb-fill"></span><span class="qb-fill"></span><span></span><span></span><span></span></div>
+                            <div class="gfx-fps good">45+ FPS</div>
+                        </div>
                     </div>
-                    <div class="graphics-preset" onclick="setGraphicsPreset('medium')">
+                    <div class="graphics-preset gfx-medium" onclick="setGraphicsPreset('medium')">
                         <div class="graphics-label">
-                            <div class="graphics-icon">🟡</div>
+                            <div class="gfx-tier-icon">⚖️</div>
                             <div>
-                                <div>Средняя</div>
+                                <div class="graphics-name">Средняя</div>
                                 <div class="graphics-desc">Улучшенные эффекты, хорошая детализация</div>
                             </div>
                         </div>
-                        <div class="gfx-fps warn">30+ FPS</div>
+                        <div class="gfx-right">
+                            <div class="gfx-quality-bar"><span class="qb-fill"></span><span class="qb-fill"></span><span class="qb-fill"></span><span></span><span></span></div>
+                            <div class="gfx-fps warn">30+ FPS</div>
+                        </div>
                     </div>
-                    <div class="graphics-preset" onclick="setGraphicsPreset('high')">
+                    <div class="graphics-preset gfx-high" onclick="setGraphicsPreset('high')">
                         <div class="graphics-label">
-                            <div class="graphics-icon">🟠</div>
+                            <div class="gfx-tier-icon">🔥</div>
                             <div>
-                                <div>Высокая</div>
+                                <div class="graphics-name">Высокая</div>
                                 <div class="graphics-desc">Расширенные эффекты, высокая детализация</div>
                             </div>
                         </div>
-                        <div class="gfx-fps warn">20+ FPS</div>
+                        <div class="gfx-right">
+                            <div class="gfx-quality-bar"><span class="qb-fill"></span><span class="qb-fill"></span><span class="qb-fill"></span><span class="qb-fill"></span><span></span></div>
+                            <div class="gfx-fps warn">20+ FPS</div>
+                        </div>
                     </div>
-                    <div class="graphics-preset" onclick="setGraphicsPreset('ultra')">
+                    <div class="graphics-preset gfx-ultra" onclick="setGraphicsPreset('ultra')">
                         <div class="graphics-label">
-                            <div class="graphics-icon">🔴</div>
+                            <div class="gfx-tier-icon">💎</div>
                             <div>
-                                <div>Ультра</div>
+                                <div class="graphics-name">Ультра</div>
                                 <div class="graphics-desc">Максимальные эффекты, кинематографическое качество</div>
                             </div>
                         </div>
-                        <div class="gfx-fps bad">Мощный ПК</div>
+                        <div class="gfx-right">
+                            <div class="gfx-quality-bar"><span class="qb-fill"></span><span class="qb-fill"></span><span class="qb-fill"></span><span class="qb-fill"></span><span class="qb-fill"></span></div>
+                            <div class="gfx-fps bad">Мощный ПК</div>
+                        </div>
                     </div>
                 </div>
 
