@@ -150,7 +150,7 @@
             <div class="hb-grid">
 
                 <!-- ЛЕСОПИЛКА -->
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('sawmill')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/sawmill.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -168,7 +168,7 @@
                 </div>
 
                 <!-- КАМЕНОЛОМНЯ -->
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('quarry')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/quarry.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -186,7 +186,7 @@
                 </div>
 
                 <!-- БАНК -->
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('bank')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/bank.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -204,7 +204,7 @@
                 </div>
 
                 <!-- ПЛАВИЛЬНЯ -->
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('smeltery')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/smeltery.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -222,7 +222,7 @@
                 </div>
 
                 <!-- КАРЬЕР -->
-                <div class="hb-card hb-card-unique">
+                <div class="hb-card hb-card-unique" onclick="openHbDetail('deep_quarry')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/deep_quarry.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -241,7 +241,7 @@
                 </div>
 
                 <!-- БАШНЯ -->
-                <div class="hb-card hb-card-combat">
+                <div class="hb-card hb-card-combat" onclick="openHbDetail('tower')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/tower.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -261,7 +261,7 @@
                 </div>
 
                 <!-- ПУШКА -->
-                <div class="hb-card hb-card-combat">
+                <div class="hb-card hb-card-combat" onclick="openHbDetail('cannon')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/cannon.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -283,7 +283,7 @@
                 </div>
 
                 <!-- МАСТЕРСКАЯ -->
-                <div class="hb-card hb-card-unique">
+                <div class="hb-card hb-card-unique" onclick="openHbDetail('workshop')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/workshop.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -301,7 +301,7 @@
                 </div>
 
                 <!-- КАМЕРА ПЫТОК -->
-                <div class="hb-card hb-card-unique">
+                <div class="hb-card hb-card-unique" onclick="openHbDetail('torture_chamber')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/torture_chamber.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -320,7 +320,7 @@
                 </div>
 
                 <!-- КУЗНИЦА -->
-                <div class="hb-card hb-card-unique">
+                <div class="hb-card hb-card-unique" onclick="openHbDetail('blacksmith')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/buildings/blacksmith.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -345,7 +345,7 @@
         <div id="hb-enemies" class="hb-section" style="display:none;">
             <div class="hb-grid">
 
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('wolf')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/enemies/wolf.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -363,7 +363,7 @@
                     </table>
                 </div>
 
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('robber')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/enemies/robber.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -381,7 +381,7 @@
                     </table>
                 </div>
 
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('marauder')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/enemies/marauder.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -399,7 +399,7 @@
                     </table>
                 </div>
 
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('swordsman')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/enemies/Swordsman.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -417,7 +417,7 @@
                     </table>
                 </div>
 
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('archer')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/enemies/Archer.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -437,7 +437,7 @@
                     </table>
                 </div>
 
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('cavalry')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/enemies/Cavalry.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -455,7 +455,7 @@
                     </table>
                 </div>
 
-                <div class="hb-card hb-card-combat" style="border-color:#8B0000;">
+                <div class="hb-card hb-card-combat" style="border-color:#8B0000;cursor:pointer" onclick="openHbDetail('boss')">
                     <div class="hb-card-header">
                         <img src="textures/enemies/boss.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -480,7 +480,7 @@
         <div id="hb-npcs" class="hb-section" style="display:none;">
             <div class="hb-grid">
 
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('bear')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/enemies/bear.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -498,7 +498,7 @@
                     </table>
                 </div>
 
-                <div class="hb-card">
+                <div class="hb-card" onclick="openHbDetail('tiger')" style="cursor:pointer">
                     <div class="hb-card-header">
                         <img src="textures/enemies/tiger.png" class="hb-img" onerror="this.style.display='none'">
                         <div>
@@ -521,6 +521,14 @@
 
     </div><!-- /container -->
 </div><!-- /handbook-overlay -->
+
+<!-- ======================= СПРАВОЧНИК: ДЕТАЛЬНОЕ ОКНО ======================= -->
+<div id="hb-detail" style="display:none; position:fixed; inset:0; z-index:10001; background:rgba(0,0,0,0.82); align-items:center; justify-content:center;" onclick="if(event.target===this)closeHbDetail()">
+    <div id="hb-detail-inner" style="background:#110e06; border:1px solid #5a3a10; border-radius:10px; max-width:640px; width:92%; max-height:88vh; overflow-y:auto; padding:28px 28px 24px; position:relative;">
+        <button onclick="closeHbDetail()" style="position:absolute;top:14px;right:16px;background:rgba(100,60,10,0.4);border:1px solid #5a3a10;color:#c9a227;font-size:16px;padding:4px 14px;cursor:pointer;border-radius:4px;">✕</button>
+        <div id="hb-detail-content"></div>
+    </div>
+</div>
 
 <!-- ======================= СЮЖЕТНАЯ ЗАСТАВКА КАМПАНИИ ======================= -->
 <div id="story-intro" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); align-items:center; justify-content:center;">
@@ -2384,7 +2392,10 @@ function openHandbook() {
     document.addEventListener('keydown', _hbEscHandler);
 }
 function _hbEscHandler(e) {
-    if (e.key === 'Escape') closeHandbook();
+    if (e.key === 'Escape') {
+        if (document.getElementById('hb-detail').style.display !== 'none') closeHbDetail();
+        else closeHandbook();
+    }
 }
 function closeHandbook() {
     document.getElementById('handbook-overlay').style.display = 'none';
@@ -2396,6 +2407,245 @@ function switchHbTab(tab) {
     document.getElementById('hb-' + tab).style.display = 'block';
     const idx = { buildings: 0, enemies: 1, npcs: 2 }[tab];
     document.querySelectorAll('.hb-tab')[idx].classList.add('active');
+}
+
+const _hbData = {
+    // ─── ЗДАНИЯ ───────────────────────────────────────────────
+    sawmill: {
+        name: '🪓 Лесопилка', type: 'Производство', img: 'textures/buildings/sawmill.png',
+        lore: 'Деревянные пилы день и ночь перерабатывают брёвна в доски. Каждый уровень вдвое увеличивает выход древесины.',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '30']] },
+            { title: '📦 Производство / сек', rows: [['Ур. 1', '2 🪵'], ['Ур. 2', '4 🪵'], ['Ур. 3', '8 🪵']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2', '50🪙 + 25🪵 + 10🪨'], ['→ Ур. 3', '50🪙 + 25🪵 + 10🪨']] },
+            { title: '💸 Продажа (75% возврат)', rows: [['Ур. 1', '~22🪙'], ['Ур. 2', '~60🪙'], ['Ур. 3', '~98🪙']] }
+        ]
+    },
+    quarry: {
+        name: '⛏ Каменоломня', type: 'Производство', img: 'textures/buildings/quarry.png',
+        lore: 'Рабочие долбят скальную породу, добывая камень для строительства. Нужно минимум 3 уровня для разблокировки Карьера.',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '30']] },
+            { title: '📦 Производство / сек', rows: [['Ур. 1', '2 🪨'], ['Ур. 2', '4 🪨'], ['Ур. 3', '8 🪨']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2', '50🪙 + 10🪵 + 25🪨'], ['→ Ур. 3', '50🪙 + 10🪵 + 25🪨']] },
+            { title: '⭐ Особые требования', rows: [['Ур. 3 открывает', 'Карьер (уник.)']] }
+        ]
+    },
+    bank: {
+        name: '🏦 Банк', type: 'Производство', img: 'textures/buildings/bank.png',
+        lore: 'Хранит и приумножает золото форпоста. Без банка масштабное строительство невозможно.',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '60']] },
+            { title: '📦 Производство / сек', rows: [['Ур. 1', '1.2 🪙'], ['Ур. 2', '2.64 🪙'], ['Ур. 3', '5.81 🪙']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2', '100🪙 + 40🪵 + 40🪨'], ['→ Ур. 3', '100🪙 + 40🪵 + 40🪨']] }
+        ]
+    },
+    smeltery: {
+        name: '🔥 Плавильня', type: 'Производство', img: 'textures/buildings/smeltery.png',
+        lore: 'Плавит руду в железные слитки. Необходима для продвинутых построек: Кузницы и Карьера.',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '120🪙'], ['Дерево', '20🪵'], ['Камень', '20🪨']] },
+            { title: '📦 Производство / сек', rows: [['Ур. 1', '1 ⚙'], ['Ур. 2', '2 ⚙'], ['Ур. 3', '4 ⚙']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2', '150🪙 + 40🪵 + 40🪨'], ['→ Ур. 3', '150🪙 + 40🪵 + 40🪨']] }
+        ]
+    },
+    deep_quarry: {
+        name: '🏔 Карьер', type: 'Производство · Уникальное', img: 'textures/buildings/deep_quarry.png',
+        lore: 'Промышленный карьер с мощной техникой. Добывает камень в 5 раз быстрее обычной каменоломни. Строится только один раз.',
+        sections: [
+            { title: '⚠ Требования', rows: [['Каменоломня', 'Ур. 3'] ] },
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '500🪙'], ['Дерево', '100🪵'], ['Камень', '200🪨'], ['Железо', '50⚙']] },
+            { title: '📦 Производство / сек', rows: [['Ур. 1', '10 🪨'], ['Ур. 2', '25 🪨'], ['Ур. 3', '62.5 🪨']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2 / 3', '1000🪙 + 200🪵 + 400🪨 + 100⚙']] }
+        ]
+    },
+    tower: {
+        name: '🗼 Башня', type: 'Боевое', img: 'textures/buildings/tower.png',
+        lore: 'Лучники на башне стреляют по ближайшим врагам. Апгрейд значительно повышает урон — выгоднее строить меньше башен, но прокачивать их.',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '60']] },
+            { title: '⚔ Урон за выстрел', rows: [['Ур. 1', '5'], ['Ур. 2', '15'], ['Ур. 3', '25']] },
+            { title: '🎯 Дальность / скорость', rows: [['Радиус атаки', '200'], ['Интервал выстрела', 'каждые 40 тиков'], ['Тип атаки', 'Одиночная цель']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2', '80🪙 + 30🪵 + 30🪨'], ['→ Ур. 3', '80🪙 + 30🪵 + 30🪨']] }
+        ]
+    },
+    cannon: {
+        name: '💣 Пушка', type: 'Боевое · Область', img: 'textures/buildings/cannon.png',
+        lore: 'Наносит урон по площади — идеальна против групп врагов. Каждый выстрел тратит камень. Следите за запасами!',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '90🪙'], ['Камень', '10🪨']] },
+            { title: '⚔ Урон (прямое попадание)', rows: [['Ур. 1', '25'], ['Ур. 2', '50'], ['Ур. 3', '100']] },
+            { title: '💥 Урон осколков (радиус 60)', rows: [['Все уровни', '40% от прямого урона']] },
+            { title: '🎯 Параметры', rows: [['Радиус атаки', '250'], ['Интервал выстрела', 'каждые 80 тиков'], ['Камень/выстрел Ур.1', '1🪨'], ['Камень/выстрел Ур.2', '3🪨'], ['Камень/выстрел Ур.3', '5🪨']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2', '120🪙 + 50🪵 + 50🪨'], ['→ Ур. 3', '120🪙 + 50🪵 + 50🪨']] }
+        ]
+    },
+    workshop: {
+        name: '🔧 Мастерская', type: 'Поддержка · Уникальное', img: 'textures/buildings/workshop.png',
+        lore: 'Мастера разрабатывают технологии снижения затрат. Скидка применяется глобально ко всем улучшениям зданий.',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '120']] },
+            { title: '💸 Глобальная скидка на апгрейды', rows: [['Ур. 1', '1%'], ['Ур. 2', '4%'], ['Ур. 3', '10%']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2', '200🪙 + 80🪵 + 80🪨'], ['→ Ур. 3', '200🪙 + 80🪵 + 80🪨']] },
+            { title: 'ℹ Примечание', rows: [['Тип', 'Уникальная — 1 шт.'], ['Применение', 'Автоматически, ко всем зданиям']] }
+        ]
+    },
+    torture_chamber: {
+        name: '🔮 Камера пыток', type: 'Поддержка · Уникальное', img: 'textures/buildings/torture_chamber.png',
+        lore: 'Магические ловушки и психологические методы замедляют врагов в зоне действия. Помогает башням сделать больше выстрелов.',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '150']] },
+            { title: '🐢 Замедление врагов', rows: [['Ур. 1', '1%'], ['Ур. 2', '4%'], ['Ур. 3', '10%']] },
+            { title: '🎯 Параметры', rows: [['Радиус действия', '300'], ['Тип', 'Уникальная — 1 шт.']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2', '250🪙 + 100🪵 + 100🪨'], ['→ Ур. 3', '250🪙 + 100🪵 + 100🪨']] }
+        ]
+    },
+    blacksmith: {
+        name: '⚒ Кузница', type: 'Поддержка · Уникальное', img: 'textures/buildings/blacksmith.png',
+        lore: 'Кует наконечники стрел и ядра повышенного качества. Увеличивает урон всех башен и пушек в радиусе 400.',
+        sections: [
+            { title: '💰 Стоимость постройки', rows: [['Монеты', '300🪙'], ['Дерево', '50🪵'], ['Камень', '50🪨'], ['Железо', '30⚙']] },
+            { title: '⚔ Бонус к урону башен/пушек', rows: [['Ур. 1', '+1%'], ['Ур. 2', '+4%'], ['Ур. 3', '+10%']] },
+            { title: '🎯 Параметры', rows: [['Радиус действия', '400'], ['Тип', 'Уникальная — 1 шт.']] },
+            { title: '🔨 Стоимость улучшения', rows: [['→ Ур. 2 / 3', '500🪙 + 100🪵 + 100🪨 + 50⚙']] }
+        ]
+    },
+    // ─── ВРАГИ ────────────────────────────────────────────────
+    wolf: {
+        name: '🐺 Волк', type: 'Обычный · Частый', img: 'textures/enemies/wolf.png',
+        lore: 'Стайный хищник. Слаб в одиночку, опасен в большом количестве. Самый распространённый враг.',
+        sections: [
+            { title: '❤ Здоровье и защита', rows: [['HP', '15'], ['Броня', 'Нет']] },
+            { title: '💨 Мобильность', rows: [['Скорость', '1.2 (высокая)'], ['Тип', 'Ближний бой']] },
+            { title: '⚔ Атака', rows: [['Урон за тик', '0.12'], ['Тип урона', 'Физический']] },
+            { title: '🎲 Спаун', rows: [['Вес', '30 из 100'], ['Примерная частота', '~30%']] },
+            { title: '💰 Награда', rows: [['Монеты', '10🪙']] }
+        ]
+    },
+    robber: {
+        name: '🗡 Разбойник', type: 'Обычный · Частый', img: 'textures/enemies/robber.png',
+        lore: 'Опытный мародёр в лёгкой броне. Крепче волка, наносит заметно больший урон.',
+        sections: [
+            { title: '❤ Здоровье', rows: [['HP', '35']] },
+            { title: '💨 Мобильность', rows: [['Скорость', '0.9 (средняя)'], ['Тип', 'Ближний бой']] },
+            { title: '⚔ Атака', rows: [['Урон за тик', '0.25']] },
+            { title: '🎲 Спаун', rows: [['Вес', '25 из 100'], ['Примерная частота', '~25%']] },
+            { title: '💰 Награда', rows: [['Монеты', '18🪙']] }
+        ]
+    },
+    marauder: {
+        name: '⚔ Мародёр', type: 'Тяжёлый', img: 'textures/enemies/marauder.png',
+        lore: 'Закованный в тяжёлую броню воин-наёмник. Медленный, но требует сосредоточенного огня нескольких башен.',
+        sections: [
+            { title: '❤ Здоровье', rows: [['HP', '90 (высокое)'], ['Сравнение', '~6× волков']] },
+            { title: '💨 Мобильность', rows: [['Скорость', '0.6 (медленная)'], ['Тип', 'Ближний бой']] },
+            { title: '⚔ Атака', rows: [['Урон за тик', '0.5 (высокий)']] },
+            { title: '🎲 Спаун', rows: [['Вес', '15 из 100'], ['Примерная частота', '~15%']] },
+            { title: '💰 Награда', rows: [['Монеты', '35🪙']] }
+        ]
+    },
+    swordsman: {
+        name: '⚔ Мечник', type: 'Тяжёлый', img: 'textures/enemies/Swordsman.png',
+        lore: 'Профессиональный воин с длинным мечом. Быстрее мародёра, почти так же опасен. Требует приоритетного уничтожения.',
+        sections: [
+            { title: '❤ Здоровье', rows: [['HP', '70']] },
+            { title: '💨 Мобильность', rows: [['Скорость', '0.8 (средняя)'], ['Тип', 'Ближний бой']] },
+            { title: '⚔ Атака', rows: [['Урон за тик', '0.45']] },
+            { title: '🎲 Спаун', rows: [['Вес', '15 из 100'], ['Примерная частота', '~15%']] },
+            { title: '💰 Награда', rows: [['Монеты', '28🪙']] }
+        ]
+    },
+    archer: {
+        name: '🏹 Лучник', type: 'Дальний бой', img: 'textures/enemies/Archer.png',
+        lore: 'Опасный противник с луком. Держится на расстоянии 180 и обстреливает игрока — не приближается, пока тот в зоне выстрела.',
+        sections: [
+            { title: '❤ Здоровье', rows: [['HP', '25 (низкое)']] },
+            { title: '💨 Мобильность', rows: [['Скорость перемещения', '1.0'], ['Поведение', 'Стоит на месте если игрок в зоне']] },
+            { title: '⚔ Атака (дальняя)', rows: [['Урон/выстрел', '0.3'], ['Дальность стрельбы', '180'], ['Интервал', 'каждые 180 тиков (~3 сек)']] },
+            { title: '🎲 Спаун', rows: [['Вес', '10 из 100'], ['Примерная частота', '~10%']] },
+            { title: '💰 Награда', rows: [['Монеты', '22🪙']] },
+            { title: '💡 Тактика', rows: [['Против него', 'Пушка (область) или быстро сократить дистанцию']] }
+        ]
+    },
+    cavalry: {
+        name: '🐴 Кавалерист', type: 'Быстрый', img: 'textures/enemies/Cavalry.png',
+        lore: 'Конный воин — самый быстрый враг в игре. Прорывается сквозь линию обороны раньше других, давая мало времени на реакцию.',
+        sections: [
+            { title: '❤ Здоровье', rows: [['HP', '50']] },
+            { title: '💨 Мобильность', rows: [['Скорость', '2.0 (в 2.5× быстрее волка!)'], ['Тип', 'Ближний бой']] },
+            { title: '⚔ Атака', rows: [['Урон за тик', '0.35']] },
+            { title: '🎲 Спаун', rows: [['Вес', '5 из 100'], ['Примерная частота', '~5% (редкий)']] },
+            { title: '💰 Награда', rows: [['Монеты', '25🪙']] },
+            { title: '💡 Тактика', rows: [['Угроза', 'Строите башни достаточно далеко'], ['Камера пыток', 'Замедление критично против него']] }
+        ]
+    },
+    boss: {
+        name: '💀 Босс', type: 'Элитный · Раз в волну', img: 'textures/enemies/boss.png',
+        lore: 'Появляется в конце каждой волны. С каждой следующей волной HP и сложность растут. Убейте его до того, как он дойдёт до вас.',
+        sections: [
+            { title: '❤ Здоровье', rows: [['Базовый HP', '500'], ['Волна 1', '500'], ['Волна 5', '~1245'], ['Волна 10', '~3096'], ['Формула', 'baseHp × 1.2^(волна−1)']] },
+            { title: '💨 Мобильность', rows: [['Скорость', '0.3 (очень медленный)'], ['Тип', 'Ближний бой']] },
+            { title: '⚔ Атака', rows: [['Урон за тик', '0.4']] },
+            { title: '💰 Награда', rows: [['Монеты', '200🪙']] },
+            { title: '💡 Тактика', rows: [['Приоритет', 'Сосредоточьте огонь всех башен'], ['Пушка', 'Максимально эффективна по одной цели']] }
+        ]
+    },
+    // ─── НПС ──────────────────────────────────────────────────
+    bear: {
+        name: '🐻 Медведь', type: 'Нейтральный НПС', img: 'textures/enemies/bear.png',
+        lore: 'Огромный лесной медведь. Мирно бродит по карте, пока не учует чужака. При приближении игрока агрессивно атакует.',
+        sections: [
+            { title: '❤ Здоровье', rows: [['HP', '180 (очень высокое)']] },
+            { title: '💨 Мобильность', rows: [['Скорость патрулирования', '0.45'], ['Скорость погони', '0.85'], ['Радиус агрессии', '130']] },
+            { title: '⚔ Атака', rows: [['Урон за удар', '0.35'], ['Дальность удара', '22'], ['Интервал', 'каждые 90 тиков']] },
+            { title: '💰 Награда за убийство', rows: [['Монеты', '40🪙'], ['Дерево', '10🪵']] },
+            { title: 'ℹ Поведение', rows: [['Тип', 'НПС (не волна)'], ['Макс. на карте', '4 одновременно'], ['Интервал спауна', 'каждые 480 тиков']] }
+        ]
+    },
+    tiger: {
+        name: '🐯 Тигр', type: 'Нейтральный НПС', img: 'textures/enemies/tiger.png',
+        lore: 'Стремительный хищник. Видит дальше медведя и значительно быстрее в погоне. Сложнее убить из-за высокой маневренности.',
+        sections: [
+            { title: '❤ Здоровье', rows: [['HP', '90']] },
+            { title: '💨 Мобильность', rows: [['Скорость патрулирования', '0.95'], ['Скорость погони', '1.7 (очень высокая)'], ['Радиус агрессии', '160 (выше чем у медведя)']] },
+            { title: '⚔ Атака', rows: [['Урон за удар', '0.28'], ['Дальность удара', '20'], ['Интервал', 'каждые 50 тиков (частые удары)']] },
+            { title: '💰 Награда за убийство', rows: [['Монеты', '25🪙'], ['Железо', '5⚙']] },
+            { title: 'ℹ Поведение', rows: [['Тип', 'НПС (не волна)'], ['Макс. на карте', '4 одновременно'], ['Интервал спауна', 'каждые 480 тиков']] }
+        ]
+    }
+};
+
+function openHbDetail(id) {
+    const d = _hbData[id];
+    if (!d) return;
+    let html = `
+        <div style="display:flex;align-items:center;gap:18px;margin-bottom:18px;">
+            <img src="${d.img}" style="width:96px;height:96px;object-fit:contain;image-rendering:pixelated;background:rgba(255,255,255,0.04);border-radius:8px;flex-shrink:0" onerror="this.style.display='none'">
+            <div>
+                <div style="font-size:22px;font-weight:800;color:#e8d5a0;margin-bottom:4px;">${d.name}</div>
+                <div style="font-size:12px;color:#7a6040;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">${d.type}</div>
+                <div style="font-size:13px;color:#aaa;line-height:1.5;">${d.lore}</div>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;">`;
+    for (const sec of d.sections) {
+        html += `<div style="background:rgba(201,162,39,0.06);border:1px solid rgba(201,162,39,0.18);border-radius:6px;padding:12px;">
+            <div style="font-size:12px;font-weight:700;color:#c9a227;margin-bottom:8px;">${sec.title}</div>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">`;
+        for (const [k, v] of sec.rows) {
+            html += `<tr>
+                <td style="color:#999;padding:3px 6px 3px 0;border-bottom:1px solid rgba(255,255,255,0.05);white-space:nowrap;">${k}</td>
+                <td style="color:#e8d5a0;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-weight:600;">${v}</td>
+            </tr>`;
+        }
+        html += `</table></div>`;
+    }
+    html += `</div>`;
+    document.getElementById('hb-detail-content').innerHTML = html;
+    document.getElementById('hb-detail').style.display = 'flex';
+}
+function closeHbDetail() {
+    document.getElementById('hb-detail').style.display = 'none';
 }
 
 function showSettings() {
