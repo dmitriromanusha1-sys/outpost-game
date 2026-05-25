@@ -440,7 +440,7 @@ class GraphicsSystem {
         // Башня — три уровня
         await this.loadTexture('textures/buildings/tower 1lvl.jpg', 'buildings', 'tower_1');
         await this.loadTexture('textures/buildings/tower 2lvl.jpg', 'buildings', 'tower_2');
-        await this.loadTexture('textures/buildings/tower 3lvl.jpg', 'buildings', 'tower_3');
+        await this.loadTexture('textures/buildings/tower 3lvl.png', 'buildings', 'tower_3');
     }
     
     async loadEnemyTextures() {
