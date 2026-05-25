@@ -356,12 +356,13 @@ class GraphicsSystem {
     }
     
     processTexture(category, name, image) {
-        if (!this.settings.removeBackground || this.settings.textureQuality === 'low') {
+        const isFileProtocol = window.location.protocol === 'file:';
+        if (!this.settings.removeBackground || this.settings.textureQuality === 'low' || isFileProtocol) {
             this.textures.processed[category] = this.textures.processed[category] || {};
             this.textures.processed[category][name] = image;
             return;
         }
-        
+
         try {
             const backgroundColor = this.detectBackgroundColor(image);
             
@@ -401,7 +402,7 @@ class GraphicsSystem {
     async loadAllTextures() {
         const loadingStatus = document.getElementById('texture-loading-status');
         
-        this.totalTextures = 3 + 11 + 4 + 2; // player + buildings + enemies + projectiles
+        this.totalTextures = 3 + 11 + 9 + 2; // player + buildings + enemies(6 base + swordsman,archer,cavalry) + projectiles
         
         if (loadingStatus) {
             loadingStatus.textContent = `Загрузка текстур: 0/${this.totalTextures}`;
@@ -438,8 +439,8 @@ class GraphicsSystem {
     }
     
     async loadEnemyTextures() {
-        const enemies = ['wolf', 'robber', 'marauder', 'boss', 'bear', 'tiger'];
-        
+        const enemies = ['wolf', 'robber', 'marauder', 'boss', 'bear', 'tiger', 'swordsman', 'archer', 'cavalry'];
+
         for (const enemy of enemies) {
             await this.loadTexture(`textures/enemies/${enemy}.png`, 'enemies', enemy);
         }
@@ -795,7 +796,7 @@ class GraphicsSystem {
             this.ctx.translate(e.x, e.y);
 
             if (this.settings.shadows) {
-                const shadowSize = e.type === 'boss' ? 50 : e.type === 'marauder' ? 32 : e.type === 'robber' ? 28 : 24;
+                const shadowSize = e.type === 'boss' ? 50 : e.type === 'marauder' ? 32 : e.type === 'cavalry' ? 36 : e.type === 'swordsman' ? 30 : e.type === 'robber' ? 28 : 24;
                 this.drawShadow(e.x - shadowSize/2, e.y - shadowSize/2, shadowSize, shadowSize, 0.4);
             }
 
@@ -803,7 +804,7 @@ class GraphicsSystem {
             const healthWidth = e.type === 'boss' ? 60 : 40;
 
             // Имя врага
-            const enemyNames = { wolf: '🐺 Волк', robber: '🗡 Разбойник', marauder: '⚔️ Мародёр', boss: '💀 Босс' };
+            const enemyNames = { wolf: '🐺 Волк', robber: '🗡 Разбойник', marauder: '⚔️ Мародёр', boss: '💀 Босс', swordsman: '⚔️ Мечник', archer: '🏹 Лучник', cavalry: '🐴 Кавалерист' };
             this.ctx.fillStyle = e.type === 'boss' ? '#ffd700' : '#fff';
             this.ctx.font = e.type === 'boss' ? 'bold 11px Arial' : '10px Arial';
             this.ctx.textAlign = 'center';
@@ -815,7 +816,7 @@ class GraphicsSystem {
             this.ctx.fillStyle = healthPercent > 0.5 ? "#00ff00" : healthPercent > 0.25 ? "#ffa500" : "#ff0000";
             this.ctx.fillRect(-healthWidth/2, -30, healthWidth * healthPercent, 5);
 
-            const size = e.type === 'boss' ? 50 : e.type === 'marauder' ? 32 : e.type === 'robber' ? 28 : 24;
+            const size = e.type === 'boss' ? 50 : e.type === 'marauder' ? 32 : e.type === 'swordsman' ? 30 : e.type === 'cavalry' ? 36 : e.type === 'robber' ? 28 : 24;
             
             const processedTexture = this.getProcessedTexture('enemies', e.type);
             const textureToUse = processedTexture || enemyTexture;
@@ -866,12 +867,15 @@ class GraphicsSystem {
             this.ctx.fillStyle = healthPercent > 0.5 ? "#00ff00" : healthPercent > 0.25 ? "#ffa500" : "#ff0000";
             this.ctx.fillRect(-healthWidth/2, -30, healthWidth * healthPercent, 5);
 
-            this.ctx.fillStyle = e.type === 'wolf' ? '#6b8e23' : 
-                                e.type === 'robber' ? '#b22222' : 
-                                e.type === 'marauder' ? '#daa520' : 
+            this.ctx.fillStyle = e.type === 'wolf' ? '#6b8e23' :
+                                e.type === 'robber' ? '#b22222' :
+                                e.type === 'marauder' ? '#daa520' :
+                                e.type === 'swordsman' ? '#4169e1' :
+                                e.type === 'archer' ? '#228b22' :
+                                e.type === 'cavalry' ? '#8b6914' :
                                 '#dc143c';
-            
-            const size = e.type === 'boss' ? 22 : e.type === 'marauder' ? 16 : e.type === 'robber' ? 14 : 12;
+
+            const size = e.type === 'boss' ? 22 : e.type === 'marauder' ? 16 : e.type === 'swordsman' ? 15 : e.type === 'cavalry' ? 18 : e.type === 'robber' ? 14 : 12;
             
             if (e.type === 'boss') {
                 this.ctx.beginPath();

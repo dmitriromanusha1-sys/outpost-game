@@ -289,12 +289,26 @@ class MusicSystem {
         if (statusEl) statusEl.textContent = '🔍 Проверка треков...';
 
         this.availableTracks.clear();
-        const checks = this.trackList.map(async trackId => {
-            try {
-                const r = await fetch(this.musicTracks[trackId].path, { method: 'HEAD' });
-                if (r.ok) this.availableTracks.add(trackId);
-            } catch {}
+
+        // fetch заблокирован на file:// — проверяем через Audio
+        const checkTrack = (trackId) => new Promise(resolve => {
+            const audio = new Audio();
+            const path = this.musicTracks[trackId].path;
+            let resolved = false;
+            const done = (ok) => {
+                if (resolved) return;
+                resolved = true;
+                if (ok) this.availableTracks.add(trackId);
+                resolve();
+            };
+            const t = setTimeout(() => done(false), 3000);
+            audio.addEventListener('canplaythrough', () => { clearTimeout(t); done(true); }, { once: true });
+            audio.addEventListener('error', () => { clearTimeout(t); done(false); }, { once: true });
+            audio.preload = 'metadata';
+            audio.src = path;
         });
+
+        const checks = this.trackList.map(checkTrack);
         await Promise.all(checks);
 
         const found = this.availableTracks.size;
