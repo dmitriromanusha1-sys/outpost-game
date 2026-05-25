@@ -1135,8 +1135,9 @@ class GraphicsSystem {
     // ======================= ОТРИСОВКА КАРТЫ =======================
     
     drawMap() {
-        // Рисуем карту с запасом чтобы при минимальном зуме (0.4) не было чёрных краёв
-        const pad = this.GAME_WIDTH * 1.5;
+        const cameraFollow = typeof camera !== 'undefined' && camera.mode === 'follow';
+        // В режиме follow рисуем с запасом чтобы не было чёрных краёв при зуме < 1
+        const pad = cameraFollow ? this.GAME_WIDTH * 1.5 : 0;
         const x = -pad;
         const y = -pad;
         const w = this.GAME_WIDTH + pad * 2;
