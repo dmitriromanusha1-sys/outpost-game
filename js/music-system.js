@@ -3,17 +3,18 @@ class MusicSystem {
     constructor() {
         this.musicTracks = {
             // Эпическая
-            epic_battle:        { path: "music/epic_battle.mp3",        category: "epic",     icon: "🔥", name: "Грандиозное сражение",   desc: "Мощная эпичная битва" },
             heroic_charge:      { path: "music/heroic_charge.mp3",      category: "epic",     icon: "⚔️", name: "Героическая атака",       desc: "Героическая атака войск" },
             dragon_slayer:      { path: "music/dragon_slayer.mp3",      category: "epic",     icon: "🐉", name: "Битва с драконом",        desc: "Битва с могучим драконом" },
             victory_march:      { path: "music/victory_march.mp3",      category: "epic",     icon: "🎖️", name: "Торжественный марш",     desc: "Торжественный победный марш" },
             final_confrontation:{ path: "music/final_confrontation.mp3",category: "epic",     icon: "👑", name: "Финальная битва",         desc: "Финальная битва с боссом" },
+            realm_defenders:    { path: "music/realm_defenders.mp3",    category: "epic",     icon: "🏰", name: "Защитники королевства",   desc: "Эпичная оборонительная тема" },
             // Боевая
             battle_theme:       { path: "music/battle_theme.mp3",       category: "battle",   icon: "🛡️", name: "Боевая тема",            desc: "Основная боевая тема" },
             siege_warfare:      { path: "music/siege_warfare.mp3",      category: "battle",   icon: "🏹", name: "Осада замка",             desc: "Музыка для осады замка" },
             orc_raid:           { path: "music/orc_raid.mp3",           category: "battle",   icon: "👹", name: "Набег орков",             desc: "Быстрая агрессивная музыка" },
             cavalry_charge:     { path: "music/cavalry_charge.mp3",     category: "battle",   icon: "🐎", name: "Атака кавалерии",        desc: "Стремительная атака кавалерии" },
             arrow_storm:        { path: "music/arrow_storm.mp3",        category: "battle",   icon: "🎯", name: "Град стрел",              desc: "Быстрые и резкие мелодии" },
+            giants_awakening:   { path: "music/giants_awakening.mp3",   category: "battle",   icon: "👊", name: "Пробуждение великанов",   desc: "Тяжёлая мощная боевая тема" },
             // Атмосферная
             dark_forest:        { path: "music/dark_forest.mp3",        category: "ambient",  icon: "🌳", name: "Темный лес",              desc: "Таинственный темный лес" },
             mystic_caves:       { path: "music/mystic_caves.mp3",       category: "ambient",  icon: "🕳️", name: "Таинственные пещеры",   desc: "Загадочные пещеры" },
@@ -22,7 +23,6 @@ class MusicSystem {
             enchanted_lake:     { path: "music/enchanted_lake.mp3",     category: "ambient",  icon: "🌊", name: "Зачарованное озеро",     desc: "Магическое озеро" },
             // Фэнтези
             elven_kingdom:      { path: "music/elven_kingdom.mp3",      category: "fantasy",  icon: "🧝", name: "Королевство эльфов",     desc: "Эльфийские мелодии" },
-            dwarven_forge:      { path: "music/dwarven_forge.mp3",      category: "fantasy",  icon: "⛏️", name: "Дварфская кузница",     desc: "Ритмичная кузнечная музыка" },
             magic_academy:      { path: "music/magic_academy.mp3",      category: "fantasy",  icon: "📚", name: "Академия магии",          desc: "Магическая академия" },
             fairy_glade:        { path: "music/fairy_glade.mp3",        category: "fantasy",  icon: "🧚", name: "Поляна фей",              desc: "Лёгкие и воздушные мелодии" },
             wizard_tower:       { path: "music/wizard_tower.mp3",       category: "fantasy",  icon: "🧙", name: "Башня волшебника",        desc: "Таинственная магическая башня" },

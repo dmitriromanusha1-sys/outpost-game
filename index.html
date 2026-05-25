@@ -1974,9 +1974,10 @@ function step() {
             
             let damage = baseDamage * (1 + getBlacksmithDamageBonus()) * skillSystem.getArcherEfficiencyBonus();
 
+            const tx = b.x, ty = b.y;
             let target = [...enemies, ...npcs]
-                .filter(en => Math.hypot(en.x - b.x, en.y - b.y) < building.attackRange)
-                .sort((a, b) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(b.x - b.x, b.y - b.y))[0];
+                .filter(en => Math.hypot(en.x - tx, en.y - ty) < building.attackRange)
+                .sort((a, c) => Math.hypot(a.x - tx, a.y - ty) - Math.hypot(c.x - tx, c.y - ty))[0];
             
             if (target) { 
                 arrows.push({
@@ -2009,9 +2010,10 @@ function step() {
             
             let damage = baseDamage * (1 + getBlacksmithDamageBonus());
 
+            const cx = b.x, cy = b.y;
             let target = [...enemies, ...npcs]
-                .filter(en => Math.hypot(en.x - b.x, en.y - b.y) < building.attackRange)
-                .sort((a, b) => Math.hypot(a.x - b.x, a.y - b.y) - Math.hypot(b.x - b.x, b.y - b.y))[0];
+                .filter(en => Math.hypot(en.x - cx, en.y - cy) < building.attackRange)
+                .sort((a, c) => Math.hypot(a.x - cx, a.y - cy) - Math.hypot(c.x - cx, c.y - cy))[0];
             
             if (target) { 
                 if (target.isBoss) {
@@ -2028,9 +2030,10 @@ function step() {
                     damage: damage,
                     splashRadius: building.splashRadius,
                     splashDamage: building.splashDamage,
+                    maxSplashTargets: [3, 4, 5][b.lvl - 1],
                     building: b,
                     stoneCost: stoneCost
-                }); 
+                });
                 b.cd = attackSpeed; 
             } else {
                 // Нет цели - сбрасываем кулдаун
@@ -2174,20 +2177,16 @@ function step() {
         let dx = cb.tx.x - cb.x, dy = cb.tx.y - cb.y, d = Math.hypot(dx, dy);
         if (d < 15) {
             cb.tx.hp -= cb.damage;
-            
-            enemies.forEach(enemy => {
-                if (enemy !== cb.tx && enemy.hp > 0) {
-                    const distanceToExplosion = Math.hypot(enemy.x - cb.x, enemy.y - cb.y);
-                    if (distanceToExplosion < cb.splashRadius) {
-                        const splashDamage = cb.damage * cb.splashDamage;
-                        enemy.hp -= splashDamage;
-                        
-                        if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
-                            for (let i = 0; i < 3; i++) {
-                                graphicsSystem.createParticle(enemy.x, enemy.y, 'spark');
-                            }
-                        }
-                    }
+
+            const splashTargets = [...enemies, ...npcs]
+                .filter(en => en !== cb.tx && en.hp > 0 && Math.hypot(en.x - cb.x, en.y - cb.y) < cb.splashRadius)
+                .sort((a, c) => Math.hypot(a.x - cb.x, a.y - cb.y) - Math.hypot(c.x - cb.x, c.y - cb.y))
+                .slice(0, cb.maxSplashTargets || 3);
+
+            splashTargets.forEach(enemy => {
+                enemy.hp -= cb.damage * cb.splashDamage;
+                if (graphicsSystem.settings.particles && document.getElementById('particles-enabled').checked) {
+                    for (let i = 0; i < 3; i++) graphicsSystem.createParticle(enemy.x, enemy.y, 'spark');
                 }
             });
             
