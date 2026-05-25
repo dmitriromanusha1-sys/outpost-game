@@ -1043,14 +1043,15 @@ function startCampaignLevel() {
     document.getElementById('story-text').textContent = m.story;
     document.getElementById('story-gameplay').textContent = '🎮 ' + m.gameplay;
 
-    // запустить уровень (он сам скроет main-menu и покажет game-container)
-    startLevel(m.diff);
-    graphicsSystem.setCurrentMap(m.map);
-
-    // скрыть игру и показать заставку поверх
-    document.getElementById('game-container').style.display = 'none';
-    const intro = document.getElementById('story-intro');
-    intro.style.display = 'flex';
+    // Скрываем меню немедленно
+    document.getElementById('main-menu').classList.add('hidden');
+    // Показываем заставку
+    document.getElementById('story-intro').style.display = 'flex';
+    // Запускаем уровень в фоне (игра откроется по кнопке "В бой!")
+    startLevel(m.diff).then(() => {
+        graphicsSystem.setCurrentMap(m.map);
+        document.getElementById('game-container').style.display = 'none';
+    }).catch(e => console.error('campaign startLevel error:', e));
 }
 
 function dismissStoryIntro() {
@@ -1071,6 +1072,9 @@ function closeLevelsMenuOutside() {}
 function startSelectedLevel() {
     const level = _selectedDifficulty || levelSystem.getCurrentLevel();
     _gameMode = 'waves';
+    // Скрываем меню немедленно, не ждём async
+    document.getElementById('main-menu').classList.add('hidden');
+    document.getElementById('game-container').style.display = 'block';
     startLevel(level).catch(e => console.error('startLevel error:', e));
 }
 
