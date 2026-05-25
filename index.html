@@ -1043,15 +1043,12 @@ function startCampaignLevel() {
     document.getElementById('story-text').textContent = m.story;
     document.getElementById('story-gameplay').textContent = '🎮 ' + m.gameplay;
 
-    // Скрываем меню немедленно
-    document.getElementById('main-menu').classList.add('hidden');
-    // Показываем заставку
+    // Запускаем уровень — он скроет меню и покажет game-container
+    startLevel(m.diff);
+    graphicsSystem.setCurrentMap(m.map);
+    // Скрываем игру и показываем сюжетную заставку поверх
+    document.getElementById('game-container').style.display = 'none';
     document.getElementById('story-intro').style.display = 'flex';
-    // Запускаем уровень в фоне (игра откроется по кнопке "В бой!")
-    startLevel(m.diff).then(() => {
-        graphicsSystem.setCurrentMap(m.map);
-        document.getElementById('game-container').style.display = 'none';
-    }).catch(e => console.error('campaign startLevel error:', e));
 }
 
 function dismissStoryIntro() {
@@ -1072,10 +1069,7 @@ function closeLevelsMenuOutside() {}
 function startSelectedLevel() {
     const level = _selectedDifficulty || levelSystem.getCurrentLevel();
     _gameMode = 'waves';
-    // Скрываем меню немедленно, не ждём async
-    document.getElementById('main-menu').classList.add('hidden');
-    document.getElementById('game-container').style.display = 'block';
-    startLevel(level).catch(e => console.error('startLevel error:', e));
+    startLevel(level);
 }
 
 // ======================= БУРГЕР-МЕНЮ НА ПРАВОЙ ПАНЕЛИ =======================
@@ -1582,14 +1576,14 @@ function hideEndScreenButtons() {
 }
 
 // ======================= ОСНОВНЫЕ ФУНКЦИИ ИГРЫ =======================
-async function startLevel(level) {
+function startLevel(level) {
     levelSystem.setLevel(level);
     const levelData = levelSystem.getLevelData();
     graphicsSystem.setCurrentMap(levelData.map);
     bossKilled = 0;
     waveNumber = 1;
     waveDifficulty = 0;
-    
+
     time = 0;
     gameTime = 0;
     enemies = [];
@@ -1605,7 +1599,7 @@ async function startLevel(level) {
     gameOver = false;
     victory = false;
     gamePaused = false;
-    
+
     waveInProgress = false;
     waveJustStarted = false;
     waveStartTime = 0;
@@ -1613,33 +1607,31 @@ async function startLevel(level) {
     const playerHealthBonus = skillSystem.getPlayerHealthBonus();
     player.hp = player.maxHp * playerHealthBonus;
     player.maxHp = player.hp;
-    
+
     player.x = currentResolution.w / 2;
     player.y = currentResolution.h / 2;
     player.direction = 'front';
-    
+
     hideEndScreenButtons();
-    
+
     document.getElementById('pause-btn').textContent = '⏸️ Пауза';
     document.getElementById('pause-btn').classList.remove('paused');
     document.getElementById('pause-indicator').classList.remove('active');
-    
-    await loadMapTexture(levelData.map);
-    
+
     document.getElementById('level-title').textContent = levelData.name;
     document.getElementById('current-level').textContent = level;
     document.getElementById('graphics-level').textContent = graphicsSystem.settings.name;
     updateUI();
-    
+
     document.querySelectorAll('.level-option').forEach(opt => {
         opt.classList.remove('active');
         if (opt.onclick && opt.onclick.toString().includes(`selectLevel(${level})`)) {
             opt.classList.add('active');
         }
     });
-    
+
     document.getElementById('levels-dropdown').classList.remove('active');
-    
+
     cleanupDocumentListeners();
 
     document.getElementById('main-menu').classList.add('hidden');
@@ -1647,6 +1639,9 @@ async function startLevel(level) {
 
     stopGameLoop();
     startGameLoop();
+
+    // Загрузка текстуры карты в фоне — игровой цикл уже запущен
+    loadMapTexture(levelData.map);
 
     nextBossTime = getWaveInterval();
     
