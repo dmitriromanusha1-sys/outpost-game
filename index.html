@@ -2195,12 +2195,15 @@ function updateWaveProgress() {
 
 function increaseWaveDifficulty() {
     waveNumber++;
-    const levelData = levelSystem.getLevelData();
-    waveDifficulty += levelData.waveDifficultyMultiplier * 20;
-    
+    // Флэт-прирост, не завязанный на level.waveDifficultyMultiplier — раньше эти два
+    // множителя умножались друг на друга и оба росли с номером волны, что давало
+    // квадратичный (не линейный) рост HP врагов и делало поздние волны непроходимыми.
+    // Капаем итоговый множитель сложности на 1.8x.
+    waveDifficulty = Math.min(80, waveDifficulty + 8);
+
     updateUI();
-    
-    showNotification(`🌊 Волна ${waveNumber}! Сложность +${Math.floor(levelData.waveDifficultyMultiplier * 20)}%`, "warning");
+
+    showNotification(`🌊 Волна ${waveNumber}!`, "warning");
 }
 
 function spawnEnemy(type = null, boss = false) {
@@ -2209,7 +2212,7 @@ function spawnEnemy(type = null, boss = false) {
     
     if (boss) {
         const baseHp = balance.baseEnemies.boss.baseHp * level.bossHpMultiplier;
-        const waveBonus = (waveNumber - 1) * balance.waveDifficultyIncrease.bossHp;
+        const waveBonus = Math.min(150, (waveNumber - 1) * balance.waveDifficultyIncrease.bossHp);
         const hp = baseHp * (1 + waveBonus / 100) * difficultyMultiplier;
         
         enemies.push({
@@ -2248,8 +2251,8 @@ function spawnEnemy(type = null, boss = false) {
     }
     
     const base = balance.baseEnemies[enemyType];
-    const waveHpBonus = (waveNumber - 1) * balance.waveDifficultyIncrease.enemyHp;
-    const waveSpeedBonus = (waveNumber - 1) * balance.waveDifficultyIncrease.enemySpeed;
+    const waveHpBonus = Math.min(100, (waveNumber - 1) * balance.waveDifficultyIncrease.enemyHp);
+    const waveSpeedBonus = Math.min(60, (waveNumber - 1) * balance.waveDifficultyIncrease.enemySpeed);
     
     const hp = base.hp * level.enemyMultiplier * (1 + waveHpBonus / 100) * difficultyMultiplier;
     let speedEnemy = base.speed * level.enemySpeedMultiplier * (1 + waveSpeedBonus / 100);
@@ -2680,7 +2683,7 @@ const _hbData = {
         name: '💀 Босс', type: 'Элитный · Раз в волну', img: 'textures/enemies/boss.png',
         lore: 'Появляется в конце каждой волны. С каждой следующей волной HP и сложность растут. Убейте его до того, как он дойдёт до вас.',
         sections: [
-            { title: '❤ Здоровье', rows: [['Базовый HP', '500'], ['Волна 1', '500'], ['Волна 5', '~1245'], ['Волна 10', '~3096'], ['Формула', 'baseHp × 1.2^(волна−1)']] },
+            { title: '❤ Здоровье', rows: [['Базовый HP', '500'], ['Формула', 'baseHp × сложность уровня × бонус волны (растёт линейно, капается)']] },
             { title: '💨 Мобильность', rows: [['Скорость', '0.3 (очень медленный)'], ['Тип', 'Ближний бой']] },
             { title: '⚔ Атака', rows: [['Урон за тик', '0.4']] },
             { title: '💰 Награда', rows: [['Монеты', '200🪙']] },
