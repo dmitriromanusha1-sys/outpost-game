@@ -868,13 +868,10 @@ class GraphicsSystem {
     drawEnemy(e) {
         const enemyTexture = this.textures.enemies[e.type];
         const attackAnim = e.attackAnim || 0;
-        // Выпад в сторону игрока во время удара
-        const lungeX = attackAnim > 0 ? (e.faceX || 0) * attackAnim * 6 : 0;
-        const lungeY = attackAnim > 0 ? (e.faceY || 0) * attackAnim * 6 : 0;
 
         if (enemyTexture && enemyTexture.complete && this.settings.textureQuality !== 'low') {
             this.ctx.save();
-            this.ctx.translate(e.x + lungeX, e.y + lungeY);
+            this.ctx.translate(e.x, e.y);
 
             if (this.settings.shadows) {
                 const shadowSize = e.type === 'boss' ? 50 : e.type === 'marauder' ? 32 : e.type === 'cavalry' ? 36 : e.type === 'swordsman' ? 30 : e.type === 'robber' ? 28 : 24;
@@ -900,14 +897,10 @@ class GraphicsSystem {
             const textureToUse = processedTexture || enemyTexture;
             this.ctx.drawImage(textureToUse, -size/2, -size/2, size, size);
 
-            // Взмах атаки — дуга в сторону игрока
+            // Замах атаки — белая полоска над врагом
             if (attackAnim > 0) {
-                const ang = Math.atan2(e.faceY || 0, e.faceX || 1);
-                this.ctx.strokeStyle = `rgba(255,255,255,${attackAnim * 0.8})`;
-                this.ctx.lineWidth = 2;
-                this.ctx.beginPath();
-                this.ctx.arc(0, 0, size/2 + 5, ang - 0.7, ang + 0.7);
-                this.ctx.stroke();
+                this.ctx.fillStyle = `rgba(255,255,255,${attackAnim})`;
+                this.ctx.fillRect(-size * 0.3, -size/2 - 6, size * 0.6, 3);
             }
 
             // Эффект замедления
@@ -956,7 +949,7 @@ class GraphicsSystem {
             this.ctx.restore();
         } else {
             this.ctx.save();
-            this.ctx.translate(e.x + lungeX, e.y + lungeY);
+            this.ctx.translate(e.x, e.y);
 
             if (this.settings.shadows) {
                 const shadowSize = e.type === 'boss' ? 44 : e.type === 'marauder' ? 32 : e.type === 'robber' ? 28 : 24;
@@ -989,12 +982,8 @@ class GraphicsSystem {
             this.ctx.fill();
 
             if (attackAnim > 0) {
-                const ang = Math.atan2(e.faceY || 0, e.faceX || 1);
-                this.ctx.strokeStyle = `rgba(255,255,255,${attackAnim * 0.8})`;
-                this.ctx.lineWidth = 2;
-                this.ctx.beginPath();
-                this.ctx.arc(0, 0, size + 4, ang - 0.7, ang + 0.7);
-                this.ctx.stroke();
+                this.ctx.fillStyle = `rgba(255,255,255,${attackAnim})`;
+                this.ctx.fillRect(-size * 0.5, -size - 6, size, 3);
             }
 
             if (e.type === 'boss') {
