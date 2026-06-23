@@ -1099,6 +1099,11 @@ const ENEMY_MELEE_RANGE = 20;
 const ENEMY_MELEE_ATTACK_INTERVAL = 40;
 const ENEMY_MELEE_MISS_CHANCE = 0.12;
 const ENEMY_RANGED_MISS_CHANCE = 0.20;
+
+// Лимит одновременно живых врагов — на больших волнах спавн мог уйти в сотни
+// сущностей и просадить FPS. Боссы не считаются лимитом, чтобы не сломать
+// условие победы (нужно убить фиксированное число боссов).
+const MAX_ENEMIES = 250;
 let fullscreen = false;
 let showFPS = true;
 let fps = 60;
@@ -2244,7 +2249,9 @@ function spawnEnemy(type = null, boss = false) {
         showNotification("⚠️ Появился босс! Будьте осторожны!", "danger");
         return;
     }
-    
+
+    if (enemies.length >= MAX_ENEMIES) return;
+
     let enemyType;
     if (!type) {
         const pool = Object.entries(balance.baseEnemies)
