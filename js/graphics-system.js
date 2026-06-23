@@ -295,6 +295,9 @@ class GraphicsSystem {
         // ── Хит-флеш: entityId → timer (0..1) ──
         this.hitFlashes = {};
 
+        // ── Кеш градиентов врагов: одинаковые цвет+размер+флеш дают одинаковый градиент ──
+        this._enemyGradientCache = {};
+
         // ── Атмосферные частицы (светлячки, пыль) ──
         this.ambientParticles = [];
 
@@ -519,27 +522,35 @@ class GraphicsSystem {
     
     drawPlayer(player) {
         const playerTexture = this.textures.player[player.direction];
-        
+        const playerFlash = this.hitFlashes['player'] || 0;
+
         if (playerTexture && playerTexture.complete && this.settings.textureQuality !== 'low') {
             this.ctx.save();
             this.ctx.translate(player.x, player.y);
-            
+
             if (player.direction === 'left') {
                 this.ctx.scale(-1, 1);
             }
-            
+
             if (this.settings.shadows) {
                 this.drawShadow(player.x - 20, player.y - 20, 40, 40, 0.4);
             }
-            
+
             const processedTexture = this.getProcessedTexture('player', player.direction);
             const textureToUse = processedTexture || playerTexture;
-            
+
             this.ctx.drawImage(textureToUse, -20, -20, 40, 40);
+            if (playerFlash > 0) {
+                this.ctx.globalAlpha = playerFlash * 0.6;
+                this.ctx.globalCompositeOperation = 'lighter';
+                this.ctx.drawImage(textureToUse, -20, -20, 40, 40);
+                this.ctx.globalCompositeOperation = 'source-over';
+                this.ctx.globalAlpha = 1;
+            }
             this.ctx.restore();
         } else {
-            this.ctx.fillStyle = "#3a7bd5";
-            if (this.settings.textureQuality === 'ultra') {
+            this.ctx.fillStyle = playerFlash > 0 ? '#ffffff' : "#3a7bd5";
+            if (this.settings.textureQuality === 'ultra' && playerFlash <= 0) {
                 const gradient = this.ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 14);
                 gradient.addColorStop(0, '#4a8bd5');
                 gradient.addColorStop(0.5, '#3a7bd5');
@@ -918,8 +929,10 @@ class GraphicsSystem {
             this.ctx.font = e.type === 'boss' ? 'bold 10px Arial' : '9px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'bottom';
-            this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            this.ctx.shadowBlur = 3;
+            if (this.settings.shadows) {
+                this.ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                this.ctx.shadowBlur = 3;
+            }
             this.ctx.fillText(enemyNames[e.type] || e.type, 0, -size/2 - 8);
             this.ctx.shadowBlur = 0;
 
@@ -946,10 +959,16 @@ class GraphicsSystem {
 
             // Хит-флеш для fallback
             const flashVal2 = this.hitFlashes[e.id] || 0;
+            const flashed = flashVal2 > 0;
 
-            const grad = this.ctx.createRadialGradient(0, -size*0.2, 0, 0, 0, size);
-            grad.addColorStop(0, flashVal2 > 0 ? '#ffffff' : eColor);
-            grad.addColorStop(1, flashVal2 > 0 ? 'rgba(255,200,200,0.5)' : 'rgba(0,0,0,0.5)');
+            const gradKey = `${eColor}|${size}|${flashed}`;
+            let grad = this._enemyGradientCache[gradKey];
+            if (!grad) {
+                grad = this.ctx.createRadialGradient(0, -size*0.2, 0, 0, 0, size);
+                grad.addColorStop(0, flashed ? '#ffffff' : eColor);
+                grad.addColorStop(1, flashed ? 'rgba(255,200,200,0.5)' : 'rgba(0,0,0,0.5)');
+                this._enemyGradientCache[gradKey] = grad;
+            }
             this.ctx.fillStyle = grad;
             this.ctx.beginPath();
             this.ctx.arc(0, 0, size, 0, Math.PI * 2);
@@ -1799,6 +1818,9 @@ class GraphicsSystem {
     // ======================= ПЛАВАЮЩИЙ ТЕКСТ =======================
 
     createFloatingText(x, y, text, color = '#fff', size = 16, bold = true) {
+        if (this.floatingTexts.length >= 100) {
+            this.floatingTexts.shift();
+        }
         this.floatingTexts.push({
             x, y,
             text: String(text),
@@ -1842,8 +1864,10 @@ class GraphicsSystem {
             ctx.scale(t.scale, t.scale);
             ctx.font = `${t.bold ? 'bold ' : ''}${t.size}px Arial`;
             // Тень для читаемости
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            ctx.shadowBlur = 4;
+            if (this.settings.shadows) {
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 4;
+            }
             ctx.fillStyle = t.color;
             ctx.fillText(t.text, 0, 0);
             ctx.shadowBlur = 0;

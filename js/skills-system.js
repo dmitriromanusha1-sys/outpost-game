@@ -70,7 +70,7 @@ class SkillSystem {
                 icon: '💸',
                 maxLevel: 2,
                 currentLevel: 0,
-                cost: 3,
+                cost: 2,
                 effect: 0.10, // 10% увеличения стоимости продажи за уровень
                 unlocked: false,
                 requirements: ['efficientProduction']
@@ -508,7 +508,6 @@ class SkillSystem {
             this.activeBonuses.playerDamageMultiplier += this.militarySkills.warMastery.effect.damageBonus;
             this.activeBonuses.playerHealthMultiplier += this.militarySkills.warMastery.effect.healthBonus;
             this.activeBonuses.critChance = this.militarySkills.warMastery.effect.critChance;
-            this.activeBonuses.globalMilitaryMultiplier += 0.25;
         }
 
         

@@ -133,7 +133,7 @@ class LevelSystem {
                 name: "Бог Войны",
                 map: "ruins",
                 startCoins: 100,
-                bossCount: 12,
+                bossCount: 11,
                 enemyMultiplier: 3.5,
                 bossHpMultiplier: 3.3,
                 enemySpeedMultiplier: 1.8,
