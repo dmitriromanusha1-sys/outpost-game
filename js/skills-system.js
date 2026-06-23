@@ -820,7 +820,6 @@ class SkillSystem {
         hotkeyHint.id = 'skills-hotkey';
         document.body.appendChild(hotkeyHint);
 
-        this.addSkillButtonToGameUI();
         this.renderSkillTree();
         this.updateBonusStats();
         this.updateAvailableSkillsIndicators();
@@ -858,47 +857,7 @@ class SkillSystem {
     }
     
     // (заменён на initTabs)
-    
-    // Добавление кнопки в игровой интерфейс
-    addSkillButtonToGameUI() {
-        // Добавляем в правую панель
-        const rightPanel = document.querySelector('.right-panel .control-panel');
-        if (rightPanel) {
-            const skillButton = document.createElement('button');
-            skillButton.className = 'btn btn-success';
-            skillButton.innerHTML = '🌳 Навыки (K)';
-            skillButton.onclick = showSkillsMenu;
-            skillButton.style.marginTop = '10px';
-            
-            // Находим место перед кнопкой возврата в меню
-            const returnButton = rightPanel.querySelector('button[onclick="returnToMenu()"]');
-            if (returnButton) {
-                rightPanel.insertBefore(skillButton, returnButton);
-            } else {
-                rightPanel.appendChild(skillButton);
-            }
-        }
-        
-        // Добавляем в нижнюю панель
-        const bottomPanel = document.querySelector('.bottom-panel .action-buttons');
-        if (bottomPanel) {
-            const skillButton = document.createElement('button');
-            skillButton.className = 'btn';
-            skillButton.innerHTML = '🌳';
-            skillButton.title = 'Навыки (K)';
-            skillButton.onclick = showSkillsMenu;
-            skillButton.style.marginLeft = '5px';
-            
-            // Добавляем перед кнопкой настроек
-            const settingsButton = bottomPanel.querySelector('button[onclick="showSettings()"]');
-            if (settingsButton) {
-                bottomPanel.insertBefore(skillButton, settingsButton);
-            } else {
-                bottomPanel.appendChild(skillButton);
-            }
-        }
-    }
-    
+
     // Обновление UI навыков
     updateSkillUI() {
         const el = id => document.getElementById(id);

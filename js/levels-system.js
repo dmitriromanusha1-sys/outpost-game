@@ -196,6 +196,7 @@ class LevelSystem {
             });
             
             const dropdown = document.getElementById('levels-dropdown');
+            if (!dropdown) return;
             const levelOptions = dropdown.querySelectorAll('.level-option');
             levelOptions[level - 1].classList.add('active');
             

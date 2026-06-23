@@ -2,7 +2,13 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Outpost</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outpost — стратегическая защита в реальном времени</title>
+    <meta name="description" content="Outpost — стратегическая защита в реальном времени. Стройте укрепления, прокачивайте навыки и отбивайте волны врагов.">
+    <meta property="og:title" content="Outpost">
+    <meta property="og:description" content="Стратегическая защита в реальном времени. Стройте укрепления, прокачивайте навыки и отбивайте волны врагов.">
+    <meta property="og:type" content="website">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -75,7 +81,7 @@
                     <span class="med-btn-text">Справочник</span>
                 </button>
             </div>
-            <div class="med-version">Beta · v0.4 · ASPECT</div>
+            <div class="med-version">v1.0 · ASPECT</div>
         </div>
     </div>
 
@@ -893,7 +899,7 @@
                 <div class="about-hero">
                     <div class="about-logo-icon">🏰</div>
                     <div class="about-game-title">Outpost</div>
-                    <div class="about-version-badge">Beta · v0.4</div>
+                    <div class="about-version-badge">v1.0</div>
                     <div class="about-tagline">Стратегическая защита в реальном времени</div>
                 </div>
 
@@ -3370,6 +3376,9 @@ function draw() {
         ctx.translate(-player.x, -player.y);
     }
 
+    ctx.save();
+    graphicsSystem.applyScreenShake();
+
     graphicsSystem.drawMap();
     graphicsSystem.applyLighting();
     graphicsSystem.drawAmbientParticles();
@@ -3383,6 +3392,8 @@ function draw() {
     graphicsSystem.drawParticles();
     graphicsSystem.drawWeather();
     graphicsSystem.drawFloatingTexts();
+
+    ctx.restore();
 
     if (camera.mode === 'follow') {
         ctx.restore();
