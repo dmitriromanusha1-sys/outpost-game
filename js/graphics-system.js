@@ -867,10 +867,14 @@ class GraphicsSystem {
     
     drawEnemy(e) {
         const enemyTexture = this.textures.enemies[e.type];
-        
+        const attackAnim = e.attackAnim || 0;
+        // Выпад в сторону игрока во время удара
+        const lungeX = attackAnim > 0 ? (e.faceX || 0) * attackAnim * 6 : 0;
+        const lungeY = attackAnim > 0 ? (e.faceY || 0) * attackAnim * 6 : 0;
+
         if (enemyTexture && enemyTexture.complete && this.settings.textureQuality !== 'low') {
             this.ctx.save();
-            this.ctx.translate(e.x, e.y);
+            this.ctx.translate(e.x + lungeX, e.y + lungeY);
 
             if (this.settings.shadows) {
                 const shadowSize = e.type === 'boss' ? 50 : e.type === 'marauder' ? 32 : e.type === 'cavalry' ? 36 : e.type === 'swordsman' ? 30 : e.type === 'robber' ? 28 : 24;
@@ -895,6 +899,16 @@ class GraphicsSystem {
             const processedTexture = this.getProcessedTexture('enemies', e.type);
             const textureToUse = processedTexture || enemyTexture;
             this.ctx.drawImage(textureToUse, -size/2, -size/2, size, size);
+
+            // Взмах атаки — дуга в сторону игрока
+            if (attackAnim > 0) {
+                const ang = Math.atan2(e.faceY || 0, e.faceX || 1);
+                this.ctx.strokeStyle = `rgba(255,255,255,${attackAnim * 0.8})`;
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, size/2 + 5, ang - 0.7, ang + 0.7);
+                this.ctx.stroke();
+            }
 
             // Эффект замедления
             if (e.slowEffect && e.slowEffect > 0) {
@@ -942,7 +956,7 @@ class GraphicsSystem {
             this.ctx.restore();
         } else {
             this.ctx.save();
-            this.ctx.translate(e.x, e.y);
+            this.ctx.translate(e.x + lungeX, e.y + lungeY);
 
             if (this.settings.shadows) {
                 const shadowSize = e.type === 'boss' ? 44 : e.type === 'marauder' ? 32 : e.type === 'robber' ? 28 : 24;
@@ -973,6 +987,15 @@ class GraphicsSystem {
             this.ctx.beginPath();
             this.ctx.arc(0, 0, size, 0, Math.PI * 2);
             this.ctx.fill();
+
+            if (attackAnim > 0) {
+                const ang = Math.atan2(e.faceY || 0, e.faceX || 1);
+                this.ctx.strokeStyle = `rgba(255,255,255,${attackAnim * 0.8})`;
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+                this.ctx.arc(0, 0, size + 4, ang - 0.7, ang + 0.7);
+                this.ctx.stroke();
+            }
 
             if (e.type === 'boss') {
                 const pulse = Math.sin(this.gameState.time * 0.08) * 0.4 + 0.6;
