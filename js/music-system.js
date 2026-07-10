@@ -45,9 +45,26 @@ class MusicSystem {
         try {
             await this.audio.play();
             this.isPlaying = true;
-        } catch {
+        } catch (err) {
             this.isPlaying = false;
-            this.showNotification('❌ Не удалось загрузить трек', 'warning');
+            if (err && err.name === 'NotAllowedError') {
+                // Браузер заблокировал автовоспроизведение — попробуем ещё раз
+                // при первом же клике/нажатии клавиши пользователем.
+                const retry = () => {
+                    this.audio.play().then(() => {
+                        this.isPlaying = true;
+                        this.updateUI();
+                        this.highlightCurrentTrack();
+                        this.updateNowPlaying();
+                    }).catch(() => {});
+                    document.removeEventListener('click', retry);
+                    document.removeEventListener('keydown', retry);
+                };
+                document.addEventListener('click', retry, { once: true });
+                document.addEventListener('keydown', retry, { once: true });
+            } else {
+                this.showNotification('❌ Не удалось загрузить трек', 'warning');
+            }
             return;
         }
 

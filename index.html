@@ -3506,7 +3506,15 @@ async function initGame() {
     await musicSystem.checkLocalFiles();
     musicSystem.loadSettings();
     musicSystem.initUI();
-    musicSystem.playMenu();
+    // Браузеры блокируют автовоспроизведение звука до первого жеста
+    // пользователя — запускаем музыку меню по первому клику/нажатию.
+    const _unlockMenuMusic = () => {
+        musicSystem.playMenu();
+        document.removeEventListener('click', _unlockMenuMusic);
+        document.removeEventListener('keydown', _unlockMenuMusic);
+    };
+    document.addEventListener('click', _unlockMenuMusic, { once: true });
+    document.addEventListener('keydown', _unlockMenuMusic, { once: true });
 
     await loadMapTexture(graphicsSystem.gameState.currentMap);
     graphicsSystem.initAmbientParticles(graphicsSystem.gameState.currentMap);
