@@ -2052,6 +2052,7 @@ function hideEndScreenButtons() {
 
 // ======================= ОСНОВНЫЕ ФУНКЦИИ ИГРЫ =======================
 function startLevel(level) {
+    musicSystem.playGame();
     levelSystem.setLevel(level);
     const levelData = levelSystem.getLevelData();
     graphicsSystem.setCurrentMap(levelData.map);
@@ -2848,6 +2849,7 @@ function cleanupDocumentListeners() {
 }
 
 function returnToMenu() {
+    musicSystem.playMenu();
     stopGameLoop();
     cleanupDocumentListeners();
 
@@ -3504,7 +3506,8 @@ async function initGame() {
     await musicSystem.checkLocalFiles();
     musicSystem.loadSettings();
     musicSystem.initUI();
-    
+    musicSystem.playMenu();
+
     await loadMapTexture(graphicsSystem.gameState.currentMap);
     graphicsSystem.initAmbientParticles(graphicsSystem.gameState.currentMap);
     

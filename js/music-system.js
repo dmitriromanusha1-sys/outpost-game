@@ -2,42 +2,8 @@
 class MusicSystem {
     constructor() {
         this.musicTracks = {
-            // Эпическая
-            heroic_charge:      { path: "music/heroic_charge.mp3",      category: "epic",     icon: "⚔️", name: "Героическая атака",       desc: "Героическая атака войск" },
-            dragon_slayer:      { path: "music/dragon_slayer.mp3",      category: "epic",     icon: "🐉", name: "Битва с драконом",        desc: "Битва с могучим драконом" },
-            victory_march:      { path: "music/victory_march.mp3",      category: "epic",     icon: "🎖️", name: "Торжественный марш",     desc: "Торжественный победный марш" },
-            final_confrontation:{ path: "music/final_confrontation.mp3",category: "epic",     icon: "👑", name: "Финальная битва",         desc: "Финальная битва с боссом" },
-            realm_defenders:    { path: "music/realm_defenders.mp3",    category: "epic",     icon: "🏰", name: "Защитники королевства",   desc: "Эпичная оборонительная тема" },
-            // Боевая
-            battle_theme:       { path: "music/battle_theme.mp3",       category: "battle",   icon: "🛡️", name: "Боевая тема",            desc: "Основная боевая тема" },
-            siege_warfare:      { path: "music/siege_warfare.mp3",      category: "battle",   icon: "🏹", name: "Осада замка",             desc: "Музыка для осады замка" },
-            orc_raid:           { path: "music/orc_raid.mp3",           category: "battle",   icon: "👹", name: "Набег орков",             desc: "Быстрая агрессивная музыка" },
-            cavalry_charge:     { path: "music/cavalry_charge.mp3",     category: "battle",   icon: "🐎", name: "Атака кавалерии",        desc: "Стремительная атака кавалерии" },
-            arrow_storm:        { path: "music/arrow_storm.mp3",        category: "battle",   icon: "🎯", name: "Град стрел",              desc: "Быстрые и резкие мелодии" },
-            giants_awakening:   { path: "music/giants_awakening.mp3",   category: "battle",   icon: "👊", name: "Пробуждение великанов",   desc: "Тяжёлая мощная боевая тема" },
-            // Атмосферная
-            dark_forest:        { path: "music/dark_forest.mp3",        category: "ambient",  icon: "🌳", name: "Темный лес",              desc: "Таинственный темный лес" },
-            mystic_caves:       { path: "music/mystic_caves.mp3",       category: "ambient",  icon: "🕳️", name: "Таинственные пещеры",   desc: "Загадочные пещеры" },
-            haunted_ruins:      { path: "music/haunted_ruins.mp3",      category: "ambient",  icon: "👻", name: "Проклятые руины",        desc: "Мрачные древние руины" },
-            foggy_mountains:    { path: "music/foggy_mountains.mp3",    category: "ambient",  icon: "🏔️", name: "Туманные горы",         desc: "Высокие туманные горы" },
-            enchanted_lake:     { path: "music/enchanted_lake.mp3",     category: "ambient",  icon: "🌊", name: "Зачарованное озеро",     desc: "Магическое озеро" },
-            // Фэнтези
-            elven_kingdom:      { path: "music/elven_kingdom.mp3",      category: "fantasy",  icon: "🧝", name: "Королевство эльфов",     desc: "Эльфийские мелодии" },
-            magic_academy:      { path: "music/magic_academy.mp3",      category: "fantasy",  icon: "📚", name: "Академия магии",          desc: "Магическая академия" },
-            fairy_glade:        { path: "music/fairy_glade.mp3",        category: "fantasy",  icon: "🧚", name: "Поляна фей",              desc: "Лёгкие и воздушные мелодии" },
-            wizard_tower:       { path: "music/wizard_tower.mp3",       category: "fantasy",  icon: "🧙", name: "Башня волшебника",        desc: "Таинственная магическая башня" },
-            // Средневековая
-            medieval_town:      { path: "music/medieval_town.mp3",      category: "medieval", icon: "🏘️", name: "Средневековый город",   desc: "Музыка средневекового города" },
-            royal_court:        { path: "music/royal_court.mp3",        category: "medieval", icon: "🏰", name: "Королевский двор",       desc: "Торжественная королевская музыка" },
-            tavern_night:       { path: "music/tavern_night.mp3",       category: "medieval", icon: "🍻", name: "Вечер в таверне",        desc: "Весёлая таверная музыка" },
-            knight_training:    { path: "music/knight_training.mp3",    category: "medieval", icon: "⚔️", name: "Тренировка рыцарей",    desc: "Рыцарские тренировки" },
-            castle_defense:     { path: "music/castle_defense.mp3",     category: "medieval", icon: "🛡️", name: "Оборона замка",         desc: "Музыка для обороны замка" },
-            // Спокойная
-            peaceful_village:   { path: "music/peaceful_village.mp3",   category: "calm",     icon: "🏡", name: "Мирная деревня",          desc: "Спокойная деревенская музыка" },
-            sunrise_fields:     { path: "music/sunrise_fields.mp3",     category: "calm",     icon: "🌅", name: "Рассветные поля",        desc: "Мелодия рассвета" },
-            quiet_river:        { path: "music/quiet_river.mp3",        category: "calm",     icon: "🌊", name: "Тихая река",              desc: "Плавная речная музыка" },
-            autumn_forest:      { path: "music/autumn_forest.mp3",      category: "calm",     icon: "🍂", name: "Осенний лес",             desc: "Осенняя лесная мелодия" },
-            starry_night:       { path: "music/starry_night.mp3",       category: "calm",     icon: "🌌", name: "Звёздная ночь",          desc: "Тихое звёздное небо" }
+            menu: { path: "music/menu.mp3", category: "menu", icon: "🏰", name: "Меню",     desc: "Музыка главного меню" },
+            game: { path: "music/game.mp3", category: "game", icon: "⚔️", name: "Битва",    desc: "Музыка во время игры" }
         };
 
         this.trackList = Object.keys(this.musicTracks);
@@ -48,7 +14,7 @@ class MusicSystem {
         this.availableTracks = new Set();
 
         this.audio = new Audio();
-        this.audio.loop = false; // авто-переход на следующий трек через событие ended
+        this.audio.loop = true; // всего 2 трека (меню/игра) — каждый просто зациклен
         this.audio.volume = 0.5;
 
         this.enabled = true;
@@ -368,6 +334,9 @@ class MusicSystem {
     }
 
     handleHotkey(e) { return false; }
+
+    playMenu() { this.play('menu'); }
+    playGame() { this.play('game'); }
 
     start() { if (this.enabled && !this.isPlaying) this.play(this.currentTrack); }
     stop() { this.pause(); this.audio.src = ''; this.currentTrack = this.trackList[0]; this.currentTrackIndex = 0; this.updateUI(); }
